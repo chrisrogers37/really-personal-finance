@@ -1,0 +1,99 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { PlaidLinkButton } from "@/components/plaid-link";
+import { IncomeSpendingChart } from "@/components/income-spending-chart";
+import { formatCurrency } from "@/lib/utils";
+
+interface MonthlyData {
+  month: string;
+  income: number;
+  spending: number;
+  net: number;
+}
+
+export default function DashboardPage() {
+  const [data, setData] = useState<MonthlyData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  async function fetchData() {
+    setLoading(true);
+    try {
+      const response = await fetch("/api/analytics/income-vs-spending");
+      const json = await response.json();
+      setData(json.monthly || []);
+    } catch {
+      console.error("Failed to fetch analytics");
+    }
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const totalIncome = data.reduce((sum, d) => sum + d.income, 0);
+  const totalSpending = data.reduce((sum, d) => sum + d.spending, 0);
+  const totalNet = totalIncome - totalSpending;
+  const latestMonth = data.length > 0 ? data[data.length - 1] : null;
+
+  return (
+    <div className="space-y-8">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">Dashboard</h1>
+          <p className="text-gray-600">Your financial overview</p>
+        </div>
+        <PlaidLinkButton onSuccess={fetchData} />
+      </div>
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-white p-6 rounded-xl border shadow-sm">
+          <p className="text-sm text-gray-600">This Month Income</p>
+          <p className="text-2xl font-bold text-green-600">
+            {latestMonth ? formatCurrency(latestMonth.income) : "$0.00"}
+          </p>
+        </div>
+        <div className="bg-white p-6 rounded-xl border shadow-sm">
+          <p className="text-sm text-gray-600">This Month Spending</p>
+          <p className="text-2xl font-bold text-red-500">
+            {latestMonth ? formatCurrency(latestMonth.spending) : "$0.00"}
+          </p>
+        </div>
+        <div className="bg-white p-6 rounded-xl border shadow-sm">
+          <p className="text-sm text-gray-600">This Month Net</p>
+          <p
+            className={`text-2xl font-bold ${
+              (latestMonth?.net ?? 0) >= 0 ? "text-green-600" : "text-red-500"
+            }`}
+          >
+            {latestMonth ? formatCurrency(latestMonth.net) : "$0.00"}
+          </p>
+        </div>
+        <div className="bg-white p-6 rounded-xl border shadow-sm">
+          <p className="text-sm text-gray-600">All-Time Net</p>
+          <p
+            className={`text-2xl font-bold ${
+              totalNet >= 0 ? "text-green-600" : "text-red-500"
+            }`}
+          >
+            {formatCurrency(totalNet)}
+          </p>
+        </div>
+      </div>
+
+      {/* Income vs Spending Chart */}
+      <div className="bg-white p-6 rounded-xl border shadow-sm">
+        <h2 className="text-lg font-semibold mb-4">Income vs Spending</h2>
+        {loading ? (
+          <div className="h-96 flex items-center justify-center text-gray-500">
+            Loading...
+          </div>
+        ) : (
+          <IncomeSpendingChart data={data} />
+        )}
+      </div>
+    </div>
+  );
+}
