@@ -2,16 +2,10 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { MerchantChart } from "@/components/merchant-chart";
+import { DateRangeFilter } from "@/components/date-range-filter";
 import { formatCurrency } from "@/lib/utils";
 import { format, subMonths } from "date-fns";
-
-interface MerchantData {
-  merchant: string;
-  total: number;
-  count: number;
-  avgAmount: number;
-  isRecurring: boolean;
-}
+import type { MerchantData } from "@/types";
 
 export default function MerchantsPage() {
   const [data, setData] = useState<MerchantData[]>([]);
@@ -57,32 +51,12 @@ export default function MerchantsPage() {
       </div>
 
       {/* Date filters */}
-      <div className="bg-white p-4 rounded-xl border shadow-sm">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">
-              Start Date
-            </label>
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="w-full px-3 py-2 border rounded-lg text-sm"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">
-              End Date
-            </label>
-            <input
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="w-full px-3 py-2 border rounded-lg text-sm"
-            />
-          </div>
-        </div>
-      </div>
+      <DateRangeFilter
+        startDate={startDate}
+        endDate={endDate}
+        onStartDateChange={setStartDate}
+        onEndDateChange={setEndDate}
+      />
 
       {/* Chart + Table */}
       <div className="bg-white p-6 rounded-xl border shadow-sm">

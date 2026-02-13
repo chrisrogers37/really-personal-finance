@@ -10,14 +10,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { formatCurrency } from "@/lib/utils";
-
-interface MerchantData {
-  merchant: string;
-  total: number;
-  count: number;
-  avgAmount: number;
-  isRecurring: boolean;
-}
+import type { MerchantData } from "@/types";
 
 export function MerchantChart({ data }: { data: MerchantData[] }) {
   if (data.length === 0) {

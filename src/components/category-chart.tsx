@@ -9,12 +9,7 @@ import {
   Legend,
 } from "recharts";
 import { formatCurrency } from "@/lib/utils";
-
-interface CategoryData {
-  category: string;
-  total: number;
-  count: number;
-}
+import type { CategoryData } from "@/types";
 
 const COLORS = [
   "#3b82f6",

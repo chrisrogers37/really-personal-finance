@@ -1,19 +1,7 @@
 "use client";
 
 import { formatCurrency, formatDate } from "@/lib/utils";
-
-interface Transaction {
-  id: string;
-  amount: string;
-  date: string;
-  name: string;
-  merchantName: string | null;
-  categoryPrimary: string | null;
-  categoryDetailed: string | null;
-  pending: boolean;
-  accountName: string | null;
-  accountType: string | null;
-}
+import type { Transaction } from "@/types";
 
 interface TransactionTableProps {
   transactions: Transaction[];
