@@ -187,16 +187,26 @@ export async function sendDailyAlerts() {
     .from(telegramConfigs)
     .where(eq(telegramConfigs.enabled, true));
 
-  for (const config of configs) {
-    // Daily summary
-    const summary = await getDailySummary(config.userId);
-    await sendTelegramMessage(config.chatId, summary);
+  const results = await Promise.allSettled(
+    configs.map(async (config) => {
+      // Daily summary
+      const summary = await getDailySummary(config.userId);
+      await sendTelegramMessage(config.chatId, summary);
 
-    // Anomaly detection
-    const anomaly = await detectAnomalies(config.userId);
-    if (anomaly) {
-      await sendTelegramMessage(config.chatId, anomaly);
-    }
+      // Anomaly detection
+      const anomaly = await detectAnomalies(config.userId);
+      if (anomaly) {
+        await sendTelegramMessage(config.chatId, anomaly);
+      }
+    })
+  );
+
+  const failures = results.filter((r) => r.status === "rejected");
+  if (failures.length > 0) {
+    console.error(
+      `Daily alerts: ${failures.length}/${configs.length} failed`,
+      failures.map((f) => (f as PromiseRejectedResult).reason)
+    );
   }
 }
 
@@ -210,8 +220,18 @@ export async function sendWeeklyAlerts() {
     .from(telegramConfigs)
     .where(eq(telegramConfigs.enabled, true));
 
-  for (const config of configs) {
-    const comparison = await getWeeklyComparison(config.userId);
-    await sendTelegramMessage(config.chatId, comparison);
+  const results = await Promise.allSettled(
+    configs.map(async (config) => {
+      const comparison = await getWeeklyComparison(config.userId);
+      await sendTelegramMessage(config.chatId, comparison);
+    })
+  );
+
+  const failures = results.filter((r) => r.status === "rejected");
+  if (failures.length > 0) {
+    console.error(
+      `Weekly alerts: ${failures.length}/${configs.length} failed`,
+      failures.map((f) => (f as PromiseRejectedResult).reason)
+    );
   }
 }
