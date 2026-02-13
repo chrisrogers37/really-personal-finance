@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 import Email from "next-auth/providers/email";
+import { updateUserProfile } from "@/lib/scd2";
 import { db } from "@/db";
 import { users, sessions, verificationTokens } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
@@ -81,38 +82,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
     async updateUser(user) {
       if (!user.id) throw new Error("User ID required");
-      // SCD2: close current row and insert new version
-      const [current] = await db
-        .select()
-        .from(users)
-        .where(and(eq(users.userId, user.id), eq(users.isCurrent, true)))
-        .limit(1);
 
-      if (!current) throw new Error("User not found");
-
-      const now = new Date();
-
-      // Close current row
-      await db
-        .update(users)
-        .set({ validTo: now, isCurrent: false })
-        .where(eq(users.id, current.id));
-
-      // Insert new version
-      const [updated] = await db
-        .insert(users)
-        .values({
-          userId: current.userId,
-          email: user.email ?? current.email,
-          name: user.name ?? current.name,
-          emailVerified:
-            user.emailVerified !== undefined
-              ? user.emailVerified
-              : current.emailVerified,
-          validFrom: now,
-          isCurrent: true,
-        })
-        .returning();
+      const updated = await updateUserProfile(user.id, {
+        name: user.name ?? undefined,
+        email: user.email ?? undefined,
+        emailVerified: user.emailVerified,
+      });
 
       return {
         id: updated.userId,
@@ -123,7 +98,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
 
     async deleteUser(userId) {
-      // Mark all versions as not current
+      // Mark all versions as not current.
+      // Single UPDATE statement -- inherently atomic in PostgreSQL,
+      // no explicit transaction needed.
       await db
         .update(users)
         .set({ validTo: new Date(), isCurrent: false })
