@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { transactions, accounts } from "@/db/schema";
 import { eq, and, gte, lte, ilike, desc } from "drizzle-orm";
+import { clampInt, isValidDateParam } from "@/lib/validation";
 
 export async function GET(request: NextRequest) {
   const session = await auth();
@@ -16,8 +17,18 @@ export async function GET(request: NextRequest) {
   const category = searchParams.get("category");
   const merchant = searchParams.get("merchant");
   const accountId = searchParams.get("accountId");
-  const limit = parseInt(searchParams.get("limit") || "100");
-  const offset = parseInt(searchParams.get("offset") || "0");
+
+  // Clamp limit to [1, 200], default 100
+  const limit = clampInt(searchParams.get("limit"), 100, 1, 200);
+  // Clamp offset to [0, 100000], default 0
+  const offset = clampInt(searchParams.get("offset"), 0, 0, 100000);
+
+  if (startDate && !isValidDateParam(startDate)) {
+    return NextResponse.json({ error: "Invalid startDate format. Use YYYY-MM-DD." }, { status: 400 });
+  }
+  if (endDate && !isValidDateParam(endDate)) {
+    return NextResponse.json({ error: "Invalid endDate format. Use YYYY-MM-DD." }, { status: 400 });
+  }
 
   const conditions = [eq(transactions.userId, session.user.id)];
 

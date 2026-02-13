@@ -3,6 +3,7 @@ import { db } from "@/db";
 import { telegramConfigs, users } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { sendTelegramMessage } from "@/lib/telegram";
+import { timingSafeCompare } from "@/lib/validation";
 
 interface TelegramUpdate {
   message?: {
@@ -13,6 +14,20 @@ interface TelegramUpdate {
 }
 
 export async function POST(request: NextRequest) {
+  // Webhook secret verification
+  // Telegram sends X-Telegram-Bot-Api-Secret-Token when registered with secret_token
+  const secretToken = request.headers.get("x-telegram-bot-api-secret-token");
+  const expectedSecret = process.env.TELEGRAM_WEBHOOK_SECRET;
+
+  if (!expectedSecret) {
+    console.error("TELEGRAM_WEBHOOK_SECRET is not configured");
+    return NextResponse.json({ error: "Server misconfiguration" }, { status: 500 });
+  }
+
+  if (!secretToken || !timingSafeCompare(secretToken, expectedSecret)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const update: TelegramUpdate = await request.json();
 
   if (!update.message?.text) {
