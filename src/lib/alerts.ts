@@ -1,7 +1,8 @@
 import { db } from "@/db";
 import { transactions, telegramConfigs } from "@/db/schema";
 import { eq, and, gte, lte, sql } from "drizzle-orm";
-import { sendTelegramMessage, formatCurrency } from "@/lib/telegram";
+import { sendTelegramMessage } from "@/lib/telegram";
+import { formatCurrency } from "@/lib/utils";
 import { format, subDays, startOfWeek, endOfWeek, subWeeks } from "date-fns";
 
 export async function getDailySummary(userId: string): Promise<string> {

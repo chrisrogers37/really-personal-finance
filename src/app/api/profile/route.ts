@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { updateUserProfile, getUserHistory } from "@/lib/scd2";
+import { updateUserProfile } from "@/lib/scd2";
 
 export async function GET() {
   const session = await auth();
@@ -53,9 +53,4 @@ export async function PUT(request: NextRequest) {
       name: updated.name,
     },
   });
-}
-
-export async function GET_HISTORY() {
-  // Exposed at /api/profile/history
-  return null;
 }

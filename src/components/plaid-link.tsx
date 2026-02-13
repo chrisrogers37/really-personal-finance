@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { usePlaidLink } from "react-plaid-link";
 
 interface PlaidLinkButtonProps {
@@ -59,9 +59,11 @@ export function PlaidLinkButton({ onSuccess }: PlaidLinkButtonProps) {
   });
 
   // Auto-open when link token is ready
-  if (linkToken && ready) {
-    open();
-  }
+  useEffect(() => {
+    if (linkToken && ready) {
+      open();
+    }
+  }, [linkToken, ready, open]);
 
   return (
     <div>

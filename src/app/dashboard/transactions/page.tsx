@@ -3,19 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { TransactionTable } from "@/components/transaction-table";
 import { format, subMonths } from "date-fns";
-
-interface Transaction {
-  id: string;
-  amount: string;
-  date: string;
-  name: string;
-  merchantName: string | null;
-  categoryPrimary: string | null;
-  categoryDetailed: string | null;
-  pending: boolean;
-  accountName: string | null;
-  accountType: string | null;
-}
+import type { Transaction } from "@/types";
 
 export default function TransactionsPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);

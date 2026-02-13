@@ -2,14 +2,10 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { CategoryChart } from "@/components/category-chart";
+import { DateRangeFilter } from "@/components/date-range-filter";
 import { formatCurrency } from "@/lib/utils";
 import { format, subMonths } from "date-fns";
-
-interface CategoryData {
-  category: string;
-  total: number;
-  count: number;
-}
+import type { CategoryData } from "@/types";
 
 export default function CategoriesPage() {
   const [data, setData] = useState<CategoryData[]>([]);
@@ -54,32 +50,12 @@ export default function CategoriesPage() {
       </div>
 
       {/* Date filters */}
-      <div className="bg-white p-4 rounded-xl border shadow-sm">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">
-              Start Date
-            </label>
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="w-full px-3 py-2 border rounded-lg text-sm"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">
-              End Date
-            </label>
-            <input
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="w-full px-3 py-2 border rounded-lg text-sm"
-            />
-          </div>
-        </div>
-      </div>
+      <DateRangeFilter
+        startDate={startDate}
+        endDate={endDate}
+        onStartDateChange={setStartDate}
+        onEndDateChange={setEndDate}
+      />
 
       {/* Chart */}
       <div className="bg-white p-6 rounded-xl border shadow-sm">
