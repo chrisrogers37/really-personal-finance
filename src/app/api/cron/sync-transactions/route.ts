@@ -38,105 +38,118 @@ export async function GET(request: NextRequest) {
   let totalAdded = 0;
   let totalModified = 0;
   let totalRemoved = 0;
+  const errors: { itemId: string; error: string }[] = [];
 
   for (const [itemId, item] of itemMap) {
-    let cursor = item.cursor;
-    let hasMore = true;
+    try {
+      let cursor = item.cursor;
+      let hasMore = true;
 
-    while (hasMore) {
-      const response = await plaidClient.transactionsSync({
-        access_token: item.accessToken,
-        cursor: cursor ?? undefined,
-        count: 500,
-      });
+      while (hasMore) {
+        const response = await plaidClient.transactionsSync({
+          access_token: item.accessToken,
+          cursor: cursor ?? undefined,
+          count: 500,
+        });
 
-      const { added, modified, removed, next_cursor, has_more } =
-        response.data;
+        const { added, modified, removed, next_cursor, has_more } =
+          response.data;
 
-      // Insert new transactions
-      if (added.length > 0) {
-        for (const txn of added) {
-          // Find the matching account
-          const matchingAccount = item.accounts.find(
-            (a) => a.plaidAccountId === txn.account_id
-          );
-          if (!matchingAccount) continue;
-
-          await db
-            .insert(transactions)
-            .values({
-              accountId: matchingAccount.id,
-              userId: item.userId,
-              plaidTransactionId: txn.transaction_id,
-              amount: txn.amount.toString(),
-              date: txn.date,
-              name: txn.name,
-              merchantName: txn.merchant_name ?? null,
-              categoryPrimary:
-                txn.personal_finance_category?.primary ?? null,
-              categoryDetailed:
-                txn.personal_finance_category?.detailed ?? null,
-              pending: txn.pending,
+        // Batch insert new transactions
+        if (added.length > 0) {
+          const values = added
+            .map((txn) => {
+              const matchingAccount = item.accounts.find(
+                (a) => a.plaidAccountId === txn.account_id
+              );
+              if (!matchingAccount) return null;
+              return {
+                accountId: matchingAccount.id,
+                userId: item.userId,
+                plaidTransactionId: txn.transaction_id,
+                amount: txn.amount.toString(),
+                date: txn.date,
+                name: txn.name,
+                merchantName: txn.merchant_name ?? null,
+                categoryPrimary:
+                  txn.personal_finance_category?.primary ?? null,
+                categoryDetailed:
+                  txn.personal_finance_category?.detailed ?? null,
+                pending: txn.pending,
+              };
             })
-            .onConflictDoNothing({ target: transactions.plaidTransactionId });
-        }
-        totalAdded += added.length;
-      }
+            .filter((v): v is NonNullable<typeof v> => v !== null);
 
-      // Update modified transactions
-      if (modified.length > 0) {
-        for (const txn of modified) {
-          await db
-            .update(transactions)
-            .set({
-              amount: txn.amount.toString(),
-              date: txn.date,
-              name: txn.name,
-              merchantName: txn.merchant_name ?? null,
-              categoryPrimary:
-                txn.personal_finance_category?.primary ?? null,
-              categoryDetailed:
-                txn.personal_finance_category?.detailed ?? null,
-              pending: txn.pending,
-            })
-            .where(
-              eq(transactions.plaidTransactionId, txn.transaction_id)
-            );
-        }
-        totalModified += modified.length;
-      }
-
-      // Remove deleted transactions
-      if (removed.length > 0) {
-        for (const txn of removed) {
-          if (txn.transaction_id) {
+          if (values.length > 0) {
             await db
-              .delete(transactions)
+              .insert(transactions)
+              .values(values)
+              .onConflictDoNothing({ target: transactions.plaidTransactionId });
+          }
+          totalAdded += added.length;
+        }
+
+        // Update modified transactions (must be individual -- different WHERE per row)
+        if (modified.length > 0) {
+          for (const txn of modified) {
+            await db
+              .update(transactions)
+              .set({
+                amount: txn.amount.toString(),
+                date: txn.date,
+                name: txn.name,
+                merchantName: txn.merchant_name ?? null,
+                categoryPrimary:
+                  txn.personal_finance_category?.primary ?? null,
+                categoryDetailed:
+                  txn.personal_finance_category?.detailed ?? null,
+                pending: txn.pending,
+              })
               .where(
                 eq(transactions.plaidTransactionId, txn.transaction_id)
               );
           }
+          totalModified += modified.length;
         }
-        totalRemoved += removed.length;
+
+        // Remove deleted transactions
+        if (removed.length > 0) {
+          for (const txn of removed) {
+            if (txn.transaction_id) {
+              await db
+                .delete(transactions)
+                .where(
+                  eq(transactions.plaidTransactionId, txn.transaction_id)
+                );
+            }
+          }
+          totalRemoved += removed.length;
+        }
+
+        cursor = next_cursor;
+        hasMore = has_more;
       }
 
-      cursor = next_cursor;
-      hasMore = has_more;
-    }
-
-    // Update cursor for all accounts in this item
-    for (const acct of item.accounts) {
-      await db
-        .update(accounts)
-        .set({ cursor })
-        .where(eq(accounts.id, acct.id));
+      // Update cursor for all accounts in this item
+      for (const acct of item.accounts) {
+        await db
+          .update(accounts)
+          .set({ cursor })
+          .where(eq(accounts.id, acct.id));
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.error(`Sync failed for item ${itemId}:`, message);
+      errors.push({ itemId, error: message });
+      // Continue to next item -- don't abort the entire job
     }
   }
 
   return NextResponse.json({
-    success: true,
+    success: errors.length === 0,
     added: totalAdded,
     modified: totalModified,
     removed: totalRemoved,
+    errors: errors.length > 0 ? errors : undefined,
   });
 }
