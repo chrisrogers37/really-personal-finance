@@ -102,6 +102,20 @@ Key tables: `users`, `accounts`, `transactions`, `telegram_configs`, `sessions`,
 
 See `src/db/schema.ts` for the complete schema.
 
+## Documentation
+
+Detailed documentation for maintainers and contributors is in the [`docs/`](docs/) directory:
+
+| Document | Description |
+|----------|-------------|
+| [Architecture Guide](docs/ARCHITECTURE.md) | System overview, design patterns (SCD2, cursor-based sync, encrypted storage), module dependencies, data flow, and how to add new features |
+| [API Reference](docs/API.md) | Every API endpoint with request/response examples, query parameters, authentication requirements, and the Plaid amount convention |
+| [Database Guide](docs/DATABASE.md) | All tables, columns, indexes, constraints, query patterns, the Neon HTTP driver, and how to make schema changes |
+| [Development Guide](docs/DEVELOPMENT.md) | Local setup, environment variables, npm scripts, testing, Plaid sandbox, Vercel deployment, and code conventions |
+| [Component Reference](docs/COMPONENTS.md) | Every React component and page with props, behavior, state management, and TypeScript interfaces |
+| [Security Documentation](docs/SECURITY.md) | Authentication, encryption, route protection, webhook security, input validation, and a security checklist for new features |
+| [Telegram Bot Guide](docs/TELEGRAM.md) | Bot setup, webhook configuration, all commands, automated alerts, anomaly detection, and how to extend the bot |
+
 ## License
 
 MIT
