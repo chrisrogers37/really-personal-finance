@@ -86,6 +86,11 @@ export function TransactionTable({
                 </td>
                 <td className="py-3 px-2 text-gray-500 text-xs">
                   {txn.accountName}
+                  {txn.source === "import" && (
+                    <span className="ml-1 px-1 py-0.5 bg-blue-50 text-blue-600 rounded text-[10px]">
+                      Import
+                    </span>
+                  )}
                 </td>
                 <td
                   className={`py-3 px-2 text-right font-medium whitespace-nowrap ${

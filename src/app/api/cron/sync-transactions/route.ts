@@ -24,6 +24,9 @@ export async function GET(request: NextRequest) {
   >();
 
   for (const acct of allAccounts) {
+    // Skip non-Plaid accounts (manual/import accounts have no Plaid fields)
+    if (!acct.plaidItemId || !acct.plaidAccessToken || !acct.plaidAccountId) continue;
+
     if (!itemMap.has(acct.plaidItemId)) {
       itemMap.set(acct.plaidItemId, {
         accessToken: decrypt(acct.plaidAccessToken),
@@ -76,6 +79,7 @@ export async function GET(request: NextRequest) {
                 categoryDetailed:
                   txn.personal_finance_category?.detailed ?? null,
                 pending: txn.pending,
+                source: "plaid" as const,
               };
             })
             .filter((v): v is NonNullable<typeof v> => v !== null);

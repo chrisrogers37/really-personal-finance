@@ -74,19 +74,20 @@ export const verificationTokens = pgTable(
   }
 );
 
-// ─── Bank Accounts (via Plaid) ────────────────────────────────────────────────
+// ─── Bank Accounts ───────────────────────────────────────────────────────────
 export const accounts = pgTable(
   "accounts",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     userId: uuid("user_id").notNull(),
-    plaidItemId: text("plaid_item_id").notNull(),
-    plaidAccessToken: text("plaid_access_token").notNull(),
-    plaidAccountId: text("plaid_account_id").notNull(),
+    plaidItemId: text("plaid_item_id"),
+    plaidAccessToken: text("plaid_access_token"),
+    plaidAccountId: text("plaid_account_id"),
     name: text("name").notNull(),
     type: text("type").notNull(),
     subtype: text("subtype"),
     mask: text("mask"),
+    source: text("source").notNull().default("plaid"),
     cursor: text("cursor"),
     createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
   },
@@ -103,7 +104,8 @@ export const transactions = pgTable(
     id: uuid("id").defaultRandom().primaryKey(),
     accountId: uuid("account_id").notNull(),
     userId: uuid("user_id").notNull(),
-    plaidTransactionId: text("plaid_transaction_id").notNull().unique(),
+    plaidTransactionId: text("plaid_transaction_id").unique(),
+    importId: text("import_id").unique(),
     amount: decimal("amount", { precision: 12, scale: 2 }).notNull(),
     date: date("date", { mode: "string" }).notNull(),
     name: text("name").notNull(),
@@ -111,6 +113,7 @@ export const transactions = pgTable(
     categoryPrimary: text("category_primary"),
     categoryDetailed: text("category_detailed"),
     pending: boolean("pending").notNull().default(false),
+    source: text("source").notNull().default("plaid"),
     createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
   },
   (table) => [
