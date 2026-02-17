@@ -58,6 +58,7 @@ export async function GET(request: NextRequest) {
       categoryPrimary: transactions.categoryPrimary,
       categoryDetailed: transactions.categoryDetailed,
       pending: transactions.pending,
+      source: transactions.source,
       accountName: accounts.name,
       accountType: accounts.type,
     })
