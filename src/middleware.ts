@@ -1,12 +1,16 @@
-import { auth } from "@/lib/auth";
+import NextAuth from "next-auth";
+import { authConfig } from "@/lib/auth.config";
 import { NextResponse } from "next/server";
+
+// Use the lightweight auth config (no Email provider / nodemailer)
+// so middleware can run in the Edge Runtime.
+const { auth } = NextAuth(authConfig);
 
 export default auth((req) => {
   const isLoggedIn = !!req.auth;
   const isAuthPage = req.nextUrl.pathname.startsWith("/auth");
   const isDashboardPage = req.nextUrl.pathname.startsWith("/dashboard");
   const isProfilePage = req.nextUrl.pathname.startsWith("/profile");
-  const isApiRoute = req.nextUrl.pathname.startsWith("/api");
   const isCronRoute = req.nextUrl.pathname.startsWith("/api/cron");
   const isTelegramRoute = req.nextUrl.pathname.startsWith("/api/telegram");
 
