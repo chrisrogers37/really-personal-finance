@@ -9,6 +9,7 @@ import {
   Receipt,
   PieChart,
   Store,
+  Upload,
   User,
   LogOut,
 } from "lucide-react";
@@ -18,6 +19,7 @@ const navItems = [
   { href: "/dashboard/transactions", label: "Transactions", icon: Receipt },
   { href: "/dashboard/categories", label: "Categories", icon: PieChart },
   { href: "/dashboard/merchants", label: "Merchants", icon: Store },
+  { href: "/dashboard/import", label: "Import", icon: Upload },
 ];
 
 export default function DashboardLayout({
