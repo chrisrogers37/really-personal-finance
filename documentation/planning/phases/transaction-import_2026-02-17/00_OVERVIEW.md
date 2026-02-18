@@ -3,7 +3,7 @@
 **Session:** transaction-import
 **Date:** 2026-02-17
 **Scope:** CSV and OFX/QFX import as a first-class alternative to Plaid
-**Status:** 🔧 IN PROGRESS
+**Status:** ✅ COMPLETE
 
 ## Context
 
@@ -34,7 +34,7 @@ Plaid sandbox works but production approval is uncertain for a personal-use app.
 | 02 | File Parsers | CSV + OFX parser library with format auto-detection | Medium | None | ✅ PR #8 |
 | 03 | Manual Accounts | API + UI for creating non-Plaid accounts | Low | Phase 01 | ✅ PR #9 |
 | 04 | Import API + Dedup | Upload endpoint, preview, duplicate detection, confirm+insert | Medium | Phases 01, 02, 03 | ✅ PR #10 |
-| 05 | Import UI | Drag-and-drop upload component, preview table, dedup confirmation | Medium | Phase 04 |
+| 05 | Import UI | Drag-and-drop upload component, preview table, dedup confirmation | Medium | Phase 04 | ✅ PR #11 |
 
 ## Dependency Graph
 
