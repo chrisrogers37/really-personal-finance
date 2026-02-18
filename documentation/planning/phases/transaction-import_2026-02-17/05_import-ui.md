@@ -1,8 +1,8 @@
 # Phase 05: Import UI
 
 **PR Title:** feat: add drag-and-drop transaction import UI with preview
-**Risk:** Low | **Effort:** Medium | **Status:** 🔧 IN PROGRESS
-**Started:** 2026-02-17
+**Risk:** Low | **Effort:** Medium | **Status:** ✅ COMPLETE
+**Started:** 2026-02-17 | **Completed:** 2026-02-17
 
 ### Challenge Round Decisions
 1. **Bug fix:** `useState(() => { fetch(...) })` → `useEffect(() => { ... }, [])` for account fetching on mount
