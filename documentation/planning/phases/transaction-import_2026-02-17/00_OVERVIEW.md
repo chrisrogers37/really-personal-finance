@@ -30,9 +30,9 @@ Plaid sandbox works but production approval is uncertain for a personal-use app.
 
 | # | Phase | PR Scope | Effort | Dependencies |
 |---|-------|----------|--------|-------------|
-| 01 | Schema Evolution | Add `source` column, make `plaidTransactionId` nullable, add manual accounts support | Low | None |
-| 02 | File Parsers | CSV + OFX parser library with format auto-detection | Medium | None | 🔧 IN PROGRESS |
-| 03 | Manual Accounts | API + UI for creating non-Plaid accounts | Low | Phase 01 |
+| 01 | Schema Evolution | Add `source` column, make `plaidTransactionId` nullable, add manual accounts support | Low | None | ✅ PR #7 |
+| 02 | File Parsers | CSV + OFX parser library with format auto-detection | Medium | None | ✅ PR #8 |
+| 03 | Manual Accounts | API + UI for creating non-Plaid accounts | Low | Phase 01 | ✅ PR #9 |
 | 04 | Import API + Dedup | Upload endpoint, preview, duplicate detection, confirm+insert | Medium | Phases 01, 02, 03 |
 | 05 | Import UI | Drag-and-drop upload component, preview table, dedup confirmation | Medium | Phase 04 |
 
