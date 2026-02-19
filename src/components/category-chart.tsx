@@ -6,25 +6,66 @@ import {
   Cell,
   ResponsiveContainer,
   Tooltip,
-  Legend,
 } from "recharts";
 import { formatCurrency } from "@/lib/utils";
 import type { CategoryData } from "@/types";
 
 const COLORS = [
-  "#3b82f6",
-  "#ef4444",
-  "#22c55e",
-  "#f59e0b",
-  "#8b5cf6",
-  "#ec4899",
-  "#14b8a6",
-  "#f97316",
-  "#6366f1",
-  "#84cc16",
-  "#06b6d4",
-  "#e11d48",
+  "#3b82f6", // blue-500
+  "#ef4444", // red-500
+  "#22c55e", // green-500
+  "#f59e0b", // amber-500
+  "#8b5cf6", // violet-500
+  "#ec4899", // pink-500
+  "#14b8a6", // teal-500
+  "#f97316", // orange-500
+  "#a78bfa", // violet-400 (avoids indigo accent collision)
+  "#a3e635", // lime-400 (brighter on dark)
+  "#06b6d4", // cyan-500
+  "#e11d48", // rose-600
 ];
+
+const CHART_THEME = {
+  tooltip: {
+    contentStyle: {
+      backgroundColor: "rgba(19, 17, 28, 0.9)",
+      border: "1px solid rgba(255, 255, 255, 0.1)",
+      borderRadius: "12px",
+      backdropFilter: "blur(12px)",
+    },
+    labelStyle: { color: "#ffffff", fontWeight: 600 },
+    itemStyle: { color: "#a1a1aa" },
+  },
+} as const;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function renderPieLabel(props: any) {
+  const cx = Number(props.cx ?? 0);
+  const cy = Number(props.cy ?? 0);
+  const midAngle = Number(props.midAngle ?? 0);
+  const innerRadius = Number(props.innerRadius ?? 0);
+  const outerRadius = Number(props.outerRadius ?? 0);
+  const name = String(props.name ?? "");
+  const percent = Number(props.percent ?? 0);
+
+  const RADIAN = Math.PI / 180;
+  const radius = innerRadius + (outerRadius - innerRadius) * 1.4;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+  return (
+    <text
+      x={x}
+      y={y}
+      fill="#a1a1aa"
+      textAnchor={x > cx ? "start" : "end"}
+      dominantBaseline="central"
+      fontSize={12}
+    >
+      {`${name} ${(percent * 100).toFixed(0)}%`}
+    </text>
+  );
+}
 
 export function CategoryChart({ data }: { data: CategoryData[] }) {
   if (data.length === 0) {
@@ -48,10 +89,8 @@ export function CategoryChart({ data }: { data: CategoryData[] }) {
               innerRadius={60}
               dataKey="total"
               nameKey="category"
-              label={(props) =>
-                `${props.name ?? ""} ${((props.percent ?? 0) * 100).toFixed(0)}%`
-              }
-              labelLine={true}
+              label={renderPieLabel}
+              labelLine={{ stroke: "#71717a" }}
             >
               {data.map((_, index) => (
                 <Cell
@@ -62,6 +101,9 @@ export function CategoryChart({ data }: { data: CategoryData[] }) {
             </Pie>
             <Tooltip
               formatter={(value) => formatCurrency(Number(value ?? 0))}
+              contentStyle={CHART_THEME.tooltip.contentStyle}
+              labelStyle={CHART_THEME.tooltip.labelStyle}
+              itemStyle={CHART_THEME.tooltip.itemStyle}
             />
           </PieChart>
         </ResponsiveContainer>
