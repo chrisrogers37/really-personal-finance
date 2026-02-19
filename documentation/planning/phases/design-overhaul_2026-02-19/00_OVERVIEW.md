@@ -27,8 +27,8 @@ Transform the app from a generic light-mode "AI vibe-coded" template to a sleek,
 | 02 | `02_glassmorphism-cards.md` | ✅ COMPLETE — Glassmorphism cards with backdrop-blur, updated tokens, auth variant. | High | Low-Med |
 | 03 | `03_landing-page-redesign.md` | ✅ COMPLETE (PR #14) — Complete landing page rewrite. Gradient hero, Lucide icons, glassmorphism feature cards, trust section. | High | Medium |
 | 04 | `04_auth-pages-redesign.md` | ✅ COMPLETE (PR #15) — Restyle signin, verify, error pages. Replace emoji icons with Lucide SVGs. Fix mobile overflow. | Medium | Low |
-| 05 | `05_dark-themed-charts.md` | Retheme all Recharts components for dark backgrounds. Dark grids, styled tooltips, themed axes. | High | Medium |
-| 06 | `06_responsive-sidebar.md` | Collapsible sidebar with mobile drawer navigation. Hamburger menu, slide-out overlay. | High | Medium |
+| 05 | `05_dark-themed-charts.md` | ✅ COMPLETE (PR #16) — Retheme all Recharts components for dark backgrounds. Dark grids, styled tooltips, themed axes. | High | Medium |
+| 06 | `06_responsive-sidebar.md` | ✅ COMPLETE (PR #17) — Collapsible sidebar with mobile drawer navigation. Hamburger menu, slide-out overlay. | High | Medium |
 | 07 | `07_animations-micro-interactions.md` | CSS keyframe animations, page entrance effects, card hover glow, button press feedback, shimmer loaders. | Medium | Medium |
 
 ---
