@@ -16,6 +16,11 @@ I now have a thorough understanding of the entire codebase, its current animatio
 
 # Phase 07 -- Animations and Micro-Interactions
 
+**Status:** ✅ COMPLETE
+**Started:** 2026-02-19
+**Completed:** 2026-02-19
+**PR:** #18
+
 **PR Title:** `feat: add animations and micro-interactions for polished UX`
 
 **Risk:** Medium -- animations can cause performance regressions (layout jank, paint storms) and accessibility violations if `prefers-reduced-motion` is not respected.
@@ -81,11 +86,15 @@ The 4 summary cards on the dashboard page use `animation-delay` to create a stag
 
 ## 3. Dependencies
 
-- **Depends on:** Phase 01 (dark palette with `#0c0a14` background). The glass card `bg-white/5` references in hover states assume the dark theme is in place.
-- **Ideally after:** Phase 02 (glass card styling). The hover effects (`hover:bg-white/8 hover:border-white/15`) assume cards already have `bg-white/5 backdrop-blur-xl border border-white/10`.
-- **Can be adapted:** If this phase ships before the dark theme, the hover values should use the light-theme equivalents instead (e.g., `hover:bg-gray-50`, `hover:shadow-md`). The keyframe definitions and animation utilities are palette-agnostic and work regardless of theme ordering.
+- **Depends on:** Phase 01 (dark palette), Phase 02 (glassmorphism cards). ✅ All dependencies merged.
+- **All prior phases (01-06) are complete.** The file-by-file changes in Section 4.2 were written pre-Phase 01 and reference stale light-mode classes. Implementation uses the CURRENT dark-theme codebase as the baseline.
 
-**IMPORTANT NOTE ON PALETTE SEQUENCING:** The detailed file-by-file changes below are written for the **current light-theme codebase** (white backgrounds, gray borders, blue accents). If Phase 01/02 land first, the hover classes like `hover:bg-gray-50` should be swapped for dark-theme equivalents like `hover:bg-white/8`. The keyframe definitions in `globals.css` are identical either way.
+**Challenge Round Resolutions (2026-02-19):**
+- Card hover: Use `hover:bg-white/8 hover:border-white/15 hover:-translate-y-0.5` (glass brightening) instead of `hover:shadow-md` (invisible on dark backgrounds)
+- Glow keyframe: Include in globals.css for future accent use, even though no element applies it yet
+- Dashboard layout: Apply `animate-fade-in-up` per-page (not on layout `<main>`) since Phase 06 rewrote the layout
+- `src/app/layout.tsx`: Dropped from file list (no changes needed)
+- All "before" code in Section 4.2 is stale — implementation references current codebase directly
 
 ---
 
