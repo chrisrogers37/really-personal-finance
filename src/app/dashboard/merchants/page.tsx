@@ -59,7 +59,7 @@ export default function MerchantsPage() {
       />
 
       {/* Chart + Table */}
-      <div className="bg-background-card p-6 rounded-xl border border-border">
+      <div className="bg-background-card backdrop-blur-xl p-6 rounded-2xl border border-border">
         {loading ? (
           <div className="h-80 flex items-center justify-center text-foreground-tertiary">
             Loading...

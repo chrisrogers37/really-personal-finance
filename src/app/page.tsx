@@ -4,7 +4,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-background-elevated border-b border-border">
+      <header className="bg-background-card backdrop-blur-xl border-b border-border">
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
           <h1 className="text-xl font-bold">Really Personal Finance</h1>
           <Link
@@ -36,7 +36,7 @@ export default function Home() {
 
         {/* Features */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20">
-          <div className="bg-background-card p-6 rounded-xl border border-border">
+          <div className="bg-background-card backdrop-blur-xl p-6 rounded-2xl border border-border">
             <div className="text-2xl mb-3">&#127974;</div>
             <h3 className="text-lg font-semibold mb-2">
               Connect Your Banks
@@ -47,7 +47,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="bg-background-card p-6 rounded-xl border border-border">
+          <div className="bg-background-card backdrop-blur-xl p-6 rounded-2xl border border-border">
             <div className="text-2xl mb-3">&#128200;</div>
             <h3 className="text-lg font-semibold mb-2">See the Big Picture</h3>
             <p className="text-foreground-muted text-sm">
@@ -56,7 +56,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="bg-background-card p-6 rounded-xl border border-border">
+          <div className="bg-background-card backdrop-blur-xl p-6 rounded-2xl border border-border">
             <div className="text-2xl mb-3">&#128276;</div>
             <h3 className="text-lg font-semibold mb-2">Telegram Alerts</h3>
             <p className="text-foreground-muted text-sm">
@@ -67,8 +67,8 @@ export default function Home() {
         </div>
 
         {/* Privacy Notice */}
-        <div className="mt-20 bg-warning/10 border border-warning/20 rounded-xl p-6 text-center">
-          <h3 className="font-semibold text-warning mb-2">
+        <div className="mt-20 bg-indigo-500/5 backdrop-blur-xl border border-border rounded-2xl p-6 text-center">
+          <h3 className="font-semibold text-indigo-300 mb-2">
             Privacy Notice
           </h3>
           <p className="text-foreground-muted text-sm max-w-xl mx-auto">
@@ -81,7 +81,7 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border bg-background-elevated">
+      <footer className="border-t border-border bg-background-card backdrop-blur-xl">
         <div className="max-w-5xl mx-auto px-4 py-6 text-center text-sm text-foreground-tertiary">
           Really Personal Finance — Open Source
         </div>

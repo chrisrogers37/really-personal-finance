@@ -51,7 +51,7 @@ export function FileDropzone({
       onDragOver={handleDrag}
       onDrop={handleDrop}
       className={`
-        border-2 border-dashed rounded-xl p-12 text-center cursor-pointer
+        border-2 border-dashed rounded-2xl p-12 text-center cursor-pointer
         transition-colors duration-200
         ${
           dragActive

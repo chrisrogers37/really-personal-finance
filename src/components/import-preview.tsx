@@ -74,7 +74,7 @@ export function ImportPreview({
   const dupCount = dupMap.size;
 
   return (
-    <div className="bg-background-card rounded-xl border border-border p-6">
+    <div className="bg-background-card backdrop-blur-xl rounded-2xl border border-border p-6">
       <div className="flex justify-between items-center mb-4">
         <div>
           <p className="text-sm text-foreground-muted">

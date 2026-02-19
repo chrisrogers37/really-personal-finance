@@ -49,7 +49,7 @@ export default function TransactionsPage() {
       </div>
 
       {/* Filters */}
-      <div className="bg-background-card p-4 rounded-xl border border-border">
+      <div className="bg-background-card backdrop-blur-xl p-4 rounded-2xl border border-border">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <label className="block text-xs font-medium text-foreground-muted mb-1">
@@ -113,7 +113,7 @@ export default function TransactionsPage() {
       </div>
 
       {/* Transaction Table */}
-      <div className="bg-background-card rounded-xl border border-border p-4">
+      <div className="bg-background-card backdrop-blur-xl rounded-2xl border border-border p-4">
         <TransactionTable transactions={transactions} loading={loading} />
 
         {/* Pagination */}

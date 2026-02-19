@@ -24,7 +24,7 @@ Transform the app from a generic light-mode "AI vibe-coded" template to a sleek,
 | Phase | Document | Summary | Impact | Effort |
 |-------|----------|---------|--------|--------|
 | 01 | `01_dark-first-design-system.md` | ✅ COMPLETE — Establish CSS tokens + dark palette. Replace all hardcoded light-mode colors across every file. | High | High |
-| 02 | `02_glassmorphism-cards.md` | Replace flat white cards with frosted glass (`bg-white/5 backdrop-blur-xl border-white/10`). Update all cards, inputs, tables. | High | Low-Med |
+| 02 | `02_glassmorphism-cards.md` | ✅ COMPLETE — Glassmorphism cards with backdrop-blur, updated tokens, auth variant. | High | Low-Med |
 | 03 | `03_landing-page-redesign.md` | Complete landing page rewrite. Gradient hero, Lucide icons, glassmorphism feature cards, trust section. | High | Medium |
 | 04 | `04_auth-pages-redesign.md` | Restyle signin, verify, error pages. Replace emoji icons with Lucide SVGs. Fix mobile overflow. | Medium | Low |
 | 05 | `05_dark-themed-charts.md` | Retheme all Recharts components for dark backgrounds. Dark grids, styled tooltips, themed axes. | High | Medium |
