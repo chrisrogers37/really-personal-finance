@@ -4,7 +4,8 @@
   /* Backgrounds */
   --background: #0c0a14;
   --background-elevated: #13111c;
-  --background-card: rgba(255, 255, 255, 0.03);
+  --background-card: rgba(255, 255, 255, 0.05);
+  --background-card-auth: rgba(255, 255, 255, 0.08);
 
   /* Foregrounds */
   --foreground: #ffffff;
@@ -30,6 +31,7 @@
   --color-background: var(--background);
   --color-background-elevated: var(--background-elevated);
   --color-background-card: var(--background-card);
+  --color-background-card-auth: var(--background-card-auth);
 
   --color-foreground: var(--foreground);
   --color-foreground-muted: var(--foreground-muted);
