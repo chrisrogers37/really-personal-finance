@@ -19,7 +19,7 @@ export default function SignInPage() {
   if (sent) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="max-w-md w-full p-8 bg-background-elevated rounded-xl border border-border">
+        <div className="max-w-md w-full p-8 bg-background-card-auth backdrop-blur-2xl rounded-2xl border border-border">
           <div className="text-center">
             <div className="text-4xl mb-4">&#9993;</div>
             <h1 className="text-2xl font-bold mb-2">Check your email</h1>
@@ -35,7 +35,7 @@ export default function SignInPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="max-w-md w-full p-8 bg-background-elevated rounded-xl border border-border">
+      <div className="max-w-md w-full p-8 bg-background-card-auth backdrop-blur-2xl rounded-2xl border border-border">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold">Really Personal Finance</h1>
           <p className="text-foreground-muted mt-2">

@@ -52,7 +52,7 @@ export default function ProfilePage() {
           </Link>
         </div>
 
-        <div className="bg-background-elevated rounded-xl border border-border p-6">
+        <div className="bg-background-card backdrop-blur-xl rounded-2xl border border-border p-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label

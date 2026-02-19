@@ -49,19 +49,19 @@ export default function DashboardPage() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-background-card p-6 rounded-xl border border-border">
+        <div className="bg-background-card backdrop-blur-xl p-6 rounded-2xl border border-border">
           <p className="text-sm text-foreground-muted">This Month Income</p>
           <p className="text-2xl font-bold text-success">
             {latestMonth ? formatCurrency(latestMonth.income) : "$0.00"}
           </p>
         </div>
-        <div className="bg-background-card p-6 rounded-xl border border-border">
+        <div className="bg-background-card backdrop-blur-xl p-6 rounded-2xl border border-border">
           <p className="text-sm text-foreground-muted">This Month Spending</p>
           <p className="text-2xl font-bold text-danger">
             {latestMonth ? formatCurrency(latestMonth.spending) : "$0.00"}
           </p>
         </div>
-        <div className="bg-background-card p-6 rounded-xl border border-border">
+        <div className="bg-background-card backdrop-blur-xl p-6 rounded-2xl border border-border">
           <p className="text-sm text-foreground-muted">This Month Net</p>
           <p
             className={`text-2xl font-bold ${
@@ -71,7 +71,7 @@ export default function DashboardPage() {
             {latestMonth ? formatCurrency(latestMonth.net) : "$0.00"}
           </p>
         </div>
-        <div className="bg-background-card p-6 rounded-xl border border-border">
+        <div className="bg-background-card backdrop-blur-xl p-6 rounded-2xl border border-border">
           <p className="text-sm text-foreground-muted">All-Time Net</p>
           <p
             className={`text-2xl font-bold ${
@@ -84,7 +84,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Income vs Spending Chart */}
-      <div className="bg-background-card p-6 rounded-xl border border-border">
+      <div className="bg-background-card backdrop-blur-xl p-6 rounded-2xl border border-border">
         <h2 className="text-lg font-semibold mb-4">Income vs Spending</h2>
         {loading ? (
           <div className="h-96 flex items-center justify-center text-foreground-tertiary">

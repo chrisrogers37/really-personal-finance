@@ -221,7 +221,7 @@ export default function ImportPage() {
       )}
 
       {state === "done" && (
-        <div className="bg-success/10 border border-success/20 p-6 rounded-xl text-center">
+        <div className="bg-success/10 backdrop-blur-xl border border-success/20 p-6 rounded-2xl text-center">
           <p className="text-lg font-medium text-success">
             Successfully imported {importedCount} transactions
           </p>

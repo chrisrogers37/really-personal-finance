@@ -33,7 +33,7 @@ export default function DashboardLayout({
   return (
     <div className="min-h-screen bg-background flex">
       {/* Sidebar */}
-      <aside className="w-64 bg-background-elevated border-r border-border flex flex-col">
+      <aside className="w-64 bg-background-card backdrop-blur-xl border-r border-border flex flex-col">
         <div className="p-6 border-b border-border">
           <Link href="/dashboard" className="text-lg font-bold text-foreground">
             Really Personal Finance
