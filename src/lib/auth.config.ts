@@ -1,7 +1,7 @@
 import type { NextAuthConfig } from "next-auth";
 import { updateUserProfile } from "@/lib/scd2";
 import { db } from "@/db";
-import { users, sessions, verificationTokens } from "@/db/schema";
+import { users, sessions, verificationTokens, authAccounts } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 
 /**
@@ -75,10 +75,31 @@ export const authConfig: NextAuthConfig = {
     },
 
     async getUserByAccount({ providerAccountId, provider }) {
-      // Not used for email provider, but required by adapter interface
-      void providerAccountId;
-      void provider;
-      return null;
+      const [account] = await db
+        .select()
+        .from(authAccounts)
+        .where(
+          and(
+            eq(authAccounts.provider, provider),
+            eq(authAccounts.providerAccountId, providerAccountId)
+          )
+        )
+        .limit(1);
+      if (!account) return null;
+
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(and(eq(users.userId, account.userId), eq(users.isCurrent, true)))
+        .limit(1);
+      if (!user) return null;
+
+      return {
+        id: user.userId,
+        email: user.email,
+        name: user.name,
+        emailVerified: user.emailVerified,
+      };
     },
 
     async updateUser(user) {
@@ -105,12 +126,36 @@ export const authConfig: NextAuthConfig = {
         .where(eq(users.userId, userId));
     },
 
-    async linkAccount() {
+    async linkAccount(account) {
+      await db.insert(authAccounts).values({
+        userId: account.userId,
+        type: account.type,
+        provider: account.provider,
+        providerAccountId: account.providerAccountId,
+        refreshToken: account.refresh_token ?? null,
+        accessToken: account.access_token ?? null,
+        expiresAt: account.expires_at
+          ? new Date(account.expires_at * 1000)
+          : null,
+        tokenType: account.token_type ?? null,
+        scope: account.scope ?? null,
+        idToken: account.id_token ?? null,
+        sessionState: typeof account.session_state === "string"
+          ? account.session_state
+          : null,
+      });
       return undefined;
     },
 
-    async unlinkAccount() {
-      return undefined;
+    async unlinkAccount({ provider, providerAccountId }) {
+      await db
+        .delete(authAccounts)
+        .where(
+          and(
+            eq(authAccounts.provider, provider),
+            eq(authAccounts.providerAccountId, providerAccountId)
+          )
+        );
     },
 
     async createSession(session) {
