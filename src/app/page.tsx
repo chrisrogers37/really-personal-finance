@@ -20,7 +20,7 @@ export default function Home() {
           </Link>
           <Link
             href="/auth/signin"
-            className="px-4 py-2 text-sm font-medium rounded-lg border border-border-emphasis hover:bg-background-card transition-colors"
+            className="px-4 py-2 text-sm font-medium rounded-lg border border-border-emphasis hover:bg-background-card transition-all duration-150 active:scale-95"
           >
             Sign in
           </Link>
@@ -35,7 +35,7 @@ export default function Home() {
           className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] sm:w-[800px] sm:h-[600px] bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"
         />
 
-        <div className="relative text-center max-w-3xl mx-auto">
+        <div className="relative text-center max-w-3xl mx-auto animate-fade-in-up">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight">
             Know where your{" "}
             <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">
@@ -49,7 +49,7 @@ export default function Home() {
           <div className="mt-10">
             <Link
               href="/auth/signin"
-              className="inline-flex items-center gap-2 px-8 py-3 bg-accent hover:bg-accent-hover text-foreground text-lg font-medium rounded-xl transition-colors"
+              className="inline-flex items-center gap-2 px-8 py-3 bg-accent hover:bg-accent-hover text-foreground text-lg font-medium rounded-xl transition-all duration-150 active:scale-95"
             >
               Get Started
               <ArrowRight className="w-5 h-5" />
@@ -61,7 +61,7 @@ export default function Home() {
       {/* Features */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-20 sm:pb-28">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-background-card backdrop-blur-xl border border-border rounded-2xl p-6 sm:p-8">
+          <div className="bg-background-card backdrop-blur-xl border border-border rounded-2xl p-6 sm:p-8 animate-scale-in transition-all duration-200 hover:bg-white/8 hover:border-white/15 hover:-translate-y-0.5" style={{ animationDelay: "100ms" }}>
             <div className="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mb-5">
               <Landmark className="w-6 h-6 text-indigo-400" />
             </div>
@@ -72,7 +72,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="bg-background-card backdrop-blur-xl border border-border rounded-2xl p-6 sm:p-8">
+          <div className="bg-background-card backdrop-blur-xl border border-border rounded-2xl p-6 sm:p-8 animate-scale-in transition-all duration-200 hover:bg-white/8 hover:border-white/15 hover:-translate-y-0.5" style={{ animationDelay: "175ms" }}>
             <div className="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mb-5">
               <TrendingUp className="w-6 h-6 text-indigo-400" />
             </div>
@@ -83,7 +83,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="bg-background-card backdrop-blur-xl border border-border rounded-2xl p-6 sm:p-8">
+          <div className="bg-background-card backdrop-blur-xl border border-border rounded-2xl p-6 sm:p-8 animate-scale-in transition-all duration-200 hover:bg-white/8 hover:border-white/15 hover:-translate-y-0.5" style={{ animationDelay: "250ms" }}>
             <div className="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mb-5">
               <Bell className="w-6 h-6 text-indigo-400" />
             </div>
@@ -98,7 +98,7 @@ export default function Home() {
 
       {/* Trust Section */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-20 sm:pb-28">
-        <div className="bg-background-card backdrop-blur-xl border border-border rounded-2xl p-6 sm:p-8">
+        <div className="bg-background-card backdrop-blur-xl border border-border rounded-2xl p-6 sm:p-8 animate-fade-in" style={{ animationDelay: "400ms" }}>
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 sm:gap-10">
             <div className="flex items-start gap-3">
               <ShieldCheck className="w-5 h-5 text-indigo-400 mt-0.5 shrink-0" />

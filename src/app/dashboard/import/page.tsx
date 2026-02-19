@@ -121,7 +121,7 @@ export default function ImportPage() {
   );
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto animate-fade-in-up">
       <h1 className="text-2xl font-bold text-foreground mb-2">
         Import Transactions
       </h1>
@@ -130,7 +130,7 @@ export default function ImportPage() {
       </p>
 
       {error && (
-        <div className="bg-danger/10 border border-danger/20 text-danger p-3 rounded-lg mb-4">
+        <div className="bg-danger/10 border border-danger/20 text-danger p-3 rounded-lg mb-4 animate-fade-in">
           {error}
         </div>
       )}
@@ -201,7 +201,7 @@ export default function ImportPage() {
                 onClick={handleCreateAccount}
                 disabled={!newAccountName.trim()}
                 className="px-4 py-2 bg-accent text-foreground rounded
-                           disabled:opacity-50"
+                           disabled:opacity-50 transition-all duration-150 active:scale-95"
               >
                 Create
               </button>
@@ -221,7 +221,7 @@ export default function ImportPage() {
       )}
 
       {state === "done" && (
-        <div className="bg-success/10 backdrop-blur-xl border border-success/20 p-6 rounded-2xl text-center">
+        <div className="bg-success/10 backdrop-blur-xl border border-success/20 p-6 rounded-2xl text-center animate-scale-in">
           <p className="text-lg font-medium text-success">
             Successfully imported {importedCount} transactions
           </p>
@@ -232,13 +232,13 @@ export default function ImportPage() {
                 setPreviewData(null);
                 setError(null);
               }}
-              className="px-4 py-2 bg-background-elevated border border-border rounded-lg hover:bg-white/5"
+              className="px-4 py-2 bg-background-elevated border border-border rounded-lg hover:bg-white/5 transition-all duration-150 active:scale-95"
             >
               Import more
             </button>
             <a
               href="/dashboard/transactions"
-              className="px-4 py-2 bg-accent text-foreground rounded-lg hover:bg-accent-hover"
+              className="px-4 py-2 bg-accent text-foreground rounded-lg hover:bg-accent-hover transition-all duration-150 active:scale-95"
             >
               View transactions
             </a>

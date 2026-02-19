@@ -18,7 +18,7 @@ export function TransactionTable({
         {Array.from({ length: 5 }).map((_, i) => (
           <div
             key={i}
-            className="h-12 bg-white/5 rounded-lg animate-pulse"
+            className="h-12 rounded-lg shimmer-bg animate-shimmer"
           />
         ))}
       </div>
@@ -60,7 +60,7 @@ export function TransactionTable({
             const amount = parseFloat(txn.amount);
             const isIncome = amount < 0;
             return (
-              <tr key={txn.id} className="border-b border-border hover:bg-white/5">
+              <tr key={txn.id} className="border-b border-border hover:bg-white/5 transition-colors duration-150">
                 <td className="py-3 px-2 text-foreground-muted whitespace-nowrap">
                   {formatDate(txn.date)}
                 </td>

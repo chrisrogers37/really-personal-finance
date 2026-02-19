@@ -52,10 +52,10 @@ export function FileDropzone({
       onDrop={handleDrop}
       className={`
         border-2 border-dashed rounded-2xl p-12 text-center cursor-pointer
-        transition-colors duration-200
+        transition-all duration-200
         ${
           dragActive
-            ? "border-accent bg-accent/10"
+            ? "border-accent bg-accent/10 scale-[1.01]"
             : "border-border bg-background-card hover:border-border-emphasis"
         }
         ${loading ? "opacity-50 pointer-events-none" : ""}
