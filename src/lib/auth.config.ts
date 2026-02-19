@@ -140,7 +140,9 @@ export const authConfig: NextAuthConfig = {
         tokenType: account.token_type ?? null,
         scope: account.scope ?? null,
         idToken: account.id_token ?? null,
-        sessionState: account.session_state ?? null,
+        sessionState: typeof account.session_state === "string"
+          ? account.session_state
+          : null,
       });
       return undefined;
     },
