@@ -40,7 +40,7 @@ export default function CategoriesPage() {
   const totalSpending = data.reduce((sum, d) => sum + d.total, 0);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in-up">
       <div>
         <h1 className="text-2xl font-bold">Spending by Category</h1>
         <p className="text-foreground-muted">
@@ -58,7 +58,7 @@ export default function CategoriesPage() {
       />
 
       {/* Chart */}
-      <div className="bg-background-card backdrop-blur-xl p-6 rounded-2xl border border-border">
+      <div className="bg-background-card backdrop-blur-xl p-6 rounded-2xl border border-border animate-fade-in transition-all duration-200 hover:bg-white/8 hover:border-white/15" style={{ animationDelay: "100ms" }}>
         {loading ? (
           <div className="h-80 flex items-center justify-center text-foreground-tertiary">
             Loading...

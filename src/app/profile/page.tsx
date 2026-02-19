@@ -41,18 +41,18 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-2xl mx-auto py-12 px-4">
+      <div className="max-w-2xl mx-auto py-12 px-4 animate-fade-in-up">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-2xl font-bold">Profile Settings</h1>
           <Link
             href="/dashboard"
-            className="text-accent hover:text-accent-hover text-sm font-medium"
+            className="text-accent hover:text-accent-hover text-sm font-medium transition-colors duration-150"
           >
             Back to Dashboard
           </Link>
         </div>
 
-        <div className="bg-background-card backdrop-blur-xl rounded-2xl border border-border p-6">
+        <div className="bg-background-card backdrop-blur-xl rounded-2xl border border-border p-6 animate-scale-in transition-all duration-200 hover:bg-white/8 hover:border-white/15">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label
@@ -67,7 +67,7 @@ export default function ProfilePage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Your name"
-                className="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground placeholder:text-foreground-tertiary focus:ring-2 focus:ring-accent focus:border-accent outline-none"
+                className="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground placeholder:text-foreground-tertiary focus:ring-2 focus:ring-accent focus:border-accent outline-none transition-all duration-150"
               />
             </div>
 
@@ -84,7 +84,7 @@ export default function ProfilePage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:ring-2 focus:ring-accent focus:border-accent outline-none"
+                className="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:ring-2 focus:ring-accent focus:border-accent outline-none transition-all duration-150"
               />
             </div>
 
@@ -103,7 +103,7 @@ export default function ProfilePage() {
             <button
               type="submit"
               disabled={saving}
-              className="py-2 px-6 bg-accent text-foreground rounded-lg hover:bg-accent-hover disabled:opacity-50 font-medium"
+              className="py-2 px-6 bg-accent text-foreground rounded-lg hover:bg-accent-hover disabled:opacity-50 font-medium transition-all duration-150 active:scale-95"
             >
               {saving ? "Saving..." : "Save Changes"}
             </button>

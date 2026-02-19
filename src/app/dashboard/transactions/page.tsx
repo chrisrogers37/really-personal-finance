@@ -42,7 +42,7 @@ export default function TransactionsPage() {
   }, [fetchTransactions]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in-up">
       <div>
         <h1 className="text-2xl font-bold">Transactions</h1>
         <p className="text-foreground-muted">Browse and filter your transactions</p>
@@ -113,7 +113,7 @@ export default function TransactionsPage() {
       </div>
 
       {/* Transaction Table */}
-      <div className="bg-background-card backdrop-blur-xl rounded-2xl border border-border p-4">
+      <div className="bg-background-card backdrop-blur-xl rounded-2xl border border-border p-4 animate-fade-in">
         <TransactionTable transactions={transactions} loading={loading} />
 
         {/* Pagination */}
@@ -121,7 +121,7 @@ export default function TransactionsPage() {
           <button
             onClick={() => setOffset(Math.max(0, offset - limit))}
             disabled={offset === 0}
-            className="px-4 py-2 text-sm font-medium text-foreground-muted border border-border rounded-lg hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 text-sm font-medium text-foreground-muted border border-border rounded-lg hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150 active:scale-95"
           >
             Previous
           </button>
@@ -131,7 +131,7 @@ export default function TransactionsPage() {
           <button
             onClick={() => setOffset(offset + limit)}
             disabled={transactions.length < limit}
-            className="px-4 py-2 text-sm font-medium text-foreground-muted border border-border rounded-lg hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 text-sm font-medium text-foreground-muted border border-border rounded-lg hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150 active:scale-95"
           >
             Next
           </button>
