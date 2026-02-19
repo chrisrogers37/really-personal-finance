@@ -18,7 +18,7 @@ export function TransactionTable({
         {Array.from({ length: 5 }).map((_, i) => (
           <div
             key={i}
-            className="h-12 bg-gray-100 rounded-lg animate-pulse"
+            className="h-12 bg-white/5 rounded-lg animate-pulse"
           />
         ))}
       </div>
@@ -27,7 +27,7 @@ export function TransactionTable({
 
   if (transactions.length === 0) {
     return (
-      <div className="text-center py-12 text-gray-500">
+      <div className="text-center py-12 text-foreground-tertiary">
         No transactions found. Adjust your filters or connect a bank account.
       </div>
     );
@@ -37,20 +37,20 @@ export function TransactionTable({
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b">
-            <th className="text-left py-3 px-2 font-medium text-gray-600">
+          <tr className="border-b border-border">
+            <th className="text-left py-3 px-2 font-medium text-foreground-muted">
               Date
             </th>
-            <th className="text-left py-3 px-2 font-medium text-gray-600">
+            <th className="text-left py-3 px-2 font-medium text-foreground-muted">
               Description
             </th>
-            <th className="text-left py-3 px-2 font-medium text-gray-600">
+            <th className="text-left py-3 px-2 font-medium text-foreground-muted">
               Category
             </th>
-            <th className="text-left py-3 px-2 font-medium text-gray-600">
+            <th className="text-left py-3 px-2 font-medium text-foreground-muted">
               Account
             </th>
-            <th className="text-right py-3 px-2 font-medium text-gray-600">
+            <th className="text-right py-3 px-2 font-medium text-foreground-muted">
               Amount
             </th>
           </tr>
@@ -60,8 +60,8 @@ export function TransactionTable({
             const amount = parseFloat(txn.amount);
             const isIncome = amount < 0;
             return (
-              <tr key={txn.id} className="border-b hover:bg-gray-50">
-                <td className="py-3 px-2 text-gray-600 whitespace-nowrap">
+              <tr key={txn.id} className="border-b border-border hover:bg-white/5">
+                <td className="py-3 px-2 text-foreground-muted whitespace-nowrap">
                   {formatDate(txn.date)}
                 </td>
                 <td className="py-3 px-2">
@@ -69,32 +69,32 @@ export function TransactionTable({
                     {txn.merchantName || txn.name}
                   </div>
                   {txn.merchantName && txn.merchantName !== txn.name && (
-                    <div className="text-xs text-gray-400">{txn.name}</div>
+                    <div className="text-xs text-foreground-tertiary">{txn.name}</div>
                   )}
                   {txn.pending && (
-                    <span className="inline-block ml-2 px-1.5 py-0.5 text-xs bg-yellow-100 text-yellow-700 rounded">
+                    <span className="inline-block ml-2 px-1.5 py-0.5 text-xs bg-warning/20 text-warning rounded">
                       Pending
                     </span>
                   )}
                 </td>
                 <td className="py-3 px-2">
                   {txn.categoryPrimary && (
-                    <span className="inline-block px-2 py-0.5 text-xs bg-gray-100 text-gray-700 rounded-full">
+                    <span className="inline-block px-2 py-0.5 text-xs bg-white/10 text-foreground-muted rounded-full">
                       {txn.categoryPrimary}
                     </span>
                   )}
                 </td>
-                <td className="py-3 px-2 text-gray-500 text-xs">
+                <td className="py-3 px-2 text-foreground-tertiary text-xs">
                   {txn.accountName}
                   {txn.source === "import" && (
-                    <span className="ml-1 px-1 py-0.5 bg-blue-50 text-blue-600 rounded text-[10px]">
+                    <span className="ml-1 px-1 py-0.5 bg-accent/10 text-accent rounded text-[10px]">
                       Import
                     </span>
                   )}
                 </td>
                 <td
                   className={`py-3 px-2 text-right font-medium whitespace-nowrap ${
-                    isIncome ? "text-green-600" : "text-gray-900"
+                    isIncome ? "text-success" : "text-foreground"
                   }`}
                 >
                   {isIncome ? "+" : "-"}

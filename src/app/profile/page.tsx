@@ -40,24 +40,24 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <div className="max-w-2xl mx-auto py-12 px-4">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-2xl font-bold">Profile Settings</h1>
           <Link
             href="/dashboard"
-            className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+            className="text-accent hover:text-accent-hover text-sm font-medium"
           >
             Back to Dashboard
           </Link>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border p-6">
+        <div className="bg-background-elevated rounded-xl border border-border p-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label
                 htmlFor="name"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium text-foreground-muted mb-1"
               >
                 Name
               </label>
@@ -67,14 +67,14 @@ export default function ProfilePage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Your name"
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                className="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground placeholder:text-foreground-tertiary focus:ring-2 focus:ring-accent focus:border-accent outline-none"
               />
             </div>
 
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium text-foreground-muted mb-1"
               >
                 Email
               </label>
@@ -84,7 +84,7 @@ export default function ProfilePage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                className="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:ring-2 focus:ring-accent focus:border-accent outline-none"
               />
             </div>
 
@@ -92,8 +92,8 @@ export default function ProfilePage() {
               <p
                 className={`text-sm ${
                   message.includes("success")
-                    ? "text-green-600"
-                    : "text-red-600"
+                    ? "text-success"
+                    : "text-danger"
                 }`}
               >
                 {message}
@@ -103,13 +103,13 @@ export default function ProfilePage() {
             <button
               type="submit"
               disabled={saving}
-              className="py-2 px-6 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium"
+              className="py-2 px-6 bg-accent text-foreground rounded-lg hover:bg-accent-hover disabled:opacity-50 font-medium"
             >
               {saving ? "Saving..." : "Save Changes"}
             </button>
           </form>
 
-          <p className="text-xs text-gray-500 mt-4">
+          <p className="text-xs text-foreground-tertiary mt-4">
             Profile changes are versioned. Your previous profile data is
             retained for audit purposes.
           </p>

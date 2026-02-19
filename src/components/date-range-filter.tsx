@@ -14,28 +14,28 @@ export function DateRangeFilter({
   onEndDateChange,
 }: DateRangeFilterProps) {
   return (
-    <div className="bg-white p-4 rounded-xl border shadow-sm">
+    <div className="bg-background-card p-4 rounded-xl border border-border">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">
+          <label className="block text-xs font-medium text-foreground-muted mb-1">
             Start Date
           </label>
           <input
             type="date"
             value={startDate}
             onChange={(e) => onStartDateChange(e.target.value)}
-            className="w-full px-3 py-2 border rounded-lg text-sm"
+            className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-background-elevated text-foreground"
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">
+          <label className="block text-xs font-medium text-foreground-muted mb-1">
             End Date
           </label>
           <input
             type="date"
             value={endDate}
             onChange={(e) => onEndDateChange(e.target.value)}
-            className="w-full px-3 py-2 border rounded-lg text-sm"
+            className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-background-elevated text-foreground"
           />
         </div>
       </div>

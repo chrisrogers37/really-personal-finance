@@ -74,13 +74,13 @@ export function ImportPreview({
   const dupCount = dupMap.size;
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border p-6">
+    <div className="bg-background-card rounded-xl border border-border p-6">
       <div className="flex justify-between items-center mb-4">
         <div>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-foreground-muted">
             Detected format: <span className="font-medium">{format}</span>
           </p>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-foreground-muted">
             {transactions.length} transactions: {newCount} new, {dupCount}{" "}
             duplicates
           </p>
@@ -88,14 +88,14 @@ export function ImportPreview({
         <div className="flex gap-2">
           <button
             onClick={() => toggleAll(true)}
-            className="text-sm text-blue-600 hover:text-blue-800"
+            className="text-sm text-accent hover:text-accent-hover"
           >
             Select all
           </button>
-          <span className="text-gray-300">|</span>
+          <span className="text-foreground-tertiary">|</span>
           <button
             onClick={() => toggleAll(false)}
-            className="text-sm text-blue-600 hover:text-blue-800"
+            className="text-sm text-accent hover:text-accent-hover"
           >
             Deselect all
           </button>
@@ -104,8 +104,8 @@ export function ImportPreview({
 
       <div className="overflow-x-auto max-h-96 overflow-y-auto">
         <table className="w-full text-sm">
-          <thead className="sticky top-0 bg-gray-50">
-            <tr className="text-left text-gray-500">
+          <thead className="sticky top-0 bg-background-elevated">
+            <tr className="text-left text-foreground-tertiary">
               <th className="p-2 w-8"></th>
               <th className="p-2">Date</th>
               <th className="p-2">Description</th>
@@ -124,9 +124,9 @@ export function ImportPreview({
                   key={i}
                   className={
                     dup?.reason === "exact_import_id"
-                      ? "bg-red-50"
+                      ? "bg-danger/10"
                       : dup
-                        ? "bg-yellow-50"
+                        ? "bg-warning/10"
                         : ""
                   }
                 >
@@ -142,24 +142,24 @@ export function ImportPreview({
                   </td>
                   <td className="p-2 truncate max-w-xs">{txn.description}</td>
                   <td
-                    className={`p-2 text-right whitespace-nowrap ${isInflow ? "text-green-600" : ""}`}
+                    className={`p-2 text-right whitespace-nowrap ${isInflow ? "text-success" : ""}`}
                   >
                     {isInflow ? "+" : "-"}
                     {formatCurrency(Math.abs(amount))}
                   </td>
                   <td className="p-2 whitespace-nowrap">
                     {!dup && (
-                      <span className="text-green-600 text-xs font-medium">
+                      <span className="text-success text-xs font-medium">
                         New
                       </span>
                     )}
                     {dup?.reason === "exact_import_id" && (
-                      <span className="text-red-600 text-xs font-medium">
+                      <span className="text-danger text-xs font-medium">
                         Already imported
                       </span>
                     )}
                     {dup?.reason === "same_date_amount" && (
-                      <span className="text-yellow-600 text-xs font-medium">
+                      <span className="text-warning text-xs font-medium">
                         Possible duplicate
                       </span>
                     )}
@@ -175,8 +175,8 @@ export function ImportPreview({
         <button
           onClick={() => onConfirm(Array.from(selected))}
           disabled={selected.size === 0 || loading}
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg
-                     hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-6 py-2 bg-accent text-foreground rounded-lg
+                     hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading
             ? "Importing..."

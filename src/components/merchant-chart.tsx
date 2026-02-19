@@ -15,7 +15,7 @@ import type { MerchantData } from "@/types";
 export function MerchantChart({ data }: { data: MerchantData[] }) {
   if (data.length === 0) {
     return (
-      <div className="h-80 flex items-center justify-center text-gray-500">
+      <div className="h-80 flex items-center justify-center text-foreground-tertiary">
         No spending data available.
       </div>
     );
@@ -42,40 +42,40 @@ export function MerchantChart({ data }: { data: MerchantData[] }) {
 
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b">
-            <th className="text-left py-2 font-medium text-gray-600">
+          <tr className="border-b border-border">
+            <th className="text-left py-2 font-medium text-foreground-muted">
               Merchant
             </th>
-            <th className="text-right py-2 font-medium text-gray-600">
+            <th className="text-right py-2 font-medium text-foreground-muted">
               Total
             </th>
-            <th className="text-right py-2 font-medium text-gray-600">
+            <th className="text-right py-2 font-medium text-foreground-muted">
               Avg
             </th>
-            <th className="text-right py-2 font-medium text-gray-600">
+            <th className="text-right py-2 font-medium text-foreground-muted">
               Txns
             </th>
-            <th className="text-right py-2 font-medium text-gray-600">
+            <th className="text-right py-2 font-medium text-foreground-muted">
               Type
             </th>
           </tr>
         </thead>
         <tbody>
           {data.map((item) => (
-            <tr key={item.merchant} className="border-b">
+            <tr key={item.merchant} className="border-b border-border">
               <td className="py-2 font-medium">{item.merchant}</td>
               <td className="text-right py-2">{formatCurrency(item.total)}</td>
-              <td className="text-right py-2 text-gray-500">
+              <td className="text-right py-2 text-foreground-tertiary">
                 {formatCurrency(item.avgAmount)}
               </td>
-              <td className="text-right py-2 text-gray-500">{item.count}</td>
+              <td className="text-right py-2 text-foreground-tertiary">{item.count}</td>
               <td className="text-right py-2">
                 {item.isRecurring ? (
-                  <span className="inline-block px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-700 rounded-full">
+                  <span className="inline-block px-2 py-0.5 text-xs font-medium bg-accent/20 text-accent rounded-full">
                     Recurring
                   </span>
                 ) : (
-                  <span className="text-gray-400 text-xs">One-time</span>
+                  <span className="text-foreground-tertiary text-xs">One-time</span>
                 )}
               </td>
             </tr>

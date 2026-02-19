@@ -31,11 +31,11 @@ export default function DashboardLayout({
   const { data: session } = useSession();
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-background flex">
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r flex flex-col">
-        <div className="p-6 border-b">
-          <Link href="/dashboard" className="text-lg font-bold text-gray-900">
+      <aside className="w-64 bg-background-elevated border-r border-border flex flex-col">
+        <div className="p-6 border-b border-border">
+          <Link href="/dashboard" className="text-lg font-bold text-foreground">
             Really Personal Finance
           </Link>
         </div>
@@ -53,8 +53,8 @@ export default function DashboardLayout({
                 className={cn(
                   "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                   isActive
-                    ? "bg-blue-50 text-blue-700"
-                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                    ? "bg-accent/10 text-accent"
+                    : "text-foreground-muted hover:bg-white/5 hover:text-foreground"
                 )}
               >
                 <item.icon className="w-5 h-5" />
@@ -64,17 +64,17 @@ export default function DashboardLayout({
           })}
         </nav>
 
-        <div className="p-4 border-t space-y-1">
+        <div className="p-4 border-t border-border space-y-1">
           <Link
             href="/profile"
-            className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+            className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-foreground-muted hover:bg-white/5 hover:text-foreground"
           >
             <User className="w-5 h-5" />
             {session?.user?.email || "Profile"}
           </Link>
           <button
             onClick={() => signOut({ callbackUrl: "/" })}
-            className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-red-600 w-full"
+            className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-foreground-muted hover:bg-white/5 hover:text-danger w-full"
           >
             <LogOut className="w-5 h-5" />
             Sign out

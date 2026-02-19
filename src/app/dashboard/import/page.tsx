@@ -122,15 +122,15 @@ export default function ImportPage() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold text-gray-900 mb-2">
+      <h1 className="text-2xl font-bold text-foreground mb-2">
         Import Transactions
       </h1>
-      <p className="text-gray-600 mb-6">
+      <p className="text-foreground-muted mb-6">
         Upload a bank export file (CSV, QFX, QBO, OFX) to import transactions.
       </p>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-lg mb-4">
+        <div className="bg-danger/10 border border-danger/20 text-danger p-3 rounded-lg mb-4">
           {error}
         </div>
       )}
@@ -144,7 +144,7 @@ export default function ImportPage() {
 
       {state === "preview" && (
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-foreground-muted mb-1">
             Import to account:
           </label>
           <div className="flex gap-2">
@@ -159,7 +159,7 @@ export default function ImportPage() {
                   setSelectedAccountId(e.target.value);
                 }
               }}
-              className="flex-1 p-2 border rounded-lg"
+              className="flex-1 p-2 border border-border rounded-lg bg-background-elevated text-foreground"
             >
               <option value="">Select account...</option>
               {accounts.map((a) => (
@@ -172,23 +172,23 @@ export default function ImportPage() {
           </div>
 
           {showNewAccount && (
-            <div className="mt-2 p-3 border rounded-lg bg-gray-50 flex gap-2 items-end">
+            <div className="mt-2 p-3 border border-border rounded-lg bg-background-elevated flex gap-2 items-end">
               <div className="flex-1">
-                <label className="block text-xs text-gray-500">Name</label>
+                <label className="block text-xs text-foreground-tertiary">Name</label>
                 <input
                   type="text"
                   value={newAccountName}
                   onChange={(e) => setNewAccountName(e.target.value)}
                   placeholder="e.g., Amex Platinum"
-                  className="w-full p-2 border rounded"
+                  className="w-full p-2 border border-border rounded bg-background text-foreground placeholder:text-foreground-tertiary"
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500">Type</label>
+                <label className="block text-xs text-foreground-tertiary">Type</label>
                 <select
                   value={newAccountType}
                   onChange={(e) => setNewAccountType(e.target.value)}
-                  className="p-2 border rounded"
+                  className="p-2 border border-border rounded bg-background-elevated text-foreground"
                 >
                   <option value="credit">Credit Card</option>
                   <option value="checking">Checking</option>
@@ -200,7 +200,7 @@ export default function ImportPage() {
               <button
                 onClick={handleCreateAccount}
                 disabled={!newAccountName.trim()}
-                className="px-4 py-2 bg-gray-800 text-white rounded
+                className="px-4 py-2 bg-accent text-foreground rounded
                            disabled:opacity-50"
               >
                 Create
@@ -221,8 +221,8 @@ export default function ImportPage() {
       )}
 
       {state === "done" && (
-        <div className="bg-green-50 border border-green-200 p-6 rounded-xl text-center">
-          <p className="text-lg font-medium text-green-800">
+        <div className="bg-success/10 border border-success/20 p-6 rounded-xl text-center">
+          <p className="text-lg font-medium text-success">
             Successfully imported {importedCount} transactions
           </p>
           <div className="mt-4 flex gap-3 justify-center">
@@ -232,13 +232,13 @@ export default function ImportPage() {
                 setPreviewData(null);
                 setError(null);
               }}
-              className="px-4 py-2 bg-white border rounded-lg hover:bg-gray-50"
+              className="px-4 py-2 bg-background-elevated border border-border rounded-lg hover:bg-white/5"
             >
               Import more
             </button>
             <a
               href="/dashboard/transactions"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="px-4 py-2 bg-accent text-foreground rounded-lg hover:bg-accent-hover"
             >
               View transactions
             </a>
