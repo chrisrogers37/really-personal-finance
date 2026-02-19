@@ -50,6 +50,13 @@
 
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Animations */
+  --animate-fade-in-up: fadeInUp 500ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-fade-in: fadeIn 300ms ease-out both;
+  --animate-scale-in: scaleIn 400ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-shimmer: shimmer 1.5s linear infinite;
+  --animate-glow: glow 2s ease-in-out infinite;
 }
 
 body {
@@ -57,4 +64,83 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, sans-serif;
   color-scheme: dark;
+}
+
+/* ============================================
+   Phase 07: Animations & Micro-Interactions
+   ============================================ */
+
+/* Keyframes — only active when user has no motion preference */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  @keyframes glow {
+    0%,
+    100% {
+      box-shadow: 0 0 8px rgba(99, 102, 241, 0.15);
+    }
+    50% {
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+    }
+  }
+}
+
+/* Shimmer gradient background for skeleton loaders */
+@utility shimmer-bg {
+  background: linear-gradient(
+    90deg,
+    rgb(255 255 255 / 0.03) 25%,
+    rgb(255 255 255 / 0.08) 50%,
+    rgb(255 255 255 / 0.03) 75%
+  );
+  background-size: 200% 100%;
+}
+
+/* Reduced motion: disable all custom animations */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in-up,
+  .animate-fade-in,
+  .animate-scale-in,
+  .animate-shimmer,
+  .animate-glow {
+    animation: none !important;
+  }
 }
