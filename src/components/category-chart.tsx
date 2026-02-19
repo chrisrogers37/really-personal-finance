@@ -29,7 +29,7 @@ const COLORS = [
 export function CategoryChart({ data }: { data: CategoryData[] }) {
   if (data.length === 0) {
     return (
-      <div className="h-80 flex items-center justify-center text-gray-500">
+      <div className="h-80 flex items-center justify-center text-foreground-tertiary">
         No spending data available.
       </div>
     );
@@ -70,21 +70,21 @@ export function CategoryChart({ data }: { data: CategoryData[] }) {
       <div className="lg:w-1/2">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b">
-              <th className="text-left py-2 font-medium text-gray-600">
+            <tr className="border-b border-border">
+              <th className="text-left py-2 font-medium text-foreground-muted">
                 Category
               </th>
-              <th className="text-right py-2 font-medium text-gray-600">
+              <th className="text-right py-2 font-medium text-foreground-muted">
                 Amount
               </th>
-              <th className="text-right py-2 font-medium text-gray-600">
+              <th className="text-right py-2 font-medium text-foreground-muted">
                 Txns
               </th>
             </tr>
           </thead>
           <tbody>
             {data.map((item, i) => (
-              <tr key={item.category} className="border-b">
+              <tr key={item.category} className="border-b border-border">
                 <td className="py-2 flex items-center gap-2">
                   <div
                     className="w-3 h-3 rounded-full"
@@ -95,7 +95,7 @@ export function CategoryChart({ data }: { data: CategoryData[] }) {
                 <td className="text-right py-2 font-medium">
                   {formatCurrency(item.total)}
                 </td>
-                <td className="text-right py-2 text-gray-500">{item.count}</td>
+                <td className="text-right py-2 text-foreground-tertiary">{item.count}</td>
               </tr>
             ))}
           </tbody>

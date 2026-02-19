@@ -70,7 +70,7 @@ export function PlaidLinkButton({ onSuccess }: PlaidLinkButtonProps) {
       <button
         onClick={createLinkToken}
         disabled={loading}
-        className="py-2 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 font-medium flex items-center gap-2"
+        className="py-2 px-4 bg-success text-foreground rounded-lg hover:bg-success/80 disabled:opacity-50 font-medium flex items-center gap-2"
       >
         {loading ? (
           "Connecting..."
@@ -93,7 +93,7 @@ export function PlaidLinkButton({ onSuccess }: PlaidLinkButtonProps) {
           </>
         )}
       </button>
-      {error && <p className="text-red-600 text-sm mt-2">{error}</p>}
+      {error && <p className="text-danger text-sm mt-2">{error}</p>}
     </div>
   );
 }

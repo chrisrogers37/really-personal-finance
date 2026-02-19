@@ -23,7 +23,7 @@ interface MonthlyData {
 export function IncomeSpendingChart({ data }: { data: MonthlyData[] }) {
   if (data.length === 0) {
     return (
-      <div className="h-80 flex items-center justify-center text-gray-500">
+      <div className="h-80 flex items-center justify-center text-foreground-tertiary">
         No data available. Connect a bank account to get started.
       </div>
     );

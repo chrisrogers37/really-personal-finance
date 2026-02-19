@@ -55,8 +55,8 @@ export function FileDropzone({
         transition-colors duration-200
         ${
           dragActive
-            ? "border-blue-400 bg-blue-50"
-            : "border-gray-300 bg-white hover:border-gray-400"
+            ? "border-accent bg-accent/10"
+            : "border-border bg-background-card hover:border-border-emphasis"
         }
         ${loading ? "opacity-50 pointer-events-none" : ""}
       `}
@@ -70,10 +70,10 @@ export function FileDropzone({
         disabled={loading}
       />
       <label htmlFor="file-upload" className="cursor-pointer">
-        <p className="text-lg font-medium text-gray-700">
+        <p className="text-lg font-medium text-foreground-muted">
           {loading ? "Parsing file..." : "Drop a bank export file here"}
         </p>
-        <p className="text-sm text-gray-500 mt-2">
+        <p className="text-sm text-foreground-tertiary mt-2">
           or click to browse. Supports CSV, QFX, QBO, OFX
         </p>
       </label>
