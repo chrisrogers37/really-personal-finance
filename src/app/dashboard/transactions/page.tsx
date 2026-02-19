@@ -45,14 +45,14 @@ export default function TransactionsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Transactions</h1>
-        <p className="text-gray-600">Browse and filter your transactions</p>
+        <p className="text-foreground-muted">Browse and filter your transactions</p>
       </div>
 
       {/* Filters */}
-      <div className="bg-white p-4 rounded-xl border shadow-sm">
+      <div className="bg-background-card p-4 rounded-xl border border-border">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">
+            <label className="block text-xs font-medium text-foreground-muted mb-1">
               Start Date
             </label>
             <input
@@ -62,11 +62,11 @@ export default function TransactionsPage() {
                 setStartDate(e.target.value);
                 setOffset(0);
               }}
-              className="w-full px-3 py-2 border rounded-lg text-sm"
+              className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-background-elevated text-foreground"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">
+            <label className="block text-xs font-medium text-foreground-muted mb-1">
               End Date
             </label>
             <input
@@ -76,11 +76,11 @@ export default function TransactionsPage() {
                 setEndDate(e.target.value);
                 setOffset(0);
               }}
-              className="w-full px-3 py-2 border rounded-lg text-sm"
+              className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-background-elevated text-foreground"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">
+            <label className="block text-xs font-medium text-foreground-muted mb-1">
               Category
             </label>
             <input
@@ -91,11 +91,11 @@ export default function TransactionsPage() {
                 setOffset(0);
               }}
               placeholder="e.g., FOOD_AND_DRINK"
-              className="w-full px-3 py-2 border rounded-lg text-sm"
+              className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-background-elevated text-foreground placeholder:text-foreground-tertiary"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">
+            <label className="block text-xs font-medium text-foreground-muted mb-1">
               Merchant
             </label>
             <input
@@ -106,32 +106,32 @@ export default function TransactionsPage() {
                 setOffset(0);
               }}
               placeholder="Search merchants..."
-              className="w-full px-3 py-2 border rounded-lg text-sm"
+              className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-background-elevated text-foreground placeholder:text-foreground-tertiary"
             />
           </div>
         </div>
       </div>
 
       {/* Transaction Table */}
-      <div className="bg-white rounded-xl border shadow-sm p-4">
+      <div className="bg-background-card rounded-xl border border-border p-4">
         <TransactionTable transactions={transactions} loading={loading} />
 
         {/* Pagination */}
-        <div className="flex items-center justify-between mt-4 pt-4 border-t">
+        <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
           <button
             onClick={() => setOffset(Math.max(0, offset - limit))}
             disabled={offset === 0}
-            className="px-4 py-2 text-sm font-medium text-gray-600 border rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 text-sm font-medium text-foreground-muted border border-border rounded-lg hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Previous
           </button>
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-foreground-tertiary">
             Showing {offset + 1}–{offset + transactions.length}
           </span>
           <button
             onClick={() => setOffset(offset + limit)}
             disabled={transactions.length < limit}
-            className="px-4 py-2 text-sm font-medium text-gray-600 border rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 text-sm font-medium text-foreground-muted border border-border rounded-lg hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Next
           </button>

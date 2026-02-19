@@ -44,7 +44,7 @@ export default function MerchantsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Spending by Merchant</h1>
-        <p className="text-gray-600">
+        <p className="text-foreground-muted">
           Total: <strong>{formatCurrency(totalSpending)}</strong> across{" "}
           {data.length} merchants ({recurringCount} recurring)
         </p>
@@ -59,9 +59,9 @@ export default function MerchantsPage() {
       />
 
       {/* Chart + Table */}
-      <div className="bg-white p-6 rounded-xl border shadow-sm">
+      <div className="bg-background-card p-6 rounded-xl border border-border">
         {loading ? (
-          <div className="h-80 flex items-center justify-center text-gray-500">
+          <div className="h-80 flex items-center justify-center text-foreground-tertiary">
             Loading...
           </div>
         ) : (

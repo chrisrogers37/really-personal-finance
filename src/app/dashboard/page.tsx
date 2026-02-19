@@ -42,40 +42,40 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Dashboard</h1>
-          <p className="text-gray-600">Your financial overview</p>
+          <p className="text-foreground-muted">Your financial overview</p>
         </div>
         <PlaidLinkButton onSuccess={fetchData} />
       </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white p-6 rounded-xl border shadow-sm">
-          <p className="text-sm text-gray-600">This Month Income</p>
-          <p className="text-2xl font-bold text-green-600">
+        <div className="bg-background-card p-6 rounded-xl border border-border">
+          <p className="text-sm text-foreground-muted">This Month Income</p>
+          <p className="text-2xl font-bold text-success">
             {latestMonth ? formatCurrency(latestMonth.income) : "$0.00"}
           </p>
         </div>
-        <div className="bg-white p-6 rounded-xl border shadow-sm">
-          <p className="text-sm text-gray-600">This Month Spending</p>
-          <p className="text-2xl font-bold text-red-500">
+        <div className="bg-background-card p-6 rounded-xl border border-border">
+          <p className="text-sm text-foreground-muted">This Month Spending</p>
+          <p className="text-2xl font-bold text-danger">
             {latestMonth ? formatCurrency(latestMonth.spending) : "$0.00"}
           </p>
         </div>
-        <div className="bg-white p-6 rounded-xl border shadow-sm">
-          <p className="text-sm text-gray-600">This Month Net</p>
+        <div className="bg-background-card p-6 rounded-xl border border-border">
+          <p className="text-sm text-foreground-muted">This Month Net</p>
           <p
             className={`text-2xl font-bold ${
-              (latestMonth?.net ?? 0) >= 0 ? "text-green-600" : "text-red-500"
+              (latestMonth?.net ?? 0) >= 0 ? "text-success" : "text-danger"
             }`}
           >
             {latestMonth ? formatCurrency(latestMonth.net) : "$0.00"}
           </p>
         </div>
-        <div className="bg-white p-6 rounded-xl border shadow-sm">
-          <p className="text-sm text-gray-600">All-Time Net</p>
+        <div className="bg-background-card p-6 rounded-xl border border-border">
+          <p className="text-sm text-foreground-muted">All-Time Net</p>
           <p
             className={`text-2xl font-bold ${
-              totalNet >= 0 ? "text-green-600" : "text-red-500"
+              totalNet >= 0 ? "text-success" : "text-danger"
             }`}
           >
             {formatCurrency(totalNet)}
@@ -84,10 +84,10 @@ export default function DashboardPage() {
       </div>
 
       {/* Income vs Spending Chart */}
-      <div className="bg-white p-6 rounded-xl border shadow-sm">
+      <div className="bg-background-card p-6 rounded-xl border border-border">
         <h2 className="text-lg font-semibold mb-4">Income vs Spending</h2>
         {loading ? (
-          <div className="h-96 flex items-center justify-center text-gray-500">
+          <div className="h-96 flex items-center justify-center text-foreground-tertiary">
             Loading...
           </div>
         ) : (
