@@ -6,15 +6,16 @@ import { Mail } from "lucide-react";
 
 export default function SignInPage() {
   const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [emailLoading, setEmailLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [sent, setSent] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
+    setEmailLoading(true);
     await signIn("email", { email, redirect: false });
     setSent(true);
-    setLoading(false);
+    setEmailLoading(false);
   }
 
   if (sent) {
@@ -48,8 +49,8 @@ export default function SignInPage() {
 
         <button
           type="button"
-          onClick={() => { setLoading(true); signIn("google", { callbackUrl: "/dashboard" }); }}
-          disabled={loading}
+          onClick={() => { setGoogleLoading(true); signIn("google", { callbackUrl: "/dashboard" }); }}
+          disabled={googleLoading || emailLoading}
           className="w-full flex items-center justify-center gap-3 py-2 px-4 border border-border rounded-xl bg-background hover:bg-white/5 text-foreground font-medium transition-all duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -100,10 +101,10 @@ export default function SignInPage() {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={emailLoading || googleLoading}
             className="w-full py-2 px-4 bg-accent text-foreground rounded-xl hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-all duration-150 active:scale-95"
           >
-            {loading ? "Sending link..." : "Continue with email"}
+            {emailLoading ? "Sending link..." : "Continue with email"}
           </button>
         </form>
 
