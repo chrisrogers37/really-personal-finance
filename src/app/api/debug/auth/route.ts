@@ -20,7 +20,11 @@ export async function GET() {
     const result = await db.select({ count: sql<number>`count(*)` }).from(users);
     checks.DB_CONNECTION = `OK (${result[0].count} users)`;
   } catch (e: unknown) {
-    checks.DB_CONNECTION = `FAILED: ${e instanceof Error ? e.message : String(e)}`;
+    const err = e instanceof Error ? e : new Error(String(e));
+    checks.DB_CONNECTION = `FAILED: ${err.message}`;
+    checks.DB_ERROR_NAME = err.name;
+    checks.DB_ERROR_CAUSE = err.cause ? String(err.cause) : "none";
+    checks.DB_URL_PREFIX = process.env.DATABASE_URL?.substring(0, 30) + "..." || "MISSING";
   }
 
   return NextResponse.json(checks);
