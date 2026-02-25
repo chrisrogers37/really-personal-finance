@@ -7,10 +7,21 @@ function parseMMDDYYYY(date: string): string {
   return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
 }
 
+/** Detect if a date string is YYYY-MM-DD format */
+function isISODate(date: string): boolean {
+  return /^\d{4}-\d{2}-\d{2}$/.test(date);
+}
+
 function detectCSVFormat(headers: string[]): "amex-csv" | "bofa-csv" | null {
   const normalized = headers.map((h) => h.trim().toLowerCase());
   if (normalized.includes("running bal.")) return "bofa-csv";
-  if (normalized.length === 3 && normalized[0] === "date") return "amex-csv";
+  // Amex: has Date, Description, Amount headers (may have additional columns)
+  if (
+    normalized.includes("date") &&
+    normalized.includes("description") &&
+    normalized.includes("amount")
+  )
+    return "amex-csv";
   return null;
 }
 
@@ -40,7 +51,7 @@ function parseAmexCSV(content: string): ParseResult {
     }
 
     transactions.push({
-      date: parseMMDDYYYY(dateRaw),
+      date: isISODate(dateRaw) ? dateRaw : parseMMDDYYYY(dateRaw),
       description,
       // Amex CSV: positive = charge (outflow), matches Plaid convention
       amount: amount.toFixed(2),
@@ -113,6 +124,42 @@ function parseBofACSV(content: string): ParseResult {
   return { format: "bofa-csv", transactions, skippedRows, errors };
 }
 
+function parseHeaderlessCSV(content: string): ParseResult {
+  const parsed = Papa.parse<string[]>(content, {
+    header: false,
+    skipEmptyLines: true,
+  });
+
+  const transactions: ParsedTransaction[] = [];
+  const errors: string[] = [];
+
+  for (const row of parsed.data) {
+    const dateRaw = row[0]?.trim();
+    const description = row[1]?.trim();
+    const amountRaw = row[2]?.trim();
+
+    if (!dateRaw || !description || !amountRaw) {
+      errors.push(`Skipped row with missing fields: ${JSON.stringify(row)}`);
+      continue;
+    }
+
+    const amount = parseFloat(amountRaw.replace(/,/g, ""));
+    if (isNaN(amount)) {
+      errors.push(`Invalid amount "${amountRaw}" for "${description}"`);
+      continue;
+    }
+
+    transactions.push({
+      date: dateRaw,
+      description,
+      // Headerless BofA: negative = outflow → negate to match Plaid convention
+      amount: (-amount).toFixed(2),
+    });
+  }
+
+  return { format: "bofa-csv", transactions, errors };
+}
+
 export function parseCSV(content: string, filename?: string): ParseResult {
   if (!content.trim()) {
     return { format: "amex-csv", transactions: [], errors: ["Empty file"] };
@@ -129,7 +176,7 @@ export function parseCSV(content: string, filename?: string): ParseResult {
     }
   }
 
-  // Try as Amex CSV
+  // Try as Amex CSV (with headers)
   const firstLine = lines[0]?.trim();
   if (firstLine) {
     const headers = firstLine.split(",");
@@ -139,8 +186,14 @@ export function parseCSV(content: string, filename?: string): ParseResult {
     }
   }
 
+  // Try as headerless CSV (e.g., BofA savings/checking with no headers)
+  // Format: YYYY-MM-DD,"Description",Amount
+  if (firstLine && isISODate(firstLine.split(",")[0]?.trim().replace(/"/g, ""))) {
+    return parseHeaderlessCSV(content);
+  }
+
   return {
-    format: "amex-csv",
+    format: "unknown-csv",
     transactions: [],
     errors: [`Unknown CSV format. Headers: "${lines[0]?.trim()}"`],
   };

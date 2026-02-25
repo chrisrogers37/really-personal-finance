@@ -9,7 +9,7 @@ export interface ParsedTransaction {
 }
 
 export interface ParseResult {
-  format: "amex-csv" | "bofa-csv" | "ofx";
+  format: "amex-csv" | "bofa-csv" | "ofx" | "unknown-csv";
   accountHint?: string; // Account identifier from file (OFX ACCTID)
   transactions: ParsedTransaction[];
   skippedRows?: number; // Header/summary rows skipped
