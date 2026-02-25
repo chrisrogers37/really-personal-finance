@@ -152,12 +152,12 @@ function parseHeaderlessCSV(content: string): ParseResult {
     transactions.push({
       date: dateRaw,
       description,
-      // Headerless BofA: negative = outflow → negate to match Plaid convention
+      // Headerless CSV: negative = outflow → negate to match Plaid convention
       amount: (-amount).toFixed(2),
     });
   }
 
-  return { format: "bofa-csv", transactions, errors };
+  return { format: "headerless-csv", transactions, errors };
 }
 
 export function parseCSV(content: string, filename?: string): ParseResult {
