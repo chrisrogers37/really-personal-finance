@@ -96,6 +96,122 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Dashboard Preview */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-20 sm:pb-28">
+        <div className="text-center mb-12 animate-fade-in" style={{ animationDelay: "300ms" }}>
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+            Everything in{" "}
+            <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">
+              one place
+            </span>
+          </h2>
+          <p className="mt-3 text-foreground-muted max-w-lg mx-auto">
+            A clean dashboard built for clarity, not clutter.
+          </p>
+        </div>
+
+        <div className="relative animate-fade-in" style={{ animationDelay: "400ms" }}>
+          {/* Decorative glow behind the preview */}
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 bg-indigo-500/8 rounded-3xl blur-2xl -m-4 pointer-events-none"
+          />
+          <div className="relative bg-background-elevated border border-border rounded-2xl overflow-hidden shadow-2xl">
+            {/* Mock browser chrome */}
+            <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-background">
+              <div className="flex gap-1.5">
+                <div className="w-3 h-3 rounded-full bg-white/10" />
+                <div className="w-3 h-3 rounded-full bg-white/10" />
+                <div className="w-3 h-3 rounded-full bg-white/10" />
+              </div>
+              <div className="flex-1 mx-8">
+                <div className="h-6 rounded-md bg-white/[0.06] max-w-xs mx-auto" />
+              </div>
+            </div>
+            {/* Mock dashboard content */}
+            <div className="p-6 sm:p-8">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+                <div className="bg-background-card rounded-xl p-4 border border-border">
+                  <p className="text-xs text-foreground-tertiary">Income</p>
+                  <p className="text-lg font-bold text-violet-400 mt-1">$4,250</p>
+                </div>
+                <div className="bg-background-card rounded-xl p-4 border border-border">
+                  <p className="text-xs text-foreground-tertiary">Spending</p>
+                  <p className="text-lg font-bold text-indigo-400 mt-1">$2,847</p>
+                </div>
+                <div className="bg-background-card rounded-xl p-4 border border-border">
+                  <p className="text-xs text-foreground-tertiary">Net</p>
+                  <p className="text-lg font-bold text-violet-400 mt-1">+$1,403</p>
+                </div>
+                <div className="bg-background-card rounded-xl p-4 border border-border">
+                  <p className="text-xs text-foreground-tertiary">Accounts</p>
+                  <p className="text-lg font-bold text-foreground mt-1">3</p>
+                </div>
+              </div>
+              {/* Mock chart area */}
+              <div className="bg-background-card rounded-xl border border-border p-6 h-48 flex items-end gap-2">
+                {[40, 65, 45, 80, 55, 70, 90, 60, 75, 50, 85, 68].map((h, i) => (
+                  <div key={i} className="flex-1 flex flex-col gap-1 items-stretch">
+                    <div
+                      className="rounded-t bg-violet-400/60"
+                      style={{ height: `${h * 0.6}%` }}
+                    />
+                    <div
+                      className="rounded-t bg-indigo-500/60"
+                      style={{ height: `${h * 0.4}%` }}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-20 sm:pb-28">
+        <div className="text-center mb-12 animate-fade-in" style={{ animationDelay: "450ms" }}>
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+            Up and running in{" "}
+            <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">
+              minutes
+            </span>
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 animate-fade-in" style={{ animationDelay: "500ms" }}>
+          <div className="text-center">
+            <div className="w-10 h-10 rounded-full bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mx-auto mb-4">
+              <span className="text-sm font-bold text-indigo-400">1</span>
+            </div>
+            <h3 className="font-semibold mb-2">Connect or Upload</h3>
+            <p className="text-sm text-foreground-muted leading-relaxed">
+              Link your bank via Plaid for automatic syncing, or upload CSV exports manually.
+            </p>
+          </div>
+
+          <div className="text-center">
+            <div className="w-10 h-10 rounded-full bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mx-auto mb-4">
+              <span className="text-sm font-bold text-indigo-400">2</span>
+            </div>
+            <h3 className="font-semibold mb-2">See Your Patterns</h3>
+            <p className="text-sm text-foreground-muted leading-relaxed">
+              Spending by category, by merchant, income vs. expenses — all visualized in your dashboard.
+            </p>
+          </div>
+
+          <div className="text-center">
+            <div className="w-10 h-10 rounded-full bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mx-auto mb-4">
+              <span className="text-sm font-bold text-indigo-400">3</span>
+            </div>
+            <h3 className="font-semibold mb-2">Get Daily Insights</h3>
+            <p className="text-sm text-foreground-muted leading-relaxed">
+              Spending summaries and anomaly alerts delivered to Telegram. The app comes to you.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Trust Section */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-20 sm:pb-28">
         <div className="bg-background-card backdrop-blur-xl border border-border rounded-2xl p-6 sm:p-8 animate-fade-in" style={{ animationDelay: "400ms" }}>
@@ -126,6 +242,33 @@ export default function Home() {
                   Audit the code or self-host. Full transparency.
                 </p>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Bottom CTA */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-20 sm:pb-28">
+        <div className="relative text-center animate-fade-in" style={{ animationDelay: "600ms" }}>
+          <div
+            aria-hidden="true"
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[200px] bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"
+          />
+          <div className="relative">
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+              Ready to take control?
+            </h2>
+            <p className="mt-3 text-foreground-muted">
+              Free, open source, and built for people who care where their money goes.
+            </p>
+            <div className="mt-8">
+              <Link
+                href="/auth/signin"
+                className="inline-flex items-center gap-2 px-8 py-3 bg-accent hover:bg-accent-hover text-foreground text-lg font-medium rounded-xl transition-all duration-150 active:scale-95"
+              >
+                Get Started
+                <ArrowRight className="w-5 h-5" />
+              </Link>
             </div>
           </div>
         </div>
