@@ -142,14 +142,14 @@ export function ImportPreview({
                   </td>
                   <td className="p-2 truncate max-w-xs">{txn.description}</td>
                   <td
-                    className={`p-2 text-right whitespace-nowrap ${isInflow ? "text-success" : ""}`}
+                    className={`p-2 text-right whitespace-nowrap ${isInflow ? "text-income" : ""}`}
                   >
                     {isInflow ? "+" : "-"}
                     {formatCurrency(Math.abs(amount))}
                   </td>
                   <td className="p-2 whitespace-nowrap">
                     {!dup && (
-                      <span className="text-success text-xs font-medium">
+                      <span className="text-income text-xs font-medium">
                         New
                       </span>
                     )}

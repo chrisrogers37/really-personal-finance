@@ -51,13 +51,13 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-background-card backdrop-blur-xl p-6 rounded-2xl border border-border animate-scale-in transition-all duration-200 hover:bg-white/8 hover:border-white/15 hover:-translate-y-0.5" style={{ animationDelay: "50ms" }}>
           <p className="text-sm text-foreground-muted">This Month Income</p>
-          <p className="text-2xl font-bold text-success">
+          <p className="text-2xl font-bold text-income">
             {latestMonth ? formatCurrency(latestMonth.income) : "$0.00"}
           </p>
         </div>
         <div className="bg-background-card backdrop-blur-xl p-6 rounded-2xl border border-border animate-scale-in transition-all duration-200 hover:bg-white/8 hover:border-white/15 hover:-translate-y-0.5" style={{ animationDelay: "125ms" }}>
           <p className="text-sm text-foreground-muted">This Month Spending</p>
-          <p className="text-2xl font-bold text-danger">
+          <p className="text-2xl font-bold text-spending">
             {latestMonth ? formatCurrency(latestMonth.spending) : "$0.00"}
           </p>
         </div>
@@ -65,7 +65,7 @@ export default function DashboardPage() {
           <p className="text-sm text-foreground-muted">This Month Net</p>
           <p
             className={`text-2xl font-bold ${
-              (latestMonth?.net ?? 0) >= 0 ? "text-success" : "text-danger"
+              (latestMonth?.net ?? 0) >= 0 ? "text-income" : "text-spending"
             }`}
           >
             {latestMonth ? formatCurrency(latestMonth.net) : "$0.00"}
@@ -75,7 +75,7 @@ export default function DashboardPage() {
           <p className="text-sm text-foreground-muted">All-Time Net</p>
           <p
             className={`text-2xl font-bold ${
-              totalNet >= 0 ? "text-success" : "text-danger"
+              totalNet >= 0 ? "text-income" : "text-spending"
             }`}
           >
             {formatCurrency(totalNet)}

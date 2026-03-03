@@ -22,6 +22,12 @@
   --danger: #ef4444;
   --warning: #f59e0b;
 
+  /* Financial */
+  --income: #a78bfa;
+  --income-muted: rgba(167, 139, 250, 0.10);
+  --spending: #6366f1;
+  --spending-muted: rgba(99, 102, 241, 0.10);
+
   /* Borders */
   --border: rgba(255, 255, 255, 0.08);
   --border-emphasis: rgba(255, 255, 255, 0.12);
@@ -44,6 +50,11 @@
   --color-success: var(--success);
   --color-danger: var(--danger);
   --color-warning: var(--warning);
+
+  --color-income: var(--income);
+  --color-income-muted: var(--income-muted);
+  --color-spending: var(--spending);
+  --color-spending-muted: var(--spending-muted);
 
   --color-border: var(--border);
   --color-border-emphasis: var(--border-emphasis);
