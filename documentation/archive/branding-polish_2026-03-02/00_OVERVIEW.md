@@ -16,9 +16,9 @@
 | Phase | Title | Impact | Effort | Status |
 |-------|-------|--------|--------|--------|
 | 01 | Purple palette for income/spending | High | Low | COMPLETE (PR #20) |
-| 02 | Elevate the import page UX | High | Medium | PENDING |
-| 03 | Enrich the landing page | High | Medium | PENDING |
-| 04 | Polish the sign-in page | Medium | Low | PENDING |
+| 02 | Elevate the import page UX | High | Medium | COMPLETE (PR #21) |
+| 03 | Enrich the landing page | High | Medium | COMPLETE (PR #22) |
+| 04 | Polish the sign-in page | Medium | Low | COMPLETE (PR #23) |
 
 ## Dependency Graph
 
