@@ -82,8 +82,8 @@ export function IncomeSpendingChart({ data }: { data: MonthlyData[] }) {
           stroke={CHART_THEME.referenceLine.stroke}
           strokeDasharray="3 3"
         />
-        <Bar dataKey="income" fill="#22c55e" name="Income" radius={[4, 4, 0, 0]} />
-        <Bar dataKey="spending" fill="#ef4444" name="Spending" radius={[4, 4, 0, 0]} />
+        <Bar dataKey="income" fill="#a78bfa" name="Income" radius={[4, 4, 0, 0]} />
+        <Bar dataKey="spending" fill="#6366f1" name="Spending" radius={[4, 4, 0, 0]} />
       </BarChart>
     </ResponsiveContainer>
   );
