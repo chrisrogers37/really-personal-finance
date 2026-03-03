@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
-import { Mail } from "lucide-react";
+import Link from "next/link";
+import { Mail, ArrowLeft } from "lucide-react";
 
 export default function SignInPage() {
   const [email, setEmail] = useState("");
@@ -21,7 +22,16 @@ export default function SignInPage() {
   if (sent) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(99,102,241,0.15),transparent_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(99,102,241,0.20),transparent_60%)]" />
+
+        <Link
+          href="/"
+          className="absolute top-6 left-6 flex items-center gap-1.5 text-sm text-foreground-muted hover:text-foreground transition-colors duration-150"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Home
+        </Link>
+
         <div className="max-w-md w-full p-8 mx-4 bg-background-card-auth backdrop-blur-2xl rounded-2xl border border-border shadow-2xl relative animate-scale-in">
           <div className="text-center">
             <Mail className="w-12 h-12 text-indigo-400 mx-auto mb-4" />
@@ -38,12 +48,28 @@ export default function SignInPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(99,102,241,0.15),transparent_70%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(99,102,241,0.20),transparent_60%)]" />
+
+      {/* Back link */}
+      <Link
+        href="/"
+        className="absolute top-6 left-6 flex items-center gap-1.5 text-sm text-foreground-muted hover:text-foreground transition-colors duration-150"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        Home
+      </Link>
+
       <div className="max-w-md w-full p-8 mx-4 bg-background-card-auth backdrop-blur-2xl rounded-2xl border border-border shadow-2xl relative animate-scale-in">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold">Really <span className="text-indigo-400">Personal</span> Finance</h1>
+          <h1 className="text-2xl font-bold">
+            Really{" "}
+            <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">
+              Personal
+            </span>{" "}
+            Finance
+          </h1>
           <p className="text-foreground-muted mt-2">
-            Sign in or create an account to get started
+            Track your spending, your way.
           </p>
         </div>
 
