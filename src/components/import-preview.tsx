@@ -88,14 +88,13 @@ export function ImportPreview({
         <div className="flex gap-2">
           <button
             onClick={() => toggleAll(true)}
-            className="text-sm text-accent hover:text-accent-hover"
+            className="text-xs font-medium px-3 py-1 rounded-full bg-accent/10 text-accent hover:bg-accent/20 transition-all duration-150"
           >
             Select all
           </button>
-          <span className="text-foreground-tertiary">|</span>
           <button
             onClick={() => toggleAll(false)}
-            className="text-sm text-accent hover:text-accent-hover"
+            className="text-xs font-medium px-3 py-1 rounded-full bg-white/[0.06] text-foreground-muted hover:bg-white/[0.10] transition-all duration-150"
           >
             Deselect all
           </button>
@@ -105,7 +104,7 @@ export function ImportPreview({
       <div className="overflow-x-auto max-h-96 overflow-y-auto">
         <table className="w-full text-sm">
           <thead className="sticky top-0 bg-background-elevated">
-            <tr className="text-left text-foreground-tertiary">
+            <tr className="text-left text-foreground-tertiary text-xs uppercase tracking-wider">
               <th className="p-2 w-8"></th>
               <th className="p-2">Date</th>
               <th className="p-2">Description</th>
@@ -122,19 +121,20 @@ export function ImportPreview({
               return (
                 <tr
                   key={i}
-                  className={
+                  className={`transition-colors hover:bg-white/[0.03] ${
                     dup?.reason === "exact_import_id"
                       ? "bg-danger/10"
                       : dup
                         ? "bg-warning/10"
                         : ""
-                  }
+                  }`}
                 >
                   <td className="p-2">
                     <input
                       type="checkbox"
                       checked={selected.has(i)}
                       onChange={() => toggle(i)}
+                      className="w-4 h-4 rounded border-border bg-background-elevated text-accent focus:ring-accent focus:ring-offset-0 cursor-pointer accent-accent"
                     />
                   </td>
                   <td className="p-2 whitespace-nowrap">
@@ -175,8 +175,8 @@ export function ImportPreview({
         <button
           onClick={() => onConfirm(Array.from(selected))}
           disabled={selected.size === 0 || loading}
-          className="px-6 py-2 bg-accent text-foreground rounded-lg
-                     hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-6 py-2.5 bg-accent text-foreground rounded-xl font-medium
+                     hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150 active:scale-95"
         >
           {loading
             ? "Importing..."
