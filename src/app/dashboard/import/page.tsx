@@ -144,7 +144,7 @@ export default function ImportPage() {
 
       {state === "preview" && (
         <div className="mb-4">
-          <label className="block text-sm font-medium text-foreground-muted mb-1">
+          <label className="block text-sm font-medium text-foreground-muted mb-2">
             Import to account:
           </label>
           <div className="flex gap-2">
@@ -159,7 +159,7 @@ export default function ImportPage() {
                   setSelectedAccountId(e.target.value);
                 }
               }}
-              className="flex-1 p-2 border border-border rounded-lg bg-background-elevated text-foreground"
+              className="flex-1 px-4 py-2.5 border border-border rounded-xl bg-background-elevated text-foreground focus:ring-2 focus:ring-accent focus:border-accent outline-none transition-all duration-150 appearance-none"
             >
               <option value="">Select account...</option>
               {accounts.map((a) => (
@@ -172,7 +172,7 @@ export default function ImportPage() {
           </div>
 
           {showNewAccount && (
-            <div className="mt-2 p-3 border border-border rounded-lg bg-background-elevated flex gap-2 items-end">
+            <div className="mt-3 p-4 border border-border rounded-xl bg-background-elevated/50 backdrop-blur-xl flex gap-3 items-end">
               <div className="flex-1">
                 <label className="block text-xs text-foreground-tertiary">Name</label>
                 <input
@@ -180,7 +180,7 @@ export default function ImportPage() {
                   value={newAccountName}
                   onChange={(e) => setNewAccountName(e.target.value)}
                   placeholder="e.g., Amex Platinum"
-                  className="w-full p-2 border border-border rounded bg-background text-foreground placeholder:text-foreground-tertiary"
+                  className="w-full px-3 py-2 border border-border rounded-xl bg-background text-foreground placeholder:text-foreground-tertiary focus:ring-2 focus:ring-accent focus:border-accent outline-none transition-all duration-150"
                 />
               </div>
               <div>
@@ -188,7 +188,7 @@ export default function ImportPage() {
                 <select
                   value={newAccountType}
                   onChange={(e) => setNewAccountType(e.target.value)}
-                  className="p-2 border border-border rounded bg-background-elevated text-foreground"
+                  className="px-3 py-2 border border-border rounded-xl bg-background text-foreground focus:ring-2 focus:ring-accent focus:border-accent outline-none transition-all duration-150"
                 >
                   <option value="credit">Credit Card</option>
                   <option value="checking">Checking</option>
@@ -200,8 +200,7 @@ export default function ImportPage() {
               <button
                 onClick={handleCreateAccount}
                 disabled={!newAccountName.trim()}
-                className="px-4 py-2 bg-accent text-foreground rounded
-                           disabled:opacity-50 transition-all duration-150 active:scale-95"
+                className="px-4 py-2 bg-accent text-foreground rounded-xl hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-all duration-150 active:scale-95"
               >
                 Create
               </button>
