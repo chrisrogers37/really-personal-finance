@@ -2,7 +2,9 @@ import { parseCSV } from "./csv";
 import { parseOFX } from "./ofx";
 import type { ParseResult } from "./types";
 
-export type { ParsedTransaction, ParseResult } from "./types";
+export type { ParsedTransaction, ParseResult, ColumnMapping, SavedColumnMapping } from "./types";
+export { parseMappedCSV, extractCSVHeaders } from "./mapped-csv";
+export type { MappedCSVOptions } from "./mapped-csv";
 
 /**
  * Auto-detect file format and parse transactions.

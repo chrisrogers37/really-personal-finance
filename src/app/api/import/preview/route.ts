@@ -3,10 +3,10 @@ import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { transactions } from "@/db/schema";
 import { eq, and, gte, lte } from "drizzle-orm";
-import { parseTransactionFile } from "@/lib/parsers";
+import { parseTransactionFile, parseMappedCSV } from "@/lib/parsers";
 import { generateImportId } from "@/lib/import";
 import type { DuplicateMatch } from "@/lib/import";
-import type { ParsedTransaction } from "@/lib/parsers/types";
+import type { ParsedTransaction, ColumnMapping } from "@/lib/parsers/types";
 
 async function findDuplicates(
   userId: string,
@@ -112,7 +112,29 @@ export async function POST(request: NextRequest) {
   }
 
   const content = await file.text();
-  const result = parseTransactionFile(content, file.name);
+
+  // Check for user-provided column mapping
+  const mappingRaw = formData.get("mapping") as string | null;
+  let result;
+
+  if (mappingRaw) {
+    try {
+      const mappingConfig = JSON.parse(mappingRaw) as {
+        columns: ColumnMapping;
+        dateFormat?: string;
+        amountConvention: "positive_outflow" | "negative_outflow";
+        skipRows: number;
+      };
+      result = parseMappedCSV(content, mappingConfig);
+    } catch {
+      return NextResponse.json(
+        { error: "Invalid mapping configuration" },
+        { status: 400 }
+      );
+    }
+  } else {
+    result = parseTransactionFile(content, file.name);
+  }
 
   if (result.transactions.length === 0) {
     return NextResponse.json(

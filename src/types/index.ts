@@ -7,7 +7,7 @@ export interface Transaction {
   categoryPrimary: string | null;
   categoryDetailed: string | null;
   pending: boolean;
-  source: "plaid" | "import";
+  source: "plaid" | "import" | "manual";
   accountName: string | null;
   accountType: string | null;
 }
