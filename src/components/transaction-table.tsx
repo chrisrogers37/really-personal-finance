@@ -1,16 +1,19 @@
 "use client";
 
 import { formatCurrency, formatDate } from "@/lib/utils";
+import { Pencil } from "lucide-react";
 import type { Transaction } from "@/types";
 
 interface TransactionTableProps {
   transactions: Transaction[];
   loading?: boolean;
+  onEditTransaction?: (transaction: Transaction) => void;
 }
 
 export function TransactionTable({
   transactions,
   loading,
+  onEditTransaction,
 }: TransactionTableProps) {
   if (loading) {
     return (
@@ -65,8 +68,14 @@ export function TransactionTable({
                   {formatDate(txn.date)}
                 </td>
                 <td className="py-3 px-2">
-                  <div className="font-medium">
+                  <div
+                    className={`font-medium ${onEditTransaction ? "group/merchant cursor-pointer hover:text-accent inline-flex items-center gap-1 transition-colors" : ""}`}
+                    onClick={() => onEditTransaction?.(txn)}
+                  >
                     {txn.merchantName || txn.name}
+                    {onEditTransaction && (
+                      <Pencil className="w-3 h-3 opacity-0 group-hover/merchant:opacity-60 transition-opacity" />
+                    )}
                   </div>
                   {txn.merchantName && txn.merchantName !== txn.name && (
                     <div className="text-xs text-foreground-tertiary">{txn.name}</div>
@@ -78,11 +87,19 @@ export function TransactionTable({
                   )}
                 </td>
                 <td className="py-3 px-2">
-                  {txn.categoryPrimary && (
-                    <span className="inline-block px-2 py-0.5 text-xs bg-white/10 text-foreground-muted rounded-full">
-                      {txn.categoryPrimary}
-                    </span>
-                  )}
+                  <span
+                    className={`inline-block px-2 py-0.5 text-xs rounded-full ${
+                      txn.categoryPrimary
+                        ? "bg-white/10 text-foreground-muted"
+                        : "bg-white/5 text-foreground-tertiary border border-dashed border-border"
+                    } ${onEditTransaction ? "cursor-pointer hover:bg-accent/20 hover:text-accent group/cat transition-colors" : ""}`}
+                    onClick={() => onEditTransaction?.(txn)}
+                  >
+                    {txn.categoryPrimary || "Uncategorized"}
+                    {onEditTransaction && (
+                      <Pencil className="w-2.5 h-2.5 ml-1 inline opacity-0 group-hover/cat:opacity-60 transition-opacity" />
+                    )}
+                  </span>
                 </td>
                 <td className="py-3 px-2 text-foreground-tertiary text-xs">
                   {txn.accountName}

@@ -2,13 +2,13 @@ import Papa from "papaparse";
 import type { ParsedTransaction, ParseResult } from "./types";
 
 /** MM/DD/YYYY → YYYY-MM-DD */
-function parseMMDDYYYY(date: string): string {
+export function parseMMDDYYYY(date: string): string {
   const [month, day, year] = date.split("/");
   return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
 }
 
 /** Detect if a date string is YYYY-MM-DD format */
-function isISODate(date: string): boolean {
+export function isISODate(date: string): boolean {
   return /^\d{4}-\d{2}-\d{2}$/.test(date);
 }
 

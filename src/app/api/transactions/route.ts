@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { randomUUID } from "crypto";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { transactions, accounts } from "@/db/schema";
@@ -70,4 +71,63 @@ export async function GET(request: NextRequest) {
     .offset(offset);
 
   return NextResponse.json({ transactions: results });
+}
+
+export async function POST(request: NextRequest) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  const userId = session.user.id;
+
+  const body = await request.json();
+  const { accountId, date, amount, description, merchantName, categoryPrimary } =
+    body as Record<string, unknown>;
+
+  if (!accountId || typeof accountId !== "string") {
+    return NextResponse.json({ error: "accountId is required" }, { status: 400 });
+  }
+  if (!date || typeof date !== "string" || !isValidDateParam(date)) {
+    return NextResponse.json({ error: "Valid date (YYYY-MM-DD) is required" }, { status: 400 });
+  }
+  if (amount === undefined || amount === null || isNaN(Number(amount))) {
+    return NextResponse.json({ error: "Valid amount is required" }, { status: 400 });
+  }
+  if (!description || typeof description !== "string" || !description.trim()) {
+    return NextResponse.json({ error: "Description is required" }, { status: 400 });
+  }
+
+  // Verify account belongs to user
+  const [account] = await db
+    .select({ id: accounts.id })
+    .from(accounts)
+    .where(and(eq(accounts.id, accountId), eq(accounts.userId, userId)))
+    .limit(1);
+
+  if (!account) {
+    return NextResponse.json({ error: "Account not found" }, { status: 404 });
+  }
+
+  const [created] = await db
+    .insert(transactions)
+    .values({
+      accountId,
+      userId,
+      amount: Number(amount).toFixed(2),
+      date,
+      name: description.trim(),
+      merchantName: typeof merchantName === "string" && merchantName.trim() ? merchantName.trim() : null,
+      categoryPrimary: typeof categoryPrimary === "string" && categoryPrimary.trim() ? categoryPrimary.trim() : null,
+      importId: `manual:${randomUUID()}`,
+      source: "manual",
+      pending: false,
+    })
+    .returning({
+      id: transactions.id,
+      amount: transactions.amount,
+      date: transactions.date,
+      name: transactions.name,
+    });
+
+  return NextResponse.json({ transaction: created }, { status: 201 });
 }

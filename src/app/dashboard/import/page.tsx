@@ -3,14 +3,30 @@
 import { useState, useCallback, useEffect } from "react";
 import { FileDropzone } from "@/components/file-dropzone";
 import { ImportPreview } from "@/components/import-preview";
+import { ColumnMapper } from "@/components/column-mapper";
+import type { ColumnMapping, SavedColumnMapping, MappingConfig } from "@/lib/parsers/types";
 
-type ImportState = "idle" | "parsing" | "preview" | "importing" | "done";
+type ImportState =
+  | "idle"
+  | "parsing"
+  | "mapping"
+  | "processing"
+  | "preview"
+  | "importing"
+  | "done";
 
 interface Account {
   id: string;
   name: string;
   type: string;
   source: string;
+}
+
+interface CSVMeta {
+  headers: string[];
+  sampleRows: Record<string, string>[];
+  fileContent: string;
+  fileName: string;
 }
 
 export default function ImportPage() {
@@ -20,44 +36,209 @@ export default function ImportPage() {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [selectedAccountId, setSelectedAccountId] = useState<string>("");
   const [importedCount, setImportedCount] = useState(0);
+  const [csvMeta, setCsvMeta] = useState<CSVMeta | null>(null);
+  const [savedMappings, setSavedMappings] = useState<SavedColumnMapping[]>([]);
+  const [matchedMapping, setMatchedMapping] = useState<SavedColumnMapping | null>(null);
 
   const [showNewAccount, setShowNewAccount] = useState(false);
   const [newAccountName, setNewAccountName] = useState("");
   const [newAccountType, setNewAccountType] = useState("credit");
 
+  // Load accounts and saved mappings on mount
   useEffect(() => {
     fetch("/api/accounts")
       .then((r) => r.json())
       .then((data) => setAccounts(data.accounts || []));
+
+    fetch("/api/column-mappings")
+      .then((r) => r.json())
+      .then((data) => setSavedMappings(data.mappings || []))
+      .catch(() => {}); // ignore if table doesn't exist yet
   }, []);
 
-  const handleFileSelect = useCallback(async (file: File) => {
-    setState("parsing");
-    setError(null);
+  // Try to match saved mappings against CSV headers
+  const findMatchingMapping = useCallback(
+    (headers: string[]): SavedColumnMapping | null => {
+      const headerSet = new Set(headers.map((h) => h.trim()));
+      for (const mapping of savedMappings) {
+        const cols = mapping.columns as ColumnMapping;
+        // All mapped columns must be present in the CSV headers
+        const requiredCols = [cols.date, cols.amount, cols.description].filter(Boolean);
+        const optionalCols = [cols.merchantName, cols.category, cols.memo].filter(Boolean);
+        const allCols = [...requiredCols, ...optionalCols];
+        if (allCols.every((col) => headerSet.has(col!))) {
+          return mapping;
+        }
+      }
+      return null;
+    },
+    [savedMappings]
+  );
 
-    const formData = new FormData();
-    formData.append("file", file);
+  const handleFileSelect = useCallback(
+    async (file: File) => {
+      setState("parsing");
+      setError(null);
+      setMatchedMapping(null);
 
-    try {
-      const res = await fetch("/api/import/preview", {
-        method: "POST",
-        body: formData,
-      });
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || "Failed to parse file");
-        setState("idle");
+      // For non-CSV files, use the existing auto-detect flow
+      const ext = file.name.toLowerCase().split(".").pop();
+      if (ext === "qfx" || ext === "qbo" || ext === "ofx") {
+        const formData = new FormData();
+        formData.append("file", file);
+        try {
+          const res = await fetch("/api/import/preview", {
+            method: "POST",
+            body: formData,
+          });
+          const data = await res.json();
+          if (!res.ok) {
+            setError(data.error || "Failed to parse file");
+            setState("idle");
+            return;
+          }
+          setPreviewData(data);
+          setState("preview");
+        } catch {
+          setError("Failed to upload file");
+          setState("idle");
+        }
         return;
       }
 
-      setPreviewData(data);
-      setState("preview");
-    } catch {
-      setError("Failed to upload file");
-      setState("idle");
-    }
-  }, []);
+      // For CSV files: read content, extract headers, check for saved mapping first
+      try {
+        const content = await file.text();
+
+        // Parse headers client-side to check for a saved mapping before hitting the server
+        const Papa = (await import("papaparse")).default;
+        const parsed = Papa.parse<Record<string, string>>(content, {
+          header: true,
+          skipEmptyLines: true,
+          preview: 5,
+        });
+
+        const headers = parsed.meta.fields;
+        const sampleRows = parsed.data;
+
+        if (!headers || headers.length === 0) {
+          setError("Could not detect columns in CSV file");
+          setState("idle");
+          return;
+        }
+
+        // Check for a matching saved mapping — skip auto-detect entirely if found
+        const match = findMatchingMapping(headers);
+        if (match) {
+          setCsvMeta({ headers, sampleRows, fileContent: content, fileName: file.name });
+          setMatchedMapping(match);
+          await applyMapping(content, file.name, {
+            columns: match.columns as ColumnMapping,
+            dateFormat: match.dateFormat,
+            amountConvention: match.amountConvention,
+            skipRows: match.skipRows,
+          });
+          return;
+        }
+
+        // No saved mapping — try server-side auto-detect (Amex, BofA, etc.)
+        const formData = new FormData();
+        formData.append("file", file);
+        const res = await fetch("/api/import/preview", {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+
+        if (res.ok && data.format !== "unknown-csv") {
+          setPreviewData(data);
+          setState("preview");
+          return;
+        }
+
+        // Unknown CSV — show column mapper
+        setCsvMeta({ headers, sampleRows, fileContent: content, fileName: file.name });
+        setState("mapping");
+      } catch {
+        setError("Failed to read file");
+        setState("idle");
+      }
+    },
+    [findMatchingMapping]
+  );
+
+  // Apply a column mapping and get the preview
+  const applyMapping = useCallback(
+    async (
+      content: string,
+      fileName: string,
+      config: MappingConfig
+    ) => {
+      setState("processing");
+      setError(null);
+
+      try {
+        const formData = new FormData();
+        const blob = new Blob([content], { type: "text/csv" });
+        formData.append("file", blob, fileName);
+        formData.append("mapping", JSON.stringify({
+          columns: config.columns,
+          dateFormat: config.dateFormat,
+          amountConvention: config.amountConvention,
+          skipRows: config.skipRows,
+        }));
+
+        const res = await fetch("/api/import/preview", {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          setError(data.error || "Failed to parse file with mapping");
+          setState("mapping");
+          return;
+        }
+
+        setPreviewData(data);
+        setState("preview");
+
+        // Save the mapping if requested
+        if (config.saveName) {
+          fetch("/api/column-mappings", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: config.saveName,
+              columns: config.columns,
+              dateFormat: config.dateFormat,
+              amountConvention: config.amountConvention,
+              skipRows: config.skipRows,
+            }),
+          })
+            .then((r) => r.json())
+            .then((data) => {
+              if (data.mapping) {
+                setSavedMappings((prev) => [...prev, data.mapping]);
+              }
+            })
+            .catch(() => {}); // non-critical
+        }
+      } catch {
+        setError("Failed to process file");
+        setState("mapping");
+      }
+    },
+    []
+  );
+
+  const handleMapperConfirm = useCallback(
+    (config: MappingConfig) => {
+      if (!csvMeta) return;
+      applyMapping(csvMeta.fileContent, csvMeta.fileName, config);
+    },
+    [csvMeta, applyMapping]
+  );
 
   const handleCreateAccount = useCallback(async () => {
     try {
@@ -120,6 +301,14 @@ export default function ImportPage() {
     [selectedAccountId, previewData]
   );
 
+  const resetAll = useCallback(() => {
+    setState("idle");
+    setPreviewData(null);
+    setCsvMeta(null);
+    setMatchedMapping(null);
+    setError(null);
+  }, []);
+
   return (
     <div className="max-w-4xl mx-auto animate-fade-in-up">
       <h1 className="text-2xl font-bold text-foreground mb-2">
@@ -127,6 +316,7 @@ export default function ImportPage() {
       </h1>
       <p className="text-foreground-muted mb-6">
         Upload a bank export file (CSV, QFX, QBO, OFX) to import transactions.
+        Any CSV format works — you can map columns interactively.
       </p>
 
       {error && (
@@ -135,6 +325,7 @@ export default function ImportPage() {
         </div>
       )}
 
+      {/* Step 1: File upload */}
       {(state === "idle" || state === "parsing") && (
         <FileDropzone
           onFileSelect={handleFileSelect}
@@ -142,11 +333,53 @@ export default function ImportPage() {
         />
       )}
 
-      {state === "preview" && (
+      {/* Step 2: Column mapping (for unknown CSVs) */}
+      {state === "mapping" && csvMeta && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-foreground-muted">
+              We couldn&apos;t auto-detect this CSV format. Map your columns below.
+            </p>
+            <button
+              onClick={resetAll}
+              className="text-sm text-foreground-tertiary hover:text-foreground transition-colors"
+            >
+              Start over
+            </button>
+          </div>
+          <ColumnMapper
+            headers={csvMeta.headers}
+            sampleRows={csvMeta.sampleRows}
+            onConfirm={handleMapperConfirm}
+            initialMapping={matchedMapping?.columns as ColumnMapping | undefined}
+          />
+        </div>
+      )}
+
+      {/* Processing indicator */}
+      {state === "processing" && (
+        <div className="bg-background-card backdrop-blur-xl rounded-2xl border border-border p-12 text-center">
+          <div className="w-12 h-12 mx-auto rounded-xl shimmer-bg animate-shimmer mb-4" />
+          <p className="text-foreground-muted">Processing with your column mapping...</p>
+        </div>
+      )}
+
+      {/* Step 3: Account selection + Preview */}
+      {(state === "preview" || state === "importing") && (
         <div className="mb-4">
-          <label className="block text-sm font-medium text-foreground-muted mb-2">
-            Import to account:
-          </label>
+          <div className="flex items-center justify-between mb-2">
+            <label className="block text-sm font-medium text-foreground-muted">
+              Import to account:
+            </label>
+            {previewData?.format === "mapped-csv" && (
+              <button
+                onClick={() => setState("mapping")}
+                className="text-xs text-accent hover:text-accent-hover transition-colors"
+              >
+                Edit column mapping
+              </button>
+            )}
+          </div>
           <div className="flex gap-2">
             <select
               value={selectedAccountId}
@@ -226,11 +459,7 @@ export default function ImportPage() {
           </p>
           <div className="mt-4 flex gap-3 justify-center">
             <button
-              onClick={() => {
-                setState("idle");
-                setPreviewData(null);
-                setError(null);
-              }}
+              onClick={resetAll}
               className="px-4 py-2 bg-background-elevated border border-border rounded-lg hover:bg-white/5 transition-all duration-150 active:scale-95"
             >
               Import more

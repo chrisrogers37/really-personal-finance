@@ -9,9 +9,41 @@ export interface ParsedTransaction {
 }
 
 export interface ParseResult {
-  format: "amex-csv" | "bofa-csv" | "headerless-csv" | "ofx" | "unknown-csv";
+  format: "amex-csv" | "bofa-csv" | "headerless-csv" | "ofx" | "mapped-csv" | "unknown-csv";
   accountHint?: string; // Account identifier from file (OFX ACCTID)
   transactions: ParsedTransaction[];
   skippedRows?: number; // Header/summary rows skipped
   errors: string[]; // Non-fatal parse warnings
+}
+
+/** User-defined column mapping for arbitrary CSV formats */
+export interface ColumnMapping {
+  date: string; // CSV header name mapped to date
+  amount: string; // CSV header name mapped to amount
+  description: string; // CSV header name mapped to description
+  merchantName?: string; // CSV header name mapped to merchant (optional)
+  category?: string; // CSV header name mapped to category (optional)
+  memo?: string; // CSV header name mapped to memo/notes (optional)
+}
+
+/** Amount convention: which direction means outflow */
+export type AmountConvention = "positive_outflow" | "negative_outflow";
+
+/** Configuration for parsing a CSV with a user-defined column mapping */
+export interface MappingConfig {
+  columns: ColumnMapping;
+  dateFormat?: string; // "MM/DD/YYYY" | "YYYY-MM-DD" | "DD/MM/YYYY"
+  amountConvention: AmountConvention;
+  skipRows: number;
+  saveName?: string; // If set, save this mapping for reuse
+}
+
+/** Saved mapping configuration (stored in DB) */
+export interface SavedColumnMapping {
+  id: string;
+  name: string;
+  columns: ColumnMapping;
+  dateFormat?: string;
+  amountConvention: AmountConvention;
+  skipRows: number;
 }

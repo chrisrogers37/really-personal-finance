@@ -6,6 +6,8 @@ import {
   boolean,
   decimal,
   date,
+  integer,
+  jsonb,
   index,
 } from "drizzle-orm/pg-core";
 
@@ -123,6 +125,24 @@ export const transactions = pgTable(
     index("idx_transactions_category").on(table.userId, table.categoryPrimary),
     index("idx_transactions_merchant").on(table.userId, table.merchantName),
     index("idx_transactions_plaid_id").on(table.plaidTransactionId),
+  ]
+);
+
+// ─── Column Mappings (saved CSV import formats) ──────────────────────────────
+export const columnMappings = pgTable(
+  "column_mappings",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id").notNull(),
+    name: text("name").notNull(),
+    columns: jsonb("columns").notNull(), // { date: "Post Date", amount: "Amount", ... }
+    dateFormat: text("date_format"), // "MM/DD/YYYY" | "YYYY-MM-DD" | "DD/MM/YYYY"
+    amountConvention: text("amount_convention").notNull().default("positive_outflow"), // "positive_outflow" | "negative_outflow"
+    skipRows: integer("skip_rows").notNull().default(0),
+    createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("idx_column_mappings_user_id").on(table.userId),
   ]
 );
 
