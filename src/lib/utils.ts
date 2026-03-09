@@ -12,6 +12,11 @@ export function formatCurrency(amount: number): string {
   }).format(amount);
 }
 
+/** Parse a raw currency string (strip $, commas, whitespace) into a number. Returns NaN on failure. */
+export function parseAmount(raw: string): number {
+  return parseFloat(raw.replace(/[\s,$]/g, ""));
+}
+
 export function formatDate(date: string | Date): string {
   return new Date(date).toLocaleDateString("en-US", {
     month: "short",

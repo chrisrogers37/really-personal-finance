@@ -8,9 +8,16 @@ import { format, subMonths } from "date-fns";
 import { Plus } from "lucide-react";
 import type { Transaction } from "@/types";
 
+interface Account {
+  id: string;
+  name: string;
+  type: string;
+}
+
 export default function TransactionsPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
+  const [accounts, setAccounts] = useState<Account[]>([]);
   const [startDate, setStartDate] = useState(
     format(subMonths(new Date(), 1), "yyyy-MM-dd")
   );
@@ -46,6 +53,13 @@ export default function TransactionsPage() {
   useEffect(() => {
     fetchTransactions();
   }, [fetchTransactions]);
+
+  useEffect(() => {
+    fetch("/api/accounts")
+      .then((r) => r.json())
+      .then((data) => setAccounts(data.accounts || []))
+      .catch(() => {});
+  }, []);
 
   return (
     <div className="space-y-6 animate-fade-in-up">
@@ -172,6 +186,7 @@ export default function TransactionsPage() {
       {/* Add Transaction Modal */}
       {showAddModal && (
         <AddTransactionModal
+          accounts={accounts}
           onClose={() => setShowAddModal(false)}
           onSaved={() => {
             setShowAddModal(false);

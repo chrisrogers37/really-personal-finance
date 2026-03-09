@@ -6,7 +6,7 @@ import { eq, and, gte, lte } from "drizzle-orm";
 import { parseTransactionFile, parseMappedCSV } from "@/lib/parsers";
 import { generateImportId } from "@/lib/import";
 import type { DuplicateMatch } from "@/lib/import";
-import type { ParsedTransaction, ColumnMapping } from "@/lib/parsers/types";
+import type { ParsedTransaction, MappingConfig } from "@/lib/parsers/types";
 
 async function findDuplicates(
   userId: string,
@@ -119,12 +119,7 @@ export async function POST(request: NextRequest) {
 
   if (mappingRaw) {
     try {
-      const mappingConfig = JSON.parse(mappingRaw) as {
-        columns: ColumnMapping;
-        dateFormat?: string;
-        amountConvention: "positive_outflow" | "negative_outflow";
-        skipRows: number;
-      };
+      const mappingConfig = JSON.parse(mappingRaw) as MappingConfig;
       result = parseMappedCSV(content, mappingConfig);
     } catch {
       return NextResponse.json(

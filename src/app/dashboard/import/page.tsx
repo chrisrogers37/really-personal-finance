@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect } from "react";
 import { FileDropzone } from "@/components/file-dropzone";
 import { ImportPreview } from "@/components/import-preview";
 import { ColumnMapper } from "@/components/column-mapper";
-import type { ColumnMapping, SavedColumnMapping } from "@/lib/parsers/types";
+import type { ColumnMapping, SavedColumnMapping, MappingConfig } from "@/lib/parsers/types";
 
 type ImportState =
   | "idle"
@@ -106,36 +106,11 @@ export default function ImportPage() {
         return;
       }
 
-      // For CSV files: read content, extract headers, check for known format or saved mapping
+      // For CSV files: read content, extract headers, check for saved mapping first
       try {
         const content = await file.text();
-        const formData = new FormData();
-        formData.append("file", file);
 
-        // First try auto-detect (Amex, BofA, etc.)
-        const res = await fetch("/api/import/preview", {
-          method: "POST",
-          body: formData,
-        });
-        const data = await res.json();
-
-        if (res.ok && data.format !== "unknown-csv") {
-          // Known format detected — go straight to preview
-          setPreviewData(data);
-          setState("preview");
-          return;
-        }
-
-        // Unknown CSV — extract headers for column mapping
-        const lines = content.split("\n");
-        const headerLine = lines[0];
-        if (!headerLine?.trim()) {
-          setError("CSV file appears to be empty");
-          setState("idle");
-          return;
-        }
-
-        // Parse just the headers and sample rows
+        // Parse headers client-side to check for a saved mapping before hitting the server
         const Papa = (await import("papaparse")).default;
         const parsed = Papa.parse<Record<string, string>>(content, {
           header: true,
@@ -143,32 +118,47 @@ export default function ImportPage() {
           preview: 5,
         });
 
-        if (!parsed.meta.fields || parsed.meta.fields.length === 0) {
+        const headers = parsed.meta.fields;
+        const sampleRows = parsed.data;
+
+        if (!headers || headers.length === 0) {
           setError("Could not detect columns in CSV file");
           setState("idle");
           return;
         }
 
-        const headers = parsed.meta.fields;
-        const sampleRows = parsed.data;
-
-        setCsvMeta({ headers, sampleRows, fileContent: content, fileName: file.name });
-
-        // Check for a matching saved mapping
+        // Check for a matching saved mapping — skip auto-detect entirely if found
         const match = findMatchingMapping(headers);
         if (match) {
+          setCsvMeta({ headers, sampleRows, fileContent: content, fileName: file.name });
           setMatchedMapping(match);
-          // Auto-apply and go to processing
           await applyMapping(content, file.name, {
             columns: match.columns as ColumnMapping,
             dateFormat: match.dateFormat,
-            amountConvention: match.amountConvention as "positive_outflow" | "negative_outflow",
+            amountConvention: match.amountConvention,
             skipRows: match.skipRows,
           });
-        } else {
-          // Show column mapper
-          setState("mapping");
+          return;
         }
+
+        // No saved mapping — try server-side auto-detect (Amex, BofA, etc.)
+        const formData = new FormData();
+        formData.append("file", file);
+        const res = await fetch("/api/import/preview", {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+
+        if (res.ok && data.format !== "unknown-csv") {
+          setPreviewData(data);
+          setState("preview");
+          return;
+        }
+
+        // Unknown CSV — show column mapper
+        setCsvMeta({ headers, sampleRows, fileContent: content, fileName: file.name });
+        setState("mapping");
       } catch {
         setError("Failed to read file");
         setState("idle");
@@ -182,13 +172,7 @@ export default function ImportPage() {
     async (
       content: string,
       fileName: string,
-      config: {
-        columns: ColumnMapping;
-        dateFormat?: string;
-        amountConvention: "positive_outflow" | "negative_outflow";
-        skipRows: number;
-        saveName?: string;
-      }
+      config: MappingConfig
     ) => {
       setState("processing");
       setError(null);
@@ -249,13 +233,7 @@ export default function ImportPage() {
   );
 
   const handleMapperConfirm = useCallback(
-    (config: {
-      columns: ColumnMapping;
-      dateFormat?: string;
-      amountConvention: "positive_outflow" | "negative_outflow";
-      skipRows: number;
-      saveName?: string;
-    }) => {
+    (config: MappingConfig) => {
       if (!csvMeta) return;
       applyMapping(csvMeta.fileContent, csvMeta.fileName, config);
     },

@@ -26,12 +26,24 @@ export interface ColumnMapping {
   memo?: string; // CSV header name mapped to memo/notes (optional)
 }
 
+/** Amount convention: which direction means outflow */
+export type AmountConvention = "positive_outflow" | "negative_outflow";
+
+/** Configuration for parsing a CSV with a user-defined column mapping */
+export interface MappingConfig {
+  columns: ColumnMapping;
+  dateFormat?: string; // "MM/DD/YYYY" | "YYYY-MM-DD" | "DD/MM/YYYY"
+  amountConvention: AmountConvention;
+  skipRows: number;
+  saveName?: string; // If set, save this mapping for reuse
+}
+
 /** Saved mapping configuration (stored in DB) */
 export interface SavedColumnMapping {
   id: string;
   name: string;
   columns: ColumnMapping;
-  dateFormat?: string; // "MM/DD/YYYY" | "YYYY-MM-DD" | "DD/MM/YYYY"
-  amountConvention: "positive_outflow" | "negative_outflow";
+  dateFormat?: string;
+  amountConvention: AmountConvention;
   skipRows: number;
 }

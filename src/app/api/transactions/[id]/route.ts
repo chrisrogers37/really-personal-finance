@@ -33,30 +33,24 @@ export async function PATCH(
     );
   }
 
-  const [existing] = await db
-    .select({ id: transactions.id })
-    .from(transactions)
-    .where(
-      and(eq(transactions.id, id), eq(transactions.userId, session.user.id))
-    )
-    .limit(1);
-
-  if (!existing) {
-    return NextResponse.json(
-      { error: "Transaction not found" },
-      { status: 404 }
-    );
-  }
-
   const [updated] = await db
     .update(transactions)
     .set(updates)
-    .where(eq(transactions.id, id))
+    .where(
+      and(eq(transactions.id, id), eq(transactions.userId, session.user.id))
+    )
     .returning({
       id: transactions.id,
       merchantName: transactions.merchantName,
       categoryPrimary: transactions.categoryPrimary,
     });
+
+  if (!updated) {
+    return NextResponse.json(
+      { error: "Transaction not found" },
+      { status: 404 }
+    );
+  }
 
   return NextResponse.json({ transaction: updated });
 }

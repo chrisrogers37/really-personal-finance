@@ -2,7 +2,7 @@ import { parseCSV } from "./csv";
 import { parseOFX } from "./ofx";
 import type { ParseResult } from "./types";
 
-export type { ParsedTransaction, ParseResult, ColumnMapping, SavedColumnMapping } from "./types";
+export type { ParsedTransaction, ParseResult, ColumnMapping, SavedColumnMapping, MappingConfig, AmountConvention } from "./types";
 export { parseMappedCSV, extractCSVHeaders } from "./mapped-csv";
 export type { MappedCSVOptions } from "./mapped-csv";
 

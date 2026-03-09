@@ -1,17 +1,15 @@
 import Papa from "papaparse";
-import type { ParsedTransaction, ParseResult, ColumnMapping } from "./types";
+import { isISODate, parseMMDDYYYY } from "./csv";
+import { parseAmount } from "@/lib/utils";
+import type { ParsedTransaction, ParseResult, ColumnMapping, MappingConfig } from "./types";
 
-/**
- * Parse a date string using a known format into YYYY-MM-DD.
- * Supports: MM/DD/YYYY, DD/MM/YYYY, YYYY-MM-DD, M/D/YYYY variants.
- */
+/** Parse a date string using a known format into YYYY-MM-DD. */
 function normalizeDate(raw: string, format?: string): string | null {
   const trimmed = raw.trim();
 
-  // Already ISO
-  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) return trimmed;
+  if (isISODate(trimmed)) return trimmed;
 
-  // Try to parse based on explicit format
+  // DD/MM/YYYY (EU format)
   if (format === "DD/MM/YYYY") {
     const match = trimmed.match(/^(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{4})$/);
     if (match) {
@@ -19,7 +17,7 @@ function normalizeDate(raw: string, format?: string): string | null {
     }
   }
 
-  // Default: MM/DD/YYYY (US format)
+  // Default: MM/DD/YYYY (US format) — handles M/D/YYYY variants via regex
   const match = trimmed.match(/^(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{4})$/);
   if (match) {
     return `${match[3]}-${match[1].padStart(2, "0")}-${match[2].padStart(2, "0")}`;
@@ -28,12 +26,8 @@ function normalizeDate(raw: string, format?: string): string | null {
   return null;
 }
 
-export interface MappedCSVOptions {
-  columns: ColumnMapping;
-  dateFormat?: string;
-  amountConvention: "positive_outflow" | "negative_outflow";
-  skipRows: number;
-}
+/** Options for parseMappedCSV — reuses MappingConfig without saveName */
+export type MappedCSVOptions = Omit<MappingConfig, "saveName">;
 
 /**
  * Parse a CSV using a user-defined column mapping.
@@ -75,7 +69,7 @@ export function parseMappedCSV(
       continue;
     }
 
-    const amount = parseFloat(amountRaw.replace(/[,$]/g, ""));
+    const amount = parseAmount(amountRaw);
     if (isNaN(amount)) {
       errors.push(`Invalid amount "${amountRaw}" for "${description}"`);
       continue;

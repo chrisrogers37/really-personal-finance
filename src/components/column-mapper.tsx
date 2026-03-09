@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { GripVertical, X, Check } from "lucide-react";
-import { formatCurrency } from "@/lib/utils";
-import type { ColumnMapping } from "@/lib/parsers/types";
+import { formatCurrency, parseAmount } from "@/lib/utils";
+import type { ColumnMapping, MappingConfig, AmountConvention } from "@/lib/parsers/types";
 
 // ─── Target field definitions ────────────────────────────────────────────────
 
@@ -27,13 +27,7 @@ const TARGET_FIELDS: TargetField[] = [
 interface ColumnMapperProps {
   headers: string[];
   sampleRows: Record<string, string>[];
-  onConfirm: (config: {
-    columns: ColumnMapping;
-    dateFormat?: string;
-    amountConvention: "positive_outflow" | "negative_outflow";
-    skipRows: number;
-    saveName?: string;
-  }) => void;
+  onConfirm: (config: MappingConfig) => void;
   /** Pre-fill from a saved mapping */
   initialMapping?: ColumnMapping;
   loading?: boolean;
@@ -74,7 +68,7 @@ export function ColumnMapper({
 
   const [dateFormat, setDateFormat] = useState<string>("MM/DD/YYYY");
   const [amountConvention, setAmountConvention] = useState<
-    "positive_outflow" | "negative_outflow"
+    AmountConvention
   >("positive_outflow");
   const [skipRows, setSkipRows] = useState(0);
   const [saveName, setSaveName] = useState("");
@@ -83,10 +77,27 @@ export function ColumnMapper({
   const [dragOverTarget, setDragOverTarget] = useState<string | null>(null);
 
   // Which source headers are already mapped
-  const mappedHeaders = new Set(Object.values(mapping).filter(Boolean));
+  const mappedHeaders = useMemo(
+    () => new Set(Object.values(mapping).filter(Boolean)),
+    [mapping]
+  );
 
   const isComplete =
     mapping.date && mapping.amount && mapping.description;
+
+  // Pre-compute header → first sample value map
+  const sampleMap = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const header of headers) {
+      for (const row of sampleRows) {
+        if (row[header]?.trim()) {
+          map.set(header, row[header].trim());
+          break;
+        }
+      }
+    }
+    return map;
+  }, [headers, sampleRows]);
 
   // ─── Drag handlers ──────────────────────────────────────────────────────────
 
@@ -160,13 +171,10 @@ export function ColumnMapper({
     });
   };
 
-  // Get a sample value for a header
-  const getSample = (header: string) => {
-    for (const row of sampleRows) {
-      if (row[header]?.trim()) return row[header].trim();
-    }
-    return "—";
-  };
+  const getSample = useCallback(
+    (header: string) => sampleMap.get(header) ?? "—",
+    [sampleMap]
+  );
 
   return (
     <div className="space-y-6">
@@ -285,7 +293,7 @@ export function ColumnMapper({
               value={amountConvention}
               onChange={(e) =>
                 setAmountConvention(
-                  e.target.value as "positive_outflow" | "negative_outflow"
+                  e.target.value as AmountConvention
                 )
               }
               className="w-full px-3 py-2.5 border border-border rounded-xl bg-background text-foreground focus:ring-2 focus:ring-accent focus:border-accent outline-none transition-all duration-150 appearance-none"
@@ -318,7 +326,7 @@ export function ColumnMapper({
               {sampleRows.slice(0, 3).map((row, i) => {
                 const raw = row[mapping.amount!];
                 if (!raw) return null;
-                const val = parseFloat(raw.replace(/[,$]/g, ""));
+                const val = parseAmount(raw);
                 if (isNaN(val)) return null;
                 const normalized = amountConvention === "negative_outflow" ? -val : val;
                 const isExpense = normalized > 0;
@@ -379,7 +387,7 @@ export function ColumnMapper({
               <tbody>
                 {sampleRows.map((row, i) => {
                   const rawAmount = row[mapping.amount!];
-                  const val = rawAmount ? parseFloat(rawAmount.replace(/[,$]/g, "")) : 0;
+                  const val = rawAmount ? parseAmount(rawAmount) : 0;
                   const normalized =
                     amountConvention === "negative_outflow" ? -val : val;
                   const isExpense = normalized > 0;
