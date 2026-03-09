@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { PlaidLinkButton } from "@/components/plaid-link";
 import { IncomeSpendingChart } from "@/components/income-spending-chart";
+import { SyncStatusBanner } from "@/components/sync-status-banner";
 import { formatCurrency } from "@/lib/utils";
 
 interface MonthlyData {
@@ -46,6 +47,9 @@ export default function DashboardPage() {
         </div>
         <PlaidLinkButton onSuccess={fetchData} />
       </div>
+
+      {/* Sync Status */}
+      <SyncStatusBanner />
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
