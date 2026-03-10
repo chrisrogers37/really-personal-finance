@@ -17,6 +17,11 @@ export function parseAmount(raw: string): number {
   return parseFloat(raw.replace(/[\s,$]/g, ""));
 }
 
+/** Format a Plaid category string for display (e.g., FOOD_AND_DRINK → Food And Drink). */
+export function formatCategory(category: string): string {
+  return category.replace(/_/g, " ");
+}
+
 export function formatDate(date: string | Date): string {
   return new Date(date).toLocaleDateString("en-US", {
     month: "short",

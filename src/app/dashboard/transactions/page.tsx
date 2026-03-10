@@ -4,7 +4,9 @@ import { useEffect, useState, useCallback } from "react";
 import { TransactionTable } from "@/components/transaction-table";
 import { EditTransactionModal } from "@/components/edit-transaction-modal";
 import { AddTransactionModal } from "@/components/add-transaction-modal";
-import { format, subDays, subMonths, startOfYear } from "date-fns";
+import { format, subMonths } from "date-fns";
+import { DATE_PRESETS, getPresetDates } from "@/lib/date-presets";
+import { formatCategory } from "@/lib/utils";
 import { Plus } from "lucide-react";
 import type { Transaction } from "@/types";
 
@@ -12,28 +14,6 @@ interface Account {
   id: string;
   name: string;
   type: string;
-}
-
-const datePresets = [
-  { label: "7d", days: 7 },
-  { label: "30d", days: 30 },
-  { label: "3mo", days: 90 },
-  { label: "YTD", days: -1 },
-  { label: "All", days: -2 },
-] as const;
-
-function getPresetDates(preset: (typeof datePresets)[number]) {
-  const today = format(new Date(), "yyyy-MM-dd");
-  if (preset.days === -1) {
-    return { start: format(startOfYear(new Date()), "yyyy-MM-dd"), end: today };
-  }
-  if (preset.days === -2) {
-    return { start: "2000-01-01", end: today };
-  }
-  return {
-    start: format(subDays(new Date(), preset.days), "yyyy-MM-dd"),
-    end: today,
-  };
 }
 
 export default function TransactionsPage() {
@@ -90,13 +70,6 @@ export default function TransactionsPage() {
       .catch(() => {});
   }, []);
 
-  function applyPreset(preset: (typeof datePresets)[number]) {
-    const { start, end } = getPresetDates(preset);
-    setStartDate(start);
-    setEndDate(end);
-    setOffset(0);
-  }
-
   return (
     <div className="space-y-6 animate-fade-in-up">
       <div className="flex items-center justify-between">
@@ -119,13 +92,17 @@ export default function TransactionsPage() {
       <div className="bg-background-card backdrop-blur-xl p-4 rounded-2xl border border-border space-y-3">
         {/* Date presets */}
         <div className="flex flex-wrap gap-2">
-          {datePresets.map((preset) => {
+          {DATE_PRESETS.map((preset) => {
             const { start, end } = getPresetDates(preset);
             const isActive = startDate === start && endDate === end;
             return (
               <button
                 key={preset.label}
-                onClick={() => applyPreset(preset)}
+                onClick={() => {
+                  setStartDate(start);
+                  setEndDate(end);
+                  setOffset(0);
+                }}
                 className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-150 active:scale-95 ${
                   isActive
                     ? "bg-accent text-foreground"
@@ -182,7 +159,7 @@ export default function TransactionsPage() {
               <option value="">All Categories</option>
               {categories.map((cat) => (
                 <option key={cat} value={cat}>
-                  {cat.replace(/_/g, " ")}
+                  {formatCategory(cat)}
                 </option>
               ))}
             </select>

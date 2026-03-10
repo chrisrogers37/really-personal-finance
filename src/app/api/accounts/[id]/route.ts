@@ -21,20 +21,10 @@ export async function PATCH(
     return NextResponse.json({ error: "Name is required" }, { status: 400 });
   }
 
-  const [account] = await db
-    .select({ id: accounts.id })
-    .from(accounts)
-    .where(and(eq(accounts.id, id), eq(accounts.userId, session.user.id)))
-    .limit(1);
-
-  if (!account) {
-    return NextResponse.json({ error: "Account not found" }, { status: 404 });
-  }
-
   const [updated] = await db
     .update(accounts)
-    .set({ name: name.trim() })
-    .where(eq(accounts.id, id))
+    .set({ name: (name as string).trim() })
+    .where(and(eq(accounts.id, id), eq(accounts.userId, session.user.id)))
     .returning({
       id: accounts.id,
       name: accounts.name,
@@ -43,6 +33,10 @@ export async function PATCH(
       mask: accounts.mask,
       source: accounts.source,
     });
+
+  if (!updated) {
+    return NextResponse.json({ error: "Account not found" }, { status: 404 });
+  }
 
   return NextResponse.json({ account: updated });
 }
@@ -57,26 +51,27 @@ export async function DELETE(
   }
 
   const { id } = await params;
+  const userId = session.user.id;
 
   const [account] = await db
-    .select({ id: accounts.id, source: accounts.source })
+    .select({ id: accounts.id })
     .from(accounts)
-    .where(and(eq(accounts.id, id), eq(accounts.userId, session.user.id)))
+    .where(and(eq(accounts.id, id), eq(accounts.userId, userId)))
     .limit(1);
 
   if (!account) {
     return NextResponse.json({ error: "Account not found" }, { status: 404 });
   }
 
-  // Delete associated transactions first
-  await db
-    .delete(transactions)
-    .where(eq(transactions.accountId, id));
-
-  // Delete the account
-  await db
-    .delete(accounts)
-    .where(eq(accounts.id, id));
+  // Atomic delete: transactions first, then account
+  await db.transaction(async (tx) => {
+    await tx
+      .delete(transactions)
+      .where(eq(transactions.accountId, id));
+    await tx
+      .delete(accounts)
+      .where(and(eq(accounts.id, id), eq(accounts.userId, userId)));
+  });
 
   return NextResponse.json({ success: true });
 }

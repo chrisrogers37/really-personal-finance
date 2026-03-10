@@ -24,7 +24,7 @@ interface Account {
   type: string;
   subtype: string | null;
   mask: string | null;
-  source: string;
+  source: "plaid" | "import" | "manual";
 }
 
 export default function SettingsPage() {
@@ -204,6 +204,11 @@ export default function SettingsPage() {
   }
 
   async function deleteAccount(id: string) {
+    const confirmed = window.confirm(
+      "Are you sure? This will permanently delete the account and all its transactions."
+    );
+    if (!confirmed) return;
+
     setAccountMessage(null);
     setDeletingAccountId(id);
     try {
