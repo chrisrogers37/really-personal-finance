@@ -5,6 +5,8 @@ import { TransactionTable } from "@/components/transaction-table";
 import { EditTransactionModal } from "@/components/edit-transaction-modal";
 import { AddTransactionModal } from "@/components/add-transaction-modal";
 import { format, subMonths } from "date-fns";
+import { DATE_PRESETS, getPresetDates } from "@/lib/date-presets";
+import { formatCategory } from "@/lib/utils";
 import { Plus } from "lucide-react";
 import type { Transaction } from "@/types";
 
@@ -18,6 +20,7 @@ export default function TransactionsPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [accounts, setAccounts] = useState<Account[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
   const [startDate, setStartDate] = useState(
     format(subMonths(new Date(), 1), "yyyy-MM-dd")
   );
@@ -27,7 +30,8 @@ export default function TransactionsPage() {
   const [offset, setOffset] = useState(0);
   const limit = 50;
 
-  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
+  const [editingTransaction, setEditingTransaction] =
+    useState<Transaction | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
 
   const fetchTransactions = useCallback(async () => {
@@ -59,6 +63,11 @@ export default function TransactionsPage() {
       .then((r) => r.json())
       .then((data) => setAccounts(data.accounts || []))
       .catch(() => {});
+
+    fetch("/api/categories")
+      .then((r) => r.json())
+      .then((data) => setCategories(data.categories || []))
+      .catch(() => {});
   }, []);
 
   return (
@@ -66,7 +75,9 @@ export default function TransactionsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Transactions</h1>
-          <p className="text-foreground-muted">Browse and filter your transactions</p>
+          <p className="text-foreground-muted">
+            Browse and filter your transactions
+          </p>
         </div>
         <button
           onClick={() => setShowAddModal(true)}
@@ -78,7 +89,32 @@ export default function TransactionsPage() {
       </div>
 
       {/* Filters */}
-      <div className="bg-background-card backdrop-blur-xl p-4 rounded-2xl border border-border">
+      <div className="bg-background-card backdrop-blur-xl p-4 rounded-2xl border border-border space-y-3">
+        {/* Date presets */}
+        <div className="flex flex-wrap gap-2">
+          {DATE_PRESETS.map((preset) => {
+            const { start, end } = getPresetDates(preset);
+            const isActive = startDate === start && endDate === end;
+            return (
+              <button
+                key={preset.label}
+                onClick={() => {
+                  setStartDate(start);
+                  setEndDate(end);
+                  setOffset(0);
+                }}
+                className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-150 active:scale-95 ${
+                  isActive
+                    ? "bg-accent text-foreground"
+                    : "border border-border text-foreground-muted hover:bg-white/5"
+                }`}
+              >
+                {preset.label}
+              </button>
+            );
+          })}
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <label className="block text-xs font-medium text-foreground-muted mb-1">
@@ -112,16 +148,21 @@ export default function TransactionsPage() {
             <label className="block text-xs font-medium text-foreground-muted mb-1">
               Category
             </label>
-            <input
-              type="text"
+            <select
               value={category}
               onChange={(e) => {
                 setCategory(e.target.value);
                 setOffset(0);
               }}
-              placeholder="e.g., FOOD_AND_DRINK"
-              className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-background-elevated text-foreground placeholder:text-foreground-tertiary"
-            />
+              className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-background-elevated text-foreground"
+            >
+              <option value="">All Categories</option>
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>
+                  {formatCategory(cat)}
+                </option>
+              ))}
+            </select>
           </div>
           <div>
             <label className="block text-xs font-medium text-foreground-muted mb-1">

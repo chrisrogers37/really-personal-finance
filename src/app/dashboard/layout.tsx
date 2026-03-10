@@ -11,6 +11,7 @@ import {
   PieChart,
   Store,
   Upload,
+  Settings,
   User,
   LogOut,
   Menu,
@@ -23,6 +24,7 @@ const navItems = [
   { href: "/dashboard/categories", label: "Categories", icon: PieChart },
   { href: "/dashboard/merchants", label: "Merchants", icon: Store },
   { href: "/dashboard/import", label: "Import", icon: Upload },
+  { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 
 export default function DashboardLayout({
