@@ -15,26 +15,26 @@ const COLORS = [
   "#ef4444", // red-500
   "#22c55e", // green-500
   "#f59e0b", // amber-500
-  "#8b5cf6", // violet-500
+  "#06b6d4", // cyan-500
   "#ec4899", // pink-500
   "#14b8a6", // teal-500
   "#f97316", // orange-500
-  "#a78bfa", // violet-400 (avoids indigo accent collision)
-  "#a3e635", // lime-400 (brighter on dark)
-  "#06b6d4", // cyan-500
+  "#64748b", // slate-500
+  "#84cc16", // lime-500
+  "#8b5cf6", // violet-500
   "#e11d48", // rose-600
 ];
 
 const CHART_THEME = {
   tooltip: {
     contentStyle: {
-      backgroundColor: "rgba(19, 17, 28, 0.9)",
-      border: "1px solid rgba(255, 255, 255, 0.1)",
+      backgroundColor: "#ffffff",
+      border: "1px solid rgba(0, 0, 0, 0.1)",
       borderRadius: "12px",
-      backdropFilter: "blur(12px)",
+      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
     },
-    labelStyle: { color: "#ffffff", fontWeight: 600 },
-    itemStyle: { color: "#a1a1aa" },
+    labelStyle: { color: "#111827", fontWeight: 600 },
+    itemStyle: { color: "#6b7280" },
   },
 } as const;
 
@@ -57,7 +57,7 @@ function renderPieLabel(props: any) {
     <text
       x={x}
       y={y}
-      fill="#a1a1aa"
+      fill="#6b7280"
       textAnchor={x > cx ? "start" : "end"}
       dominantBaseline="central"
       fontSize={12}
@@ -90,7 +90,7 @@ export function CategoryChart({ data }: { data: CategoryData[] }) {
               dataKey="total"
               nameKey="category"
               label={renderPieLabel}
-              labelLine={{ stroke: "#71717a" }}
+              labelLine={{ stroke: "#9ca3af" }}
             >
               {data.map((_, index) => (
                 <Cell

@@ -58,14 +58,14 @@ export function EditTransactionModal({
         <>
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-2.5 border border-border rounded-xl text-foreground-muted hover:bg-white/5 transition-all duration-150 active:scale-95 font-medium"
+            className="flex-1 px-4 py-2.5 border border-border rounded-xl text-foreground-muted hover:bg-black/[0.04] transition-all duration-150 active:scale-95 font-medium"
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
             disabled={saving}
-            className="flex-1 px-4 py-2.5 bg-accent text-foreground rounded-xl font-medium hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150 active:scale-95"
+            className="flex-1 px-4 py-2.5 bg-accent text-white rounded-xl font-medium hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150 active:scale-95"
           >
             {saving ? "Saving..." : "Save"}
           </button>

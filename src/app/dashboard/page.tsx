@@ -53,19 +53,19 @@ export default function DashboardPage() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-background-card backdrop-blur-xl p-6 rounded-2xl border border-border animate-scale-in transition-all duration-200 hover:bg-white/8 hover:border-white/15 hover:-translate-y-0.5" style={{ animationDelay: "50ms" }}>
+        <div className="bg-background-card backdrop-blur-xl p-6 rounded-2xl border border-border animate-scale-in transition-all duration-200 hover:bg-black/[0.04] hover:border-border-emphasis hover:-translate-y-0.5" style={{ animationDelay: "50ms" }}>
           <p className="text-sm text-foreground-muted">This Month Income</p>
           <p className="text-2xl font-bold text-income">
             {latestMonth ? formatCurrency(latestMonth.income) : "$0.00"}
           </p>
         </div>
-        <div className="bg-background-card backdrop-blur-xl p-6 rounded-2xl border border-border animate-scale-in transition-all duration-200 hover:bg-white/8 hover:border-white/15 hover:-translate-y-0.5" style={{ animationDelay: "125ms" }}>
+        <div className="bg-background-card backdrop-blur-xl p-6 rounded-2xl border border-border animate-scale-in transition-all duration-200 hover:bg-black/[0.04] hover:border-border-emphasis hover:-translate-y-0.5" style={{ animationDelay: "125ms" }}>
           <p className="text-sm text-foreground-muted">This Month Spending</p>
           <p className="text-2xl font-bold text-spending">
             {latestMonth ? formatCurrency(latestMonth.spending) : "$0.00"}
           </p>
         </div>
-        <div className="bg-background-card backdrop-blur-xl p-6 rounded-2xl border border-border animate-scale-in transition-all duration-200 hover:bg-white/8 hover:border-white/15 hover:-translate-y-0.5" style={{ animationDelay: "200ms" }}>
+        <div className="bg-background-card backdrop-blur-xl p-6 rounded-2xl border border-border animate-scale-in transition-all duration-200 hover:bg-black/[0.04] hover:border-border-emphasis hover:-translate-y-0.5" style={{ animationDelay: "200ms" }}>
           <p className="text-sm text-foreground-muted">This Month Net</p>
           <p
             className={`text-2xl font-bold ${
@@ -75,7 +75,7 @@ export default function DashboardPage() {
             {latestMonth ? formatCurrency(latestMonth.net) : "$0.00"}
           </p>
         </div>
-        <div className="bg-background-card backdrop-blur-xl p-6 rounded-2xl border border-border animate-scale-in transition-all duration-200 hover:bg-white/8 hover:border-white/15 hover:-translate-y-0.5" style={{ animationDelay: "275ms" }}>
+        <div className="bg-background-card backdrop-blur-xl p-6 rounded-2xl border border-border animate-scale-in transition-all duration-200 hover:bg-black/[0.04] hover:border-border-emphasis hover:-translate-y-0.5" style={{ animationDelay: "275ms" }}>
           <p className="text-sm text-foreground-muted">All-Time Net</p>
           <p
             className={`text-2xl font-bold ${
@@ -88,7 +88,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Income vs Spending Chart */}
-      <div className="bg-background-card backdrop-blur-xl p-6 rounded-2xl border border-border animate-fade-in transition-all duration-200 hover:bg-white/8 hover:border-white/15" style={{ animationDelay: "350ms" }}>
+      <div className="bg-background-card backdrop-blur-xl p-6 rounded-2xl border border-border animate-fade-in transition-all duration-200 hover:bg-black/[0.04] hover:border-border-emphasis" style={{ animationDelay: "350ms" }}>
         <h2 className="text-lg font-semibold mb-4">Income vs Spending</h2>
         {loading ? (
           <div className="h-96 flex items-center justify-center text-foreground-tertiary">

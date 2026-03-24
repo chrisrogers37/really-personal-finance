@@ -99,7 +99,7 @@ export function SyncStatusBanner() {
       <button
         onClick={triggerSync}
         disabled={syncing}
-        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-border text-foreground-muted rounded-lg hover:bg-white/5 transition-all duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-border text-foreground-muted rounded-lg hover:bg-black/[0.04] transition-all duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
       >
         <RefreshCw className={`w-3 h-3 ${syncing ? "animate-spin" : ""}`} />
         Sync Now

@@ -13,21 +13,21 @@ import { formatCurrency } from "@/lib/utils";
 import type { MerchantData } from "@/types";
 
 const CHART_THEME = {
-  grid: { stroke: "rgba(255, 255, 255, 0.06)" },
+  grid: { stroke: "rgba(0, 0, 0, 0.06)" },
   axis: {
-    tick: { fill: "#a1a1aa" },
-    axisLine: { stroke: "rgba(255, 255, 255, 0.08)" },
-    tickLine: { stroke: "rgba(255, 255, 255, 0.08)" },
+    tick: { fill: "#6b7280" },
+    axisLine: { stroke: "rgba(0, 0, 0, 0.08)" },
+    tickLine: { stroke: "rgba(0, 0, 0, 0.08)" },
   },
   tooltip: {
     contentStyle: {
-      backgroundColor: "rgba(19, 17, 28, 0.9)",
-      border: "1px solid rgba(255, 255, 255, 0.1)",
+      backgroundColor: "#ffffff",
+      border: "1px solid rgba(0, 0, 0, 0.1)",
       borderRadius: "12px",
-      backdropFilter: "blur(12px)",
+      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
     },
-    labelStyle: { color: "#ffffff", fontWeight: 600 },
-    itemStyle: { color: "#a1a1aa" },
+    labelStyle: { color: "#111827", fontWeight: 600 },
+    itemStyle: { color: "#6b7280" },
   },
 } as const;
 
@@ -63,7 +63,7 @@ export function MerchantChart({ data }: { data: MerchantData[] }) {
             type="category"
             dataKey="merchant"
             width={90}
-            tick={{ fontSize: 12, fill: "#a1a1aa" }}
+            tick={{ fontSize: 12, fill: "#6b7280" }}
             axisLine={CHART_THEME.axis.axisLine}
             tickLine={CHART_THEME.axis.tickLine}
           />
@@ -72,9 +72,9 @@ export function MerchantChart({ data }: { data: MerchantData[] }) {
             contentStyle={CHART_THEME.tooltip.contentStyle}
             labelStyle={CHART_THEME.tooltip.labelStyle}
             itemStyle={CHART_THEME.tooltip.itemStyle}
-            cursor={{ fill: "rgba(255, 255, 255, 0.04)" }}
+            cursor={{ fill: "rgba(0, 0, 0, 0.04)" }}
           />
-          <Bar dataKey="total" fill="#6366f1" radius={[0, 4, 4, 0]} />
+          <Bar dataKey="total" fill="#3b82f6" radius={[0, 4, 4, 0]} />
         </BarChart>
       </ResponsiveContainer>
 
