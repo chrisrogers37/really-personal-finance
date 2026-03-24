@@ -31,8 +31,8 @@ export function DateRangeFilter({
               }}
               className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-150 active:scale-95 ${
                 isActive
-                  ? "bg-accent text-foreground"
-                  : "border border-border text-foreground-muted hover:bg-white/5"
+                  ? "bg-accent text-white"
+                  : "border border-border text-foreground-muted hover:bg-black/[0.04]"
               }`}
             >
               {preset.label}

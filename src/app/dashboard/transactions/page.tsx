@@ -81,7 +81,7 @@ export default function TransactionsPage() {
         </div>
         <button
           onClick={() => setShowAddModal(true)}
-          className="flex items-center gap-2 px-4 py-2.5 bg-accent text-foreground rounded-xl font-medium hover:bg-accent-hover transition-all duration-150 active:scale-95"
+          className="flex items-center gap-2 px-4 py-2.5 bg-accent text-white rounded-xl font-medium hover:bg-accent-hover transition-all duration-150 active:scale-95"
         >
           <Plus className="w-4 h-4" />
           <span className="hidden sm:inline">Add Transaction</span>
@@ -105,8 +105,8 @@ export default function TransactionsPage() {
                 }}
                 className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-150 active:scale-95 ${
                   isActive
-                    ? "bg-accent text-foreground"
-                    : "border border-border text-foreground-muted hover:bg-white/5"
+                    ? "bg-accent text-white"
+                    : "border border-border text-foreground-muted hover:bg-black/[0.04]"
                 }`}
               >
                 {preset.label}
@@ -195,7 +195,7 @@ export default function TransactionsPage() {
           <button
             onClick={() => setOffset(Math.max(0, offset - limit))}
             disabled={offset === 0}
-            className="px-4 py-2 text-sm font-medium text-foreground-muted border border-border rounded-lg hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150 active:scale-95"
+            className="px-4 py-2 text-sm font-medium text-foreground-muted border border-border rounded-lg hover:bg-black/[0.04] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150 active:scale-95"
           >
             Previous
           </button>
@@ -205,7 +205,7 @@ export default function TransactionsPage() {
           <button
             onClick={() => setOffset(offset + limit)}
             disabled={transactions.length < limit}
-            className="px-4 py-2 text-sm font-medium text-foreground-muted border border-border rounded-lg hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150 active:scale-95"
+            className="px-4 py-2 text-sm font-medium text-foreground-muted border border-border rounded-lg hover:bg-black/[0.04] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150 active:scale-95"
           >
             Next
           </button>

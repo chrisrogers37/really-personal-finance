@@ -118,7 +118,7 @@ export default function DashboardLayout({
             showLabels ? "px-3 py-2" : "justify-center px-0 py-2",
             active
               ? "bg-accent/10 text-accent"
-              : "text-foreground-muted hover:bg-white/5 hover:text-foreground"
+              : "text-foreground-muted hover:bg-black/[0.04] hover:text-foreground"
           )}
         >
           <item.icon className="w-5 h-5 shrink-0" />
@@ -137,7 +137,7 @@ export default function DashboardLayout({
             !showLabels ? (session?.user?.email || "Profile") : undefined
           }
           className={cn(
-            "flex items-center gap-3 rounded-lg text-sm font-medium text-foreground-muted hover:bg-white/5 hover:text-foreground transition-colors",
+            "flex items-center gap-3 rounded-lg text-sm font-medium text-foreground-muted hover:bg-black/[0.04] hover:text-foreground transition-colors",
             showLabels ? "px-3 py-2" : "justify-center px-0 py-2"
           )}
         >
@@ -152,7 +152,7 @@ export default function DashboardLayout({
           onClick={() => signOut({ callbackUrl: "/" })}
           title={!showLabels ? "Sign out" : undefined}
           className={cn(
-            "flex items-center gap-3 rounded-lg text-sm font-medium text-foreground-muted hover:bg-white/5 hover:text-danger w-full transition-colors",
+            "flex items-center gap-3 rounded-lg text-sm font-medium text-foreground-muted hover:bg-black/[0.04] hover:text-danger w-full transition-colors",
             showLabels ? "px-3 py-2" : "justify-center px-0 py-2"
           )}
         >
@@ -273,7 +273,7 @@ export default function DashboardLayout({
                   "px-0 group-hover/sidebar:px-3",
                   active
                     ? "bg-accent/10 text-accent"
-                    : "text-foreground-muted hover:bg-white/5 hover:text-foreground"
+                    : "text-foreground-muted hover:bg-black/[0.04] hover:text-foreground"
                 )}
               >
                 <item.icon className="w-5 h-5 shrink-0" />
@@ -290,7 +290,7 @@ export default function DashboardLayout({
           <Link
             href="/profile"
             title={session?.user?.email || "Profile"}
-            className="flex items-center gap-3 rounded-lg text-sm font-medium text-foreground-muted hover:bg-white/5 hover:text-foreground transition-colors py-2 justify-center group-hover/sidebar:justify-start px-0 group-hover/sidebar:px-3"
+            className="flex items-center gap-3 rounded-lg text-sm font-medium text-foreground-muted hover:bg-black/[0.04] hover:text-foreground transition-colors py-2 justify-center group-hover/sidebar:justify-start px-0 group-hover/sidebar:px-3"
           >
             <User className="w-5 h-5 shrink-0" />
             <span className="hidden group-hover/sidebar:inline truncate whitespace-nowrap">
@@ -300,7 +300,7 @@ export default function DashboardLayout({
           <button
             onClick={() => signOut({ callbackUrl: "/" })}
             title="Sign out"
-            className="flex items-center gap-3 rounded-lg text-sm font-medium text-foreground-muted hover:bg-white/5 hover:text-danger w-full transition-colors py-2 justify-center group-hover/sidebar:justify-start px-0 group-hover/sidebar:px-3"
+            className="flex items-center gap-3 rounded-lg text-sm font-medium text-foreground-muted hover:bg-black/[0.04] hover:text-danger w-full transition-colors py-2 justify-center group-hover/sidebar:justify-start px-0 group-hover/sidebar:px-3"
           >
             <LogOut className="w-5 h-5 shrink-0" />
             <span className="hidden group-hover/sidebar:inline whitespace-nowrap">

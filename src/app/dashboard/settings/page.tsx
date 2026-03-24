@@ -273,14 +273,14 @@ export default function SettingsPage() {
               <button
                 onClick={testTelegram}
                 disabled={telegramTesting || !telegramConfig.enabled}
-                className="flex items-center gap-2 px-3 py-2 text-sm font-medium bg-accent text-foreground rounded-lg hover:bg-accent-hover transition-all duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-3 py-2 text-sm font-medium bg-accent text-white rounded-lg hover:bg-accent-hover transition-all duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Send className="w-3.5 h-3.5" />
                 {telegramTesting ? "Sending..." : "Send Test Alert"}
               </button>
               <button
                 onClick={toggleTelegramEnabled}
-                className="px-3 py-2 text-sm font-medium border border-border text-foreground-muted rounded-lg hover:bg-white/5 transition-all duration-150 active:scale-95"
+                className="px-3 py-2 text-sm font-medium border border-border text-foreground-muted rounded-lg hover:bg-black/[0.04] transition-all duration-150 active:scale-95"
               >
                 {telegramConfig.enabled ? "Pause Alerts" : "Resume Alerts"}
               </button>
@@ -323,7 +323,7 @@ export default function SettingsPage() {
               <button
                 onClick={saveTelegramConfig}
                 disabled={!chatIdInput.trim() || telegramSaving}
-                className="px-4 py-2 text-sm font-medium bg-accent text-foreground rounded-lg hover:bg-accent-hover transition-all duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 text-sm font-medium bg-accent text-white rounded-lg hover:bg-accent-hover transition-all duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {telegramSaving ? "Saving..." : "Connect"}
               </button>
@@ -392,7 +392,7 @@ export default function SettingsPage() {
                       </button>
                       <button
                         onClick={() => setEditingAccountId(null)}
-                        className="p-1 text-foreground-muted hover:bg-white/5 rounded transition-colors"
+                        className="p-1 text-foreground-muted hover:bg-black/[0.04] rounded transition-colors"
                         title="Cancel"
                       >
                         <X className="w-4 h-4" />
@@ -433,7 +433,7 @@ export default function SettingsPage() {
                         setEditingAccountId(account.id);
                         setEditName(account.name);
                       }}
-                      className="p-1.5 text-foreground-muted hover:bg-white/5 rounded-lg transition-colors"
+                      className="p-1.5 text-foreground-muted hover:bg-black/[0.04] rounded-lg transition-colors"
                       title="Rename"
                     >
                       <Pencil className="w-4 h-4" />

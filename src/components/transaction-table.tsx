@@ -63,7 +63,7 @@ export function TransactionTable({
             const amount = parseFloat(txn.amount);
             const isIncome = amount < 0;
             return (
-              <tr key={txn.id} className="border-b border-border hover:bg-white/5 transition-colors duration-150">
+              <tr key={txn.id} className="border-b border-border hover:bg-black/[0.04] transition-colors duration-150">
                 <td className="py-3 px-2 text-foreground-muted whitespace-nowrap">
                   {formatDate(txn.date)}
                 </td>
@@ -90,8 +90,8 @@ export function TransactionTable({
                   <span
                     className={`inline-block px-2 py-0.5 text-xs rounded-full ${
                       txn.categoryPrimary
-                        ? "bg-white/10 text-foreground-muted"
-                        : "bg-white/5 text-foreground-tertiary border border-dashed border-border"
+                        ? "bg-black/10 text-foreground-muted"
+                        : "bg-black/[0.04] text-foreground-tertiary border border-dashed border-border"
                     } ${onEditTransaction ? "cursor-pointer hover:bg-accent/20 hover:text-accent group/cat transition-colors" : ""}`}
                     onClick={() => onEditTransaction?.(txn)}
                   >

@@ -59,7 +59,7 @@ export function FileDropzone({
         ${
           dragActive
             ? "border-accent bg-accent/10 scale-[1.01] animate-glow"
-            : "border-border hover:border-border-emphasis hover:bg-white/[0.03]"
+            : "border-border hover:border-border-emphasis hover:bg-black/[0.03]"
         }
         ${loading ? "opacity-50 pointer-events-none" : ""}
       `}
@@ -74,8 +74,8 @@ export function FileDropzone({
       />
       <label htmlFor="file-upload" className="cursor-pointer">
         <div className="flex flex-col items-center gap-4">
-          <div className={`w-16 h-16 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center ${loading ? "animate-shimmer shimmer-bg" : ""}`}>
-            <Upload className="w-8 h-8 text-indigo-400" />
+          <div className={`w-16 h-16 rounded-2xl bg-black/[0.04] border border-border flex items-center justify-center ${loading ? "animate-shimmer shimmer-bg" : ""}`}>
+            <Upload className="w-8 h-8 text-foreground-muted" />
           </div>
 
           <div>
@@ -91,7 +91,7 @@ export function FileDropzone({
             {FORMAT_BADGES.map((fmt) => (
               <span
                 key={fmt}
-                className="px-2.5 py-1 text-xs font-medium rounded-full bg-white/[0.06] border border-white/[0.08] text-foreground-muted"
+                className="px-2.5 py-1 text-xs font-medium rounded-full bg-black/[0.04] border border-border text-foreground-muted"
               >
                 {fmt}
               </span>

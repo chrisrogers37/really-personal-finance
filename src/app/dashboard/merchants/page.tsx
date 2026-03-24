@@ -59,7 +59,7 @@ export default function MerchantsPage() {
       />
 
       {/* Chart + Table */}
-      <div className="bg-background-card backdrop-blur-xl p-6 rounded-2xl border border-border animate-fade-in transition-all duration-200 hover:bg-white/8 hover:border-white/15" style={{ animationDelay: "100ms" }}>
+      <div className="bg-background-card backdrop-blur-xl p-6 rounded-2xl border border-border animate-fade-in transition-all duration-200 hover:bg-black/[0.04] hover:border-border-emphasis" style={{ animationDelay: "100ms" }}>
         {loading ? (
           <div className="h-80 flex items-center justify-center text-foreground-tertiary">
             Loading...

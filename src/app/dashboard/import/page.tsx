@@ -433,7 +433,7 @@ export default function ImportPage() {
               <button
                 onClick={handleCreateAccount}
                 disabled={!newAccountName.trim()}
-                className="px-4 py-2 bg-accent text-foreground rounded-xl hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-all duration-150 active:scale-95"
+                className="px-4 py-2 bg-accent text-white rounded-xl hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-all duration-150 active:scale-95"
               >
                 Create
               </button>
@@ -460,13 +460,13 @@ export default function ImportPage() {
           <div className="mt-4 flex gap-3 justify-center">
             <button
               onClick={resetAll}
-              className="px-4 py-2 bg-background-elevated border border-border rounded-lg hover:bg-white/5 transition-all duration-150 active:scale-95"
+              className="px-4 py-2 bg-background-elevated border border-border rounded-lg hover:bg-black/[0.04] transition-all duration-150 active:scale-95"
             >
               Import more
             </button>
             <a
               href="/dashboard/transactions"
-              className="px-4 py-2 bg-accent text-foreground rounded-lg hover:bg-accent-hover transition-all duration-150 active:scale-95"
+              className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-hover transition-all duration-150 active:scale-95"
             >
               View transactions
             </a>

@@ -84,14 +84,14 @@ export function AddTransactionModal({ accounts, onClose, onSaved }: AddTransacti
         <>
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-2.5 border border-border rounded-xl text-foreground-muted hover:bg-white/5 transition-all duration-150 active:scale-95 font-medium"
+            className="flex-1 px-4 py-2.5 border border-border rounded-xl text-foreground-muted hover:bg-black/[0.04] transition-all duration-150 active:scale-95 font-medium"
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
             disabled={saving || !description.trim() || !amount}
-            className="flex-1 px-4 py-2.5 bg-accent text-foreground rounded-xl font-medium hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150 active:scale-95"
+            className="flex-1 px-4 py-2.5 bg-accent text-white rounded-xl font-medium hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150 active:scale-95"
           >
             {saving ? "Adding..." : "Add Transaction"}
           </button>
@@ -106,8 +106,8 @@ export function AddTransactionModal({ accounts, onClose, onSaved }: AddTransacti
             onClick={() => setIsExpense(true)}
             className={`flex-1 py-2 text-sm font-medium transition-colors ${
               isExpense
-                ? "bg-accent text-foreground"
-                : "bg-background text-foreground-muted hover:bg-white/5"
+                ? "bg-accent text-white"
+                : "bg-background text-foreground-muted hover:bg-black/[0.04]"
             }`}
           >
             Expense
@@ -118,7 +118,7 @@ export function AddTransactionModal({ accounts, onClose, onSaved }: AddTransacti
             className={`flex-1 py-2 text-sm font-medium transition-colors ${
               !isExpense
                 ? "bg-success text-foreground"
-                : "bg-background text-foreground-muted hover:bg-white/5"
+                : "bg-background text-foreground-muted hover:bg-black/[0.04]"
             }`}
           >
             Income

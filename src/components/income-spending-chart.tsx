@@ -21,24 +21,24 @@ interface MonthlyData {
 }
 
 const CHART_THEME = {
-  grid: { stroke: "rgba(255, 255, 255, 0.06)" },
+  grid: { stroke: "rgba(0, 0, 0, 0.06)" },
   axis: {
-    tick: { fill: "#a1a1aa" },
-    axisLine: { stroke: "rgba(255, 255, 255, 0.08)" },
-    tickLine: { stroke: "rgba(255, 255, 255, 0.08)" },
+    tick: { fill: "#6b7280" },
+    axisLine: { stroke: "rgba(0, 0, 0, 0.08)" },
+    tickLine: { stroke: "rgba(0, 0, 0, 0.08)" },
   },
   tooltip: {
     contentStyle: {
-      backgroundColor: "rgba(19, 17, 28, 0.9)",
-      border: "1px solid rgba(255, 255, 255, 0.1)",
+      backgroundColor: "#ffffff",
+      border: "1px solid rgba(0, 0, 0, 0.1)",
       borderRadius: "12px",
-      backdropFilter: "blur(12px)",
+      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
     },
-    labelStyle: { color: "#ffffff", fontWeight: 600 },
-    itemStyle: { color: "#a1a1aa" },
+    labelStyle: { color: "#111827", fontWeight: 600 },
+    itemStyle: { color: "#6b7280" },
   },
-  referenceLine: { stroke: "rgba(255, 255, 255, 0.15)" },
-  legend: { wrapperStyle: { color: "#a1a1aa" } },
+  referenceLine: { stroke: "rgba(0, 0, 0, 0.12)" },
+  legend: { wrapperStyle: { color: "#6b7280" } },
 } as const;
 
 export function IncomeSpendingChart({ data }: { data: MonthlyData[] }) {
@@ -74,7 +74,7 @@ export function IncomeSpendingChart({ data }: { data: MonthlyData[] }) {
           contentStyle={CHART_THEME.tooltip.contentStyle}
           labelStyle={CHART_THEME.tooltip.labelStyle}
           itemStyle={CHART_THEME.tooltip.itemStyle}
-          cursor={{ fill: "rgba(255, 255, 255, 0.04)" }}
+          cursor={{ fill: "rgba(0, 0, 0, 0.04)" }}
         />
         <Legend wrapperStyle={CHART_THEME.legend.wrapperStyle} />
         <ReferenceLine
@@ -82,8 +82,8 @@ export function IncomeSpendingChart({ data }: { data: MonthlyData[] }) {
           stroke={CHART_THEME.referenceLine.stroke}
           strokeDasharray="3 3"
         />
-        <Bar dataKey="income" fill="#a78bfa" name="Income" radius={[4, 4, 0, 0]} />
-        <Bar dataKey="spending" fill="#6366f1" name="Spending" radius={[4, 4, 0, 0]} />
+        <Bar dataKey="income" fill="#059669" name="Income" radius={[4, 4, 0, 0]} />
+        <Bar dataKey="spending" fill="#3b82f6" name="Spending" radius={[4, 4, 0, 0]} />
       </BarChart>
     </ResponsiveContainer>
   );

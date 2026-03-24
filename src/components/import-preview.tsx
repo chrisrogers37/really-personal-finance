@@ -94,7 +94,7 @@ export function ImportPreview({
           </button>
           <button
             onClick={() => toggleAll(false)}
-            className="text-xs font-medium px-3 py-1 rounded-full bg-white/[0.06] text-foreground-muted hover:bg-white/[0.10] transition-all duration-150"
+            className="text-xs font-medium px-3 py-1 rounded-full bg-black/[0.04] text-foreground-muted hover:bg-black/[0.08] transition-all duration-150"
           >
             Deselect all
           </button>
@@ -121,7 +121,7 @@ export function ImportPreview({
               return (
                 <tr
                   key={i}
-                  className={`transition-colors hover:bg-white/[0.03] ${
+                  className={`transition-colors hover:bg-black/[0.03] ${
                     dup?.reason === "exact_import_id"
                       ? "bg-danger/10"
                       : dup
@@ -175,7 +175,7 @@ export function ImportPreview({
         <button
           onClick={() => onConfirm(Array.from(selected))}
           disabled={selected.size === 0 || loading}
-          className="px-6 py-2.5 bg-accent text-foreground rounded-xl font-medium
+          className="px-6 py-2.5 bg-accent text-white rounded-xl font-medium
                      hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150 active:scale-95"
         >
           {loading

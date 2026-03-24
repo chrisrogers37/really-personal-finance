@@ -52,7 +52,7 @@ export default function ProfilePage() {
           </Link>
         </div>
 
-        <div className="bg-background-card backdrop-blur-xl rounded-2xl border border-border p-6 animate-scale-in transition-all duration-200 hover:bg-white/8 hover:border-white/15">
+        <div className="bg-background-card backdrop-blur-xl rounded-2xl border border-border p-6 animate-scale-in transition-all duration-200 hover:bg-black/[0.04] hover:border-border-emphasis">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label
@@ -103,7 +103,7 @@ export default function ProfilePage() {
             <button
               type="submit"
               disabled={saving}
-              className="py-2 px-6 bg-accent text-foreground rounded-lg hover:bg-accent-hover disabled:opacity-50 font-medium transition-all duration-150 active:scale-95"
+              className="py-2 px-6 bg-accent text-white rounded-lg hover:bg-accent-hover disabled:opacity-50 font-medium transition-all duration-150 active:scale-95"
             >
               {saving ? "Saving..." : "Save Changes"}
             </button>
