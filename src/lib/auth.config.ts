@@ -262,6 +262,19 @@ export const authConfig: NextAuthConfig = {
   callbacks: {
     async session({ session, user }) {
       session.user.id = user.id;
+
+      // Attach role and MFA status to session
+      const [currentUser] = await db
+        .select({ role: users.role, mfaEnabled: users.mfaEnabled })
+        .from(users)
+        .where(and(eq(users.userId, user.id), eq(users.isCurrent, true)))
+        .limit(1);
+
+      if (currentUser) {
+        (session.user as unknown as Record<string, unknown>).role = currentUser.role;
+        (session.user as unknown as Record<string, unknown>).mfaEnabled = currentUser.mfaEnabled;
+      }
+
       return session;
     },
   },
