@@ -11,10 +11,11 @@ export default auth((req) => {
   const isAuthPage = req.nextUrl.pathname.startsWith("/auth");
   const isDashboardPage = req.nextUrl.pathname.startsWith("/dashboard");
   const isProfilePage = req.nextUrl.pathname.startsWith("/profile");
+  const isAdminRoute = req.nextUrl.pathname.startsWith("/api/admin");
   const isCronRoute = req.nextUrl.pathname.startsWith("/api/cron");
   const isTelegramRoute = req.nextUrl.pathname.startsWith("/api/telegram");
 
-  // Allow cron and telegram webhook routes through
+  // Allow cron and telegram webhook routes through (have their own auth)
   if (isCronRoute || isTelegramRoute) {
     return NextResponse.next();
   }
@@ -24,8 +25,11 @@ export default auth((req) => {
     return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
   }
 
-  // Protect dashboard and profile routes
-  if ((isDashboardPage || isProfilePage) && !isLoggedIn) {
+  // Protect dashboard, profile, and admin routes
+  if ((isDashboardPage || isProfilePage || isAdminRoute) && !isLoggedIn) {
+    if (isAdminRoute) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     return NextResponse.redirect(new URL("/auth/signin", req.nextUrl));
   }
 
@@ -33,5 +37,5 @@ export default auth((req) => {
 });
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/profile/:path*", "/auth/:path*"],
+  matcher: ["/dashboard/:path*", "/profile/:path*", "/auth/:path*", "/api/admin/:path*"],
 };

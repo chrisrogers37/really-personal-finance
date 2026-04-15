@@ -4,6 +4,7 @@ import { plaidClient } from "@/lib/plaid";
 import { db } from "@/db";
 import { accounts } from "@/db/schema";
 import { encrypt } from "@/lib/encryption";
+import { audit } from "@/lib/audit";
 
 export async function POST(request: NextRequest) {
   const session = await auth();
@@ -53,6 +54,14 @@ export async function POST(request: NextRequest) {
         .returning()
     )
   );
+
+  await audit({
+    userId: session.user!.id!,
+    action: "plaid.link",
+    resource: "accounts",
+    detail: { itemId, accountCount: inserted.flat().length },
+    request,
+  });
 
   return NextResponse.json({
     accounts: inserted.flat().map((a) => ({

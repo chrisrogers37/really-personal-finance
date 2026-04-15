@@ -1,5 +1,6 @@
 import {
   pgTable,
+  pgEnum,
   uuid,
   text,
   timestamp,
@@ -11,6 +12,31 @@ import {
   index,
 } from "drizzle-orm/pg-core";
 
+// ─── Enums ───────────────────────────────────────────────────────────────────
+export const userRoleEnum = pgEnum("user_role", ["owner", "admin", "member", "viewer"]);
+export const auditActionEnum = pgEnum("audit_action", [
+  "auth.login",
+  "auth.logout",
+  "auth.login_failed",
+  "auth.mfa_enrolled",
+  "auth.mfa_verified",
+  "auth.mfa_disabled",
+  "auth.mfa_failed",
+  "data.read",
+  "data.create",
+  "data.update",
+  "data.delete",
+  "data.export",
+  "plaid.link",
+  "plaid.sync",
+  "plaid.token_access",
+  "consent.granted",
+  "consent.revoked",
+  "admin.role_change",
+  "admin.user_deprovisioned",
+  "admin.access_review",
+]);
+
 // ─── Users (SCD2) ────────────────────────────────────────────────────────────
 export const users = pgTable(
   "users",
@@ -19,7 +45,9 @@ export const users = pgTable(
     userId: uuid("user_id").notNull(),
     email: text("email").notNull(),
     name: text("name"),
+    role: userRoleEnum("role").notNull().default("member"),
     emailVerified: timestamp("email_verified", { mode: "date" }),
+    mfaEnabled: boolean("mfa_enabled").notNull().default(false),
     validFrom: timestamp("valid_from", { mode: "date" }).notNull().defaultNow(),
     validTo: timestamp("valid_to", { mode: "date" }),
     isCurrent: boolean("is_current").notNull().default(true),
@@ -158,5 +186,61 @@ export const telegramConfigs = pgTable(
   },
   (table) => [
     index("idx_telegram_configs_user_id").on(table.userId),
+  ]
+);
+
+// ─── Audit Logs ──────────────────────────────────────────────────────────────
+export const auditLogs = pgTable(
+  "audit_logs",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id"),
+    action: auditActionEnum("action").notNull(),
+    resource: text("resource"), // e.g. "accounts", "transactions", "plaid_token"
+    resourceId: text("resource_id"),
+    detail: jsonb("detail"), // additional context
+    ipAddress: text("ip_address"),
+    userAgent: text("user_agent"),
+    createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("idx_audit_logs_user_id").on(table.userId),
+    index("idx_audit_logs_action").on(table.action),
+    index("idx_audit_logs_created_at").on(table.createdAt),
+  ]
+);
+
+// ─── MFA Credentials (TOTP) ─────────────────────────────────────────────────
+export const mfaCredentials = pgTable(
+  "mfa_credentials",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id").notNull().unique(),
+    totpSecret: text("totp_secret").notNull(), // encrypted with AES-256-GCM
+    recoveryCodes: text("recovery_codes").notNull(), // encrypted JSON array
+    verified: boolean("verified").notNull().default(false),
+    createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("idx_mfa_credentials_user_id").on(table.userId),
+  ]
+);
+
+// ─── Consent Records ────────────────────────────────────────────────────────
+export const consentRecords = pgTable(
+  "consent_records",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id").notNull(),
+    consentType: text("consent_type").notNull(), // "plaid_data_access", "privacy_policy", "tos"
+    version: text("version").notNull(), // policy version consented to
+    grantedAt: timestamp("granted_at", { mode: "date" }).notNull().defaultNow(),
+    revokedAt: timestamp("revoked_at", { mode: "date" }),
+    ipAddress: text("ip_address"),
+    createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("idx_consent_records_user_id").on(table.userId),
+    index("idx_consent_records_type").on(table.userId, table.consentType),
   ]
 );
