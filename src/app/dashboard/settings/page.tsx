@@ -33,13 +33,13 @@ export default function SettingsPage() {
     null
   );
   const [telegramLoading, setTelegramLoading] = useState(true);
-  const [chatIdInput, setChatIdInput] = useState("");
-  const [telegramSaving, setTelegramSaving] = useState(false);
   const [telegramTesting, setTelegramTesting] = useState(false);
   const [telegramMessage, setTelegramMessage] = useState<{
     type: "success" | "error";
     text: string;
   } | null>(null);
+  const [linkCode, setLinkCode] = useState<string | null>(null);
+  const [linkCodeLoading, setLinkCodeLoading] = useState(false);
 
   // -- Accounts state --
   const [accounts, setAccounts] = useState<Account[]>([]);
@@ -61,9 +61,6 @@ export default function SettingsPage() {
       const res = await fetch("/api/telegram/config");
       const json = await res.json();
       setTelegramConfig(json.config || null);
-      if (json.config) {
-        setChatIdInput(json.config.chatId);
-      }
     } catch {
       console.error("Failed to fetch Telegram config");
     }
@@ -89,31 +86,6 @@ export default function SettingsPage() {
   }, [fetchTelegramConfig, fetchAccounts]);
 
   // -- Telegram handlers --
-  async function saveTelegramConfig() {
-    setTelegramSaving(true);
-    setTelegramMessage(null);
-    try {
-      const res = await fetch("/api/telegram/config", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ chatId: chatIdInput.trim() }),
-      });
-      const json = await res.json();
-      if (!res.ok) {
-        setTelegramMessage({
-          type: "error",
-          text: json.error || "Failed to save",
-        });
-      } else {
-        setTelegramConfig(json.config);
-        setTelegramMessage({ type: "success", text: "Telegram connected!" });
-      }
-    } catch {
-      setTelegramMessage({ type: "error", text: "Network error" });
-    }
-    setTelegramSaving(false);
-  }
-
   async function toggleTelegramEnabled() {
     if (!telegramConfig) return;
     setTelegramMessage(null);
@@ -142,7 +114,6 @@ export default function SettingsPage() {
       const res = await fetch("/api/telegram/config", { method: "DELETE" });
       if (res.ok) {
         setTelegramConfig(null);
-        setChatIdInput("");
         setTelegramMessage({
           type: "success",
           text: "Telegram disconnected",
@@ -174,6 +145,26 @@ export default function SettingsPage() {
       setTelegramMessage({ type: "error", text: "Network error" });
     }
     setTelegramTesting(false);
+  }
+
+  async function generateLinkCode() {
+    setLinkCodeLoading(true);
+    setTelegramMessage(null);
+    try {
+      const res = await fetch("/api/telegram/link-token", { method: "POST" });
+      const json = await res.json();
+      if (res.ok) {
+        setLinkCode(json.token);
+      } else {
+        setTelegramMessage({
+          type: "error",
+          text: json.error || "Failed to generate code",
+        });
+      }
+    } catch {
+      setTelegramMessage({ type: "error", text: "Network error" });
+    }
+    setLinkCodeLoading(false);
   }
 
   // -- Account handlers --
@@ -298,36 +289,53 @@ export default function SettingsPage() {
             <div className="bg-background-elevated rounded-lg p-4 text-sm text-foreground-muted space-y-2">
               <p className="font-medium text-foreground">How to connect:</p>
               <ol className="list-decimal list-inside space-y-1">
+                <li>Click &quot;Generate Link Code&quot; below</li>
                 <li>
-                  Open Telegram and message your bot with{" "}
+                  Open Telegram and message the bot with{" "}
                   <code className="bg-black/20 px-1 rounded">
-                    /start your@email.com
+                    /start YOUR_CODE
                   </code>
                 </li>
-                <li>
-                  The bot will reply with your chat ID, or you can find it using{" "}
-                  <code className="bg-black/20 px-1 rounded">@userinfobot</code>
-                </li>
-                <li>Enter your chat ID below and save</li>
+                <li>The bot will confirm the link</li>
               </ol>
             </div>
 
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={chatIdInput}
-                onChange={(e) => setChatIdInput(e.target.value)}
-                placeholder="Enter your Telegram chat ID"
-                className="flex-1 px-3 py-2 border border-border rounded-lg text-sm bg-background-elevated text-foreground placeholder:text-foreground-tertiary"
-              />
+            {linkCode ? (
+              <div className="space-y-2">
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-foreground-muted">
+                    Your link code:
+                  </span>
+                  <code className="text-lg font-bold bg-background-elevated px-3 py-1 rounded tracking-widest">
+                    {linkCode}
+                  </code>
+                </div>
+                <p className="text-xs text-foreground-tertiary">
+                  Send{" "}
+                  <code className="bg-black/20 px-1 rounded">
+                    /start {linkCode}
+                  </code>{" "}
+                  to the bot in Telegram. Code expires in 10 minutes.
+                </p>
+                <button
+                  onClick={() => {
+                    setLinkCode(null);
+                    fetchTelegramConfig();
+                  }}
+                  className="text-sm text-accent hover:underline"
+                >
+                  Done — refresh status
+                </button>
+              </div>
+            ) : (
               <button
-                onClick={saveTelegramConfig}
-                disabled={!chatIdInput.trim() || telegramSaving}
+                onClick={generateLinkCode}
+                disabled={linkCodeLoading}
                 className="px-4 py-2 text-sm font-medium bg-accent text-white rounded-lg hover:bg-accent-hover transition-all duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {telegramSaving ? "Saving..." : "Connect"}
+                {linkCodeLoading ? "Generating..." : "Generate Link Code"}
               </button>
-            </div>
+            )}
           </div>
         )}
 
