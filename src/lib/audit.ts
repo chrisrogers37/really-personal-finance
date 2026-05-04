@@ -9,6 +9,7 @@ export type AuditAction =
   | "auth.mfa_verified"
   | "auth.mfa_disabled"
   | "auth.mfa_failed"
+  | "auth.mfa_rate_limited"
   | "data.read"
   | "data.create"
   | "data.update"

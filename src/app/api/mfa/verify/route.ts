@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { confirmMfaEnrollment, verifyMfaCode, hasMfaEnabled } from "@/lib/mfa";
 import { audit } from "@/lib/audit";
+import { checkRateLimit, recordFailure, resetAttempts } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
   const session = await auth();
@@ -16,22 +17,40 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid code" }, { status: 400 });
   }
 
+  const rateLimitKey = `mfa:${session.user.id}`;
+  const limit = checkRateLimit(rateLimitKey);
+  if (!limit.allowed) {
+    await audit({
+      userId: session.user.id,
+      action: "auth.mfa_rate_limited",
+      resource: "mfa",
+      detail: { retryAfterMs: limit.retryAfterMs },
+      request,
+    });
+    return NextResponse.json(
+      { error: "Too many attempts. Try again later." },
+      { status: 429 },
+    );
+  }
+
   const isEnrolled = await hasMfaEnabled(session.user.id);
 
   if (!isEnrolled) {
     // First-time verification during enrollment
     const success = await confirmMfaEnrollment(session.user.id, code);
     if (!success) {
+      const { remaining } = recordFailure(rateLimitKey);
       await audit({
         userId: session.user.id,
         action: "auth.mfa_failed",
         resource: "mfa",
-        detail: { phase: "enrollment" },
+        detail: { phase: "enrollment", attemptsRemaining: remaining },
         request,
       });
       return NextResponse.json({ error: "Invalid code" }, { status: 400 });
     }
 
+    resetAttempts(rateLimitKey);
     await audit({
       userId: session.user.id,
       action: "auth.mfa_verified",
@@ -46,16 +65,18 @@ export async function POST(request: NextRequest) {
   // Login-time MFA verification
   const valid = await verifyMfaCode(session.user.id, code);
   if (!valid) {
+    const { remaining } = recordFailure(rateLimitKey);
     await audit({
       userId: session.user.id,
       action: "auth.mfa_failed",
       resource: "mfa",
-      detail: { phase: "login" },
+      detail: { phase: "login", attemptsRemaining: remaining },
       request,
     });
     return NextResponse.json({ error: "Invalid code" }, { status: 400 });
   }
 
+  resetAttempts(rateLimitKey);
   await audit({
     userId: session.user.id,
     action: "auth.mfa_verified",
