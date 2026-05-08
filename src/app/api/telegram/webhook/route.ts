@@ -5,6 +5,7 @@ import { eq, and, gt, isNull } from "drizzle-orm";
 import { sendTelegramMessage } from "@/lib/telegram";
 import { timingSafeCompare } from "@/lib/validation";
 import { audit } from "@/lib/audit";
+import { checkRateLimit, recordFailure, resetAttempts } from "@/lib/rate-limit";
 
 interface TelegramUpdate {
   message?: {
@@ -56,10 +57,19 @@ export async function POST(request: NextRequest) {
 
     const code = parts[1].toUpperCase().trim();
 
+    // Rate limit failed /start attempts per chatId
+    const rateLimitKey = `telegram-link:${chatId}`;
+    const limit = checkRateLimit(rateLimitKey);
+    if (!limit.allowed) {
+      await sendTelegramMessage(chatId, "Too many attempts. Try again later.");
+      return NextResponse.json({ ok: true });
+    }
+
+    // Atomic: validate + mark as used in a single UPDATE...RETURNING to prevent TOCTOU races
     const now = new Date();
-    const [linkToken] = await db
-      .select({ id: telegramLinkTokens.id, userId: telegramLinkTokens.userId })
-      .from(telegramLinkTokens)
+    const result = await db
+      .update(telegramLinkTokens)
+      .set({ usedAt: now })
       .where(
         and(
           eq(telegramLinkTokens.token, code),
@@ -67,9 +77,10 @@ export async function POST(request: NextRequest) {
           isNull(telegramLinkTokens.usedAt)
         )
       )
-      .limit(1);
+      .returning({ id: telegramLinkTokens.id, userId: telegramLinkTokens.userId });
 
-    if (!linkToken) {
+    if (result.length === 0) {
+      recordFailure(rateLimitKey);
       await Promise.all([
         audit({
           action: "telegram.link_failed",
@@ -84,16 +95,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: true });
     }
 
-    // Mark token as used
-    await db
-      .update(telegramLinkTokens)
-      .set({ usedAt: now })
-      .where(eq(telegramLinkTokens.id, linkToken.id));
+    const { userId } = result[0];
+    resetAttempts(rateLimitKey);
 
     // Upsert telegram config
     await db
       .insert(telegramConfigs)
-      .values({ userId: linkToken.userId, chatId, enabled: true })
+      .values({ userId, chatId, enabled: true })
       .onConflictDoUpdate({
         target: telegramConfigs.userId,
         set: { chatId, enabled: true },
@@ -101,7 +109,7 @@ export async function POST(request: NextRequest) {
 
     await Promise.all([
       audit({
-        userId: linkToken.userId,
+        userId,
         action: "telegram.link_completed",
         resource: "telegram_configs",
         detail: { chatId },
