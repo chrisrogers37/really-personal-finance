@@ -1,4 +1,4 @@
-const attempts = new Map<string, { count: number; lockedUntil: number | null }>();
+const attempts = new Map<string, { count: number; lockedUntil: number | null; lastAttempt: number }>();
 
 const MAX_ATTEMPTS = 5;
 const LOCKOUT_MS = 15 * 60 * 1000; // 15 minutes
@@ -11,6 +11,8 @@ function cleanupExpired(): void {
   lastCleanup = now;
   for (const [key, entry] of attempts) {
     if (entry.lockedUntil && entry.lockedUntil <= now) {
+      attempts.delete(key);
+    } else if (!entry.lockedUntil && now - entry.lastAttempt > LOCKOUT_MS) {
       attempts.delete(key);
     }
   }
@@ -37,8 +39,9 @@ export function checkRateLimit(key: string): { allowed: boolean; remaining: numb
 }
 
 export function recordFailure(key: string): { remaining: number } {
-  const entry = attempts.get(key) ?? { count: 0, lockedUntil: null };
+  const entry = attempts.get(key) ?? { count: 0, lockedUntil: null, lastAttempt: 0 };
   entry.count += 1;
+  entry.lastAttempt = Date.now();
 
   if (entry.count >= MAX_ATTEMPTS) {
     entry.lockedUntil = Date.now() + LOCKOUT_MS;

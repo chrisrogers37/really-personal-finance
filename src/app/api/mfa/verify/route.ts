@@ -29,7 +29,10 @@ export async function POST(request: NextRequest) {
     });
     return NextResponse.json(
       { error: "Too many attempts. Try again later." },
-      { status: 429 },
+      {
+        status: 429,
+        headers: { "Retry-After": String(Math.ceil(limit.retryAfterMs! / 1000)) },
+      },
     );
   }
 
