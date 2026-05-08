@@ -33,6 +33,9 @@ export const auditActionEnum = pgEnum("audit_action", [
   "plaid.token_access",
   "consent.granted",
   "consent.revoked",
+  "telegram.link_initiated",
+  "telegram.link_completed",
+  "telegram.link_failed",
   "admin.role_change",
   "admin.user_deprovisioned",
   "admin.access_review",
@@ -187,6 +190,23 @@ export const telegramConfigs = pgTable(
   },
   (table) => [
     index("idx_telegram_configs_user_id").on(table.userId),
+  ]
+);
+
+// ─── Telegram Link Tokens ────────────────────────────────────────────────────
+export const telegramLinkTokens = pgTable(
+  "telegram_link_tokens",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id").notNull(),
+    token: text("token").notNull().unique(),
+    expires: timestamp("expires", { mode: "date" }).notNull(),
+    usedAt: timestamp("used_at", { mode: "date" }),
+    createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("idx_telegram_link_tokens_token").on(table.token),
+    index("idx_telegram_link_tokens_user_id").on(table.userId),
   ]
 );
 

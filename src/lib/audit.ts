@@ -20,6 +20,9 @@ export type AuditAction =
   | "plaid.token_access"
   | "consent.granted"
   | "consent.revoked"
+  | "telegram.link_initiated"
+  | "telegram.link_completed"
+  | "telegram.link_failed"
   | "admin.role_change"
   | "admin.user_deprovisioned"
   | "admin.access_review";
