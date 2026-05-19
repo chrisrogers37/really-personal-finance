@@ -1,15 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { requireUser } from "@/lib/api-helpers";
 import { db } from "@/db";
 import { transactions, accounts } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { validateConfirmInput } from "@/lib/import";
 
 export async function POST(request: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const guard = await requireUser();
+  if (guard instanceof NextResponse) return guard;
+  const { session } = guard;
   const userId = session.user.id;
 
   const body = await request.json();

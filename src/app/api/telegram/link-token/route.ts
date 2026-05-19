@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { randomBytes } from "crypto";
-import { auth } from "@/lib/auth";
+import { requireUser } from "@/lib/api-helpers";
 import { db } from "@/db";
 import { telegramLinkTokens } from "@/db/schema";
 import { eq, and, gt, isNull } from "drizzle-orm";
@@ -19,10 +19,9 @@ function generateLinkCode(): string {
 }
 
 export async function POST(request: Request) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const guard = await requireUser();
+  if (guard instanceof NextResponse) return guard;
+  const { session } = guard;
 
   const now = new Date();
   const existing = await db

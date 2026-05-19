@@ -1,21 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
-import { getUserRole, setUserRole, hasMinRole, VALID_ROLES } from "@/lib/rbac";
+import { requireAdmin } from "@/lib/api-helpers";
+import { setUserRole, hasMinRole, VALID_ROLES } from "@/lib/rbac";
 import { audit } from "@/lib/audit";
 import { db } from "@/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 export async function GET() {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const role = await getUserRole(session.user.id);
-  if (!hasMinRole(role, "admin")) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
+  const guard = await requireAdmin();
+  if (guard instanceof NextResponse) return guard;
+  const { session } = guard;
 
   const allUsers = await db
     .select({
@@ -41,15 +35,9 @@ export async function GET() {
 }
 
 export async function PATCH(request: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const callerRole = await getUserRole(session.user.id);
-  if (!hasMinRole(callerRole, "admin")) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
+  const guard = await requireAdmin();
+  if (guard instanceof NextResponse) return guard;
+  const { session, role: callerRole } = guard;
 
   const body = await request.json();
   const { targetUserId, role, action } = body;

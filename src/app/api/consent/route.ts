@@ -1,23 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { requireUser } from "@/lib/api-helpers";
 import { grantConsent, revokeConsent, getActiveConsents, VALID_CONSENT_TYPES } from "@/lib/consent";
 import { audit } from "@/lib/audit";
 
 export async function GET() {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const guard = await requireUser();
+  if (guard instanceof NextResponse) return guard;
+  const { session } = guard;
 
   const consents = await getActiveConsents(session.user.id);
   return NextResponse.json({ consents });
 }
 
 export async function POST(request: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const guard = await requireUser();
+  if (guard instanceof NextResponse) return guard;
+  const { session } = guard;
 
   const body = await request.json();
   const { consentType, version, action } = body;

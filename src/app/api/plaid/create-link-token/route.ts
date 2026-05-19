@@ -1,13 +1,12 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { requireUser } from "@/lib/api-helpers";
 import { plaidClient } from "@/lib/plaid";
 import { CountryCode, Products } from "plaid";
 
 export async function POST() {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const guard = await requireUser();
+  if (guard instanceof NextResponse) return guard;
+  const { session } = guard;
 
   const products = (process.env.PLAID_PRODUCTS || "transactions")
     .split(",")
