@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireUser } from "@/lib/api-helpers";
+import { requireUser, withErrorHandling } from "@/lib/api-helpers";
 import { db } from "@/db";
 import { telegramConfigs } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
-export async function GET() {
+async function _GET() {
   const guard = await requireUser();
   if (guard instanceof NextResponse) return guard;
   const { session } = guard;
@@ -22,7 +22,7 @@ export async function GET() {
   return NextResponse.json({ config: config || null });
 }
 
-export async function PUT(request: NextRequest) {
+async function _PUT(request: NextRequest) {
   const guard = await requireUser();
   if (guard instanceof NextResponse) return guard;
   const { session } = guard;
@@ -74,7 +74,7 @@ export async function PUT(request: NextRequest) {
   return NextResponse.json({ config: updated || null });
 }
 
-export async function DELETE() {
+async function _DELETE() {
   const guard = await requireUser();
   if (guard instanceof NextResponse) return guard;
   const { session } = guard;
@@ -85,3 +85,7 @@ export async function DELETE() {
 
   return NextResponse.json({ success: true });
 }
+
+export const GET = withErrorHandling(_GET);
+export const PUT = withErrorHandling(_PUT);
+export const DELETE = withErrorHandling(_DELETE);

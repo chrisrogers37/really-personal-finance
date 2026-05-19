@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireUser } from "@/lib/api-helpers";
+import { requireUser, withErrorHandling } from "@/lib/api-helpers";
 import { disableMfa, verifyMfaCode } from "@/lib/mfa";
 import { audit } from "@/lib/audit";
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   const guard = await requireUser();
   if (guard instanceof NextResponse) return guard;
   const { session } = guard;
@@ -32,3 +32,5 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({ disabled: true });
 }
+
+export const POST = withErrorHandling(_POST);

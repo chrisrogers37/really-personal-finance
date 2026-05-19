@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
-import { requireUser } from "@/lib/api-helpers";
+import { requireUser, withErrorHandling } from "@/lib/api-helpers";
 import { db } from "@/db";
 import { telegramConfigs } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { sendTelegramMessage } from "@/lib/telegram";
 
-export async function POST() {
+async function _POST() {
   const guard = await requireUser();
   if (guard instanceof NextResponse) return guard;
   const { session } = guard;
@@ -37,3 +37,5 @@ export async function POST() {
 
   return NextResponse.json({ success: true });
 }
+
+export const POST = withErrorHandling(_POST);

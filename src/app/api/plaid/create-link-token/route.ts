@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { requireUser } from "@/lib/api-helpers";
+import { requireUser, withErrorHandling } from "@/lib/api-helpers";
 import { plaidClient } from "@/lib/plaid";
 import { CountryCode, Products } from "plaid";
 
-export async function POST() {
+async function _POST() {
   const guard = await requireUser();
   if (guard instanceof NextResponse) return guard;
   const { session } = guard;
@@ -29,3 +29,5 @@ export async function POST() {
 
   return NextResponse.json({ linkToken: response.data.link_token });
 }
+
+export const POST = withErrorHandling(_POST);

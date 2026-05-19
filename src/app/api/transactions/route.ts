@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { randomUUID } from "crypto";
-import { requireUser } from "@/lib/api-helpers";
+import { requireUser, withErrorHandling } from "@/lib/api-helpers";
 import { db } from "@/db";
 import { transactions, accounts } from "@/db/schema";
 import { eq, and, gte, lte, ilike, desc } from "drizzle-orm";
 import { clampInt, isValidDateParam } from "@/lib/validation";
 
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   const guard = await requireUser();
   if (guard instanceof NextResponse) return guard;
   const { session } = guard;
@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({ transactions: results });
 }
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   const guard = await requireUser();
   if (guard instanceof NextResponse) return guard;
   const { session } = guard;
@@ -129,3 +129,6 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({ transaction: created }, { status: 201 });
 }
+
+export const GET = withErrorHandling(_GET);
+export const POST = withErrorHandling(_POST);

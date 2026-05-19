@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sendDailyAlerts, sendWeeklyAlerts } from "@/lib/alerts";
+import { withErrorHandling } from "@/lib/api-helpers";
 
 export const maxDuration = 60;
 
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   const authHeader = request.headers.get("authorization");
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -19,3 +20,5 @@ export async function GET(request: NextRequest) {
   await sendDailyAlerts();
   return NextResponse.json({ success: true, type: "daily" });
 }
+
+export const GET = withErrorHandling(_GET);

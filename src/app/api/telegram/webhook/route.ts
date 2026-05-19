@@ -6,6 +6,7 @@ import { sendTelegramMessage } from "@/lib/telegram";
 import { timingSafeCompare } from "@/lib/validation";
 import { audit } from "@/lib/audit";
 import { checkRateLimit, recordFailure, resetAttempts } from "@/lib/rate-limit";
+import { withErrorHandling } from "@/lib/api-helpers";
 
 interface TelegramUpdate {
   message?: {
@@ -15,7 +16,7 @@ interface TelegramUpdate {
   };
 }
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   // Webhook secret verification
   // Telegram sends X-Telegram-Bot-Api-Secret-Token when registered with secret_token
   const secretToken = request.headers.get("x-telegram-bot-api-secret-token");
@@ -173,3 +174,5 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({ ok: true });
 }
+
+export const POST = withErrorHandling(_POST);

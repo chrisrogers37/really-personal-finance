@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAdmin } from "@/lib/api-helpers";
+import { requireAdmin, withErrorHandling } from "@/lib/api-helpers";
 import { db } from "@/db";
 import { auditLogs } from "@/db/schema";
 import { desc, eq } from "drizzle-orm";
 import { clampInt } from "@/lib/validation";
 
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   const guard = await requireAdmin();
   if (guard instanceof NextResponse) return guard;
   const { session } = guard;
@@ -32,3 +32,5 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json({ logs, limit, offset });
 }
+
+export const GET = withErrorHandling(_GET);

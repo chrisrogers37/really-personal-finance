@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAdmin } from "@/lib/api-helpers";
+import { requireAdmin, withErrorHandling } from "@/lib/api-helpers";
 import { setUserRole, hasMinRole, VALID_ROLES } from "@/lib/rbac";
 import { audit } from "@/lib/audit";
 import { db } from "@/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
-export async function GET() {
+async function _GET() {
   const guard = await requireAdmin();
   if (guard instanceof NextResponse) return guard;
   const { session } = guard;
@@ -34,7 +34,7 @@ export async function GET() {
   return NextResponse.json({ users: allUsers });
 }
 
-export async function PATCH(request: NextRequest) {
+async function _PATCH(request: NextRequest) {
   const guard = await requireAdmin();
   if (guard instanceof NextResponse) return guard;
   const { session, role: callerRole } = guard;
@@ -90,3 +90,6 @@ export async function PATCH(request: NextRequest) {
 
   return NextResponse.json({ updated: true });
 }
+
+export const GET = withErrorHandling(_GET);
+export const PATCH = withErrorHandling(_PATCH);
