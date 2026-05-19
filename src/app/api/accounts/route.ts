@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireUser } from "@/lib/api-helpers";
+import { requireUser, withErrorHandling } from "@/lib/api-helpers";
 import { db } from "@/db";
 import { accounts } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { validateAccountInput } from "@/lib/validation";
 
-export async function GET() {
+async function _GET() {
   const guard = await requireUser();
   if (guard instanceof NextResponse) return guard;
   const { session } = guard;
@@ -25,7 +25,7 @@ export async function GET() {
   return NextResponse.json({ accounts: userAccounts });
 }
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   const guard = await requireUser();
   if (guard instanceof NextResponse) return guard;
   const { session } = guard;
@@ -60,3 +60,6 @@ export async function POST(request: NextRequest) {
     },
   });
 }
+
+export const GET = withErrorHandling(_GET);
+export const POST = withErrorHandling(_POST);

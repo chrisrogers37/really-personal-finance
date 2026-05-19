@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { requireUser } from "@/lib/api-helpers";
+import { requireUser, withErrorHandling } from "@/lib/api-helpers";
 import { enrollMfa } from "@/lib/mfa";
 import { audit } from "@/lib/audit";
 
-export async function POST(request: Request) {
+async function _POST(request: Request) {
   const guard = await requireUser();
   if (guard instanceof NextResponse) return guard;
   const { session } = guard;
@@ -23,3 +23,5 @@ export async function POST(request: Request) {
 
   return NextResponse.json({ uri, secret, recoveryCodes });
 }
+
+export const POST = withErrorHandling(_POST);

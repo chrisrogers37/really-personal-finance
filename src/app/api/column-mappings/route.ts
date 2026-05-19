@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireUser } from "@/lib/api-helpers";
+import { requireUser, withErrorHandling } from "@/lib/api-helpers";
 import { db } from "@/db";
 import { columnMappings } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 
-export async function GET() {
+async function _GET() {
   const guard = await requireUser();
   if (guard instanceof NextResponse) return guard;
   const { session } = guard;
@@ -18,7 +18,7 @@ export async function GET() {
   return NextResponse.json({ mappings });
 }
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   const guard = await requireUser();
   if (guard instanceof NextResponse) return guard;
   const { session } = guard;
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
   return NextResponse.json({ mapping }, { status: 201 });
 }
 
-export async function DELETE(request: NextRequest) {
+async function _DELETE(request: NextRequest) {
   const guard = await requireUser();
   if (guard instanceof NextResponse) return guard;
   const { session } = guard;
@@ -71,3 +71,7 @@ export async function DELETE(request: NextRequest) {
 
   return NextResponse.json({ success: true });
 }
+
+export const GET = withErrorHandling(_GET);
+export const POST = withErrorHandling(_POST);
+export const DELETE = withErrorHandling(_DELETE);

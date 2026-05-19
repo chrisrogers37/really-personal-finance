@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireUser } from "@/lib/api-helpers";
+import { requireUser, withErrorHandling } from "@/lib/api-helpers";
 import { db } from "@/db";
 import { transactions } from "@/db/schema";
 import { eq, and, gte, lte, sql } from "drizzle-orm";
 import { isValidDateParam } from "@/lib/validation";
 
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   const guard = await requireUser();
   if (guard instanceof NextResponse) return guard;
   const { session } = guard;
@@ -47,3 +47,5 @@ export async function GET(request: NextRequest) {
     })),
   });
 }
+
+export const GET = withErrorHandling(_GET);

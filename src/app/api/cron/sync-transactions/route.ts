@@ -3,10 +3,11 @@ import { db } from "@/db";
 import { accounts } from "@/db/schema";
 import { syncPlaidTransactions } from "@/lib/sync-plaid";
 import { audit } from "@/lib/audit";
+import { withErrorHandling } from "@/lib/api-helpers";
 
 export const maxDuration = 300; // 5 minutes for Vercel
 
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   // Verify cron secret
   const authHeader = request.headers.get("authorization");
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
@@ -37,3 +38,5 @@ export async function GET(request: NextRequest) {
     errors: result.errors.length > 0 ? result.errors : undefined,
   });
 }
+
+export const GET = withErrorHandling(_GET);

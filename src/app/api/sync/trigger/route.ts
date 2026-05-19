@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireUser } from "@/lib/api-helpers";
+import { requireUser, withErrorHandling } from "@/lib/api-helpers";
 import { db } from "@/db";
 import { accounts } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
@@ -7,7 +7,7 @@ import { syncPlaidTransactions } from "@/lib/sync-plaid";
 
 export const maxDuration = 60;
 
-export async function POST() {
+async function _POST() {
   const guard = await requireUser();
   if (guard instanceof NextResponse) return guard;
   const { session } = guard;
@@ -34,3 +34,5 @@ export async function POST() {
     errors: result.errors.length > 0 ? result.errors : undefined,
   });
 }
+
+export const POST = withErrorHandling(_POST);

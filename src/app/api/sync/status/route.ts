@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { requireUser } from "@/lib/api-helpers";
+import { requireUser, withErrorHandling } from "@/lib/api-helpers";
 import { db } from "@/db";
 import { accounts, transactions } from "@/db/schema";
 import { eq, and, sql, max } from "drizzle-orm";
 
-export async function GET() {
+async function _GET() {
   const guard = await requireUser();
   if (guard instanceof NextResponse) return guard;
   const { session } = guard;
@@ -49,3 +49,5 @@ export async function GET() {
     transactionCount: stats?.count || 0,
   });
 }
+
+export const GET = withErrorHandling(_GET);

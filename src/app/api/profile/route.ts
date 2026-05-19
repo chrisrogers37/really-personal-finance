@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireUser } from "@/lib/api-helpers";
+import { requireUser, withErrorHandling } from "@/lib/api-helpers";
 import { updateUserProfile } from "@/lib/scd2";
 
-export async function GET() {
+async function _GET() {
   const guard = await requireUser();
   if (guard instanceof NextResponse) return guard;
   const { session } = guard;
@@ -16,7 +16,7 @@ export async function GET() {
   });
 }
 
-export async function PUT(request: NextRequest) {
+async function _PUT(request: NextRequest) {
   const guard = await requireUser();
   if (guard instanceof NextResponse) return guard;
   const { session } = guard;
@@ -52,3 +52,6 @@ export async function PUT(request: NextRequest) {
     },
   });
 }
+
+export const GET = withErrorHandling(_GET);
+export const PUT = withErrorHandling(_PUT);

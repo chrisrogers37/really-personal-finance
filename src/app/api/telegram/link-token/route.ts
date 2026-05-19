@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { randomBytes } from "crypto";
-import { requireUser } from "@/lib/api-helpers";
+import { requireUser, withErrorHandling } from "@/lib/api-helpers";
 import { db } from "@/db";
 import { telegramLinkTokens } from "@/db/schema";
 import { eq, and, gt, isNull } from "drizzle-orm";
@@ -18,7 +18,7 @@ function generateLinkCode(): string {
   return code;
 }
 
-export async function POST(request: Request) {
+async function _POST(request: Request) {
   const guard = await requireUser();
   if (guard instanceof NextResponse) return guard;
   const { session } = guard;
@@ -65,3 +65,5 @@ export async function POST(request: Request) {
     expiresAt: expires.toISOString(),
   });
 }
+
+export const POST = withErrorHandling(_POST);
