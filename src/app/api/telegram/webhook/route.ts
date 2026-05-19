@@ -60,7 +60,7 @@ async function _POST(request: NextRequest) {
 
     // Rate limit failed /start attempts per chatId
     const rateLimitKey = `telegram-link:${chatId}`;
-    const limit = checkRateLimit(rateLimitKey);
+    const limit = await checkRateLimit(rateLimitKey);
     if (!limit.allowed) {
       await sendTelegramMessage(chatId, "Too many attempts. Try again later.");
       return NextResponse.json({ ok: true });
@@ -81,7 +81,7 @@ async function _POST(request: NextRequest) {
       .returning({ id: telegramLinkTokens.id, userId: telegramLinkTokens.userId });
 
     if (result.length === 0) {
-      recordFailure(rateLimitKey);
+      await recordFailure(rateLimitKey);
       await Promise.all([
         audit({
           action: "telegram.link_failed",
@@ -97,7 +97,7 @@ async function _POST(request: NextRequest) {
     }
 
     const { userId } = result[0];
-    resetAttempts(rateLimitKey);
+    await resetAttempts(rateLimitKey);
 
     // Upsert telegram config
     await db

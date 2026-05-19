@@ -247,6 +247,20 @@ export const mfaCredentials = pgTable(
   ]
 );
 
+// ─── Rate Limit Attempts ─────────────────────────────────────────────────────
+export const rateLimitAttempts = pgTable(
+  "rate_limit_attempts",
+  {
+    key: text("key").primaryKey(),
+    count: integer("count").notNull().default(0),
+    lockedUntil: timestamp("locked_until", { mode: "date" }),
+    lastAttempt: timestamp("last_attempt", { mode: "date" }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("idx_rate_limit_attempts_last_attempt").on(table.lastAttempt),
+  ]
+);
+
 // ─── Consent Records ────────────────────────────────────────────────────────
 export const consentRecords = pgTable(
   "consent_records",

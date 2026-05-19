@@ -17,7 +17,7 @@ async function _POST(request: NextRequest) {
   }
 
   const rateLimitKey = `mfa:${session.user.id}`;
-  const limit = checkRateLimit(rateLimitKey);
+  const limit = await checkRateLimit(rateLimitKey);
   if (!limit.allowed) {
     await audit({
       userId: session.user.id,
@@ -41,7 +41,7 @@ async function _POST(request: NextRequest) {
     // First-time verification during enrollment
     const success = await confirmMfaEnrollment(session.user.id, code);
     if (!success) {
-      const { remaining } = recordFailure(rateLimitKey);
+      const { remaining } = await recordFailure(rateLimitKey);
       await audit({
         userId: session.user.id,
         action: "auth.mfa_failed",
@@ -52,7 +52,7 @@ async function _POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid code" }, { status: 400 });
     }
 
-    resetAttempts(rateLimitKey);
+    await resetAttempts(rateLimitKey);
     await audit({
       userId: session.user.id,
       action: "auth.mfa_verified",
@@ -67,7 +67,7 @@ async function _POST(request: NextRequest) {
   // Login-time MFA verification
   const valid = await verifyMfaCode(session.user.id, code);
   if (!valid) {
-    const { remaining } = recordFailure(rateLimitKey);
+    const { remaining } = await recordFailure(rateLimitKey);
     await audit({
       userId: session.user.id,
       action: "auth.mfa_failed",
@@ -78,7 +78,7 @@ async function _POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid code" }, { status: 400 });
   }
 
-  resetAttempts(rateLimitKey);
+  await resetAttempts(rateLimitKey);
   await audit({
     userId: session.user.id,
     action: "auth.mfa_verified",
