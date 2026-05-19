@@ -1,15 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { requireUser } from "@/lib/api-helpers";
 import { db } from "@/db";
 import { transactions } from "@/db/schema";
 import { eq, and, gte, lte, sql } from "drizzle-orm";
 import { clampInt, isValidDateParam } from "@/lib/validation";
 
 export async function GET(request: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const guard = await requireUser();
+  if (guard instanceof NextResponse) return guard;
+  const { session } = guard;
 
   const searchParams = request.nextUrl.searchParams;
   const startDate = searchParams.get("startDate");
