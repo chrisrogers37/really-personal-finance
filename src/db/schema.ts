@@ -93,6 +93,7 @@ export const sessions = pgTable(
     sessionToken: text("session_token").notNull().unique(),
     userId: uuid("user_id").notNull(),
     expires: timestamp("expires", { mode: "date" }).notNull(),
+    mfaVerifiedAt: timestamp("mfa_verified_at", { mode: "date" }),
   },
   (table) => [
     index("idx_sessions_user_id").on(table.userId),

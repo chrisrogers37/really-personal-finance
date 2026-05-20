@@ -5,6 +5,7 @@ declare module "next-auth" {
   interface User {
     role?: UserRole;
     mfaEnabled?: boolean;
+    mfaVerifiedAt?: Date | null;
   }
 
   interface Session {
@@ -14,6 +15,7 @@ declare module "next-auth" {
       name?: string | null;
       role?: UserRole;
       mfaEnabled?: boolean;
+      mfaVerifiedAt?: Date | null;
     };
   }
 }
