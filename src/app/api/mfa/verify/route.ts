@@ -3,6 +3,34 @@ import { requireUser, withErrorHandling } from "@/lib/api-helpers";
 import { confirmMfaEnrollment, verifyMfaCode, hasMfaEnabled } from "@/lib/mfa";
 import { audit } from "@/lib/audit";
 import { checkRateLimit, recordFailure, resetAttempts } from "@/lib/rate-limit";
+import { db } from "@/db";
+import { sessions } from "@/db/schema";
+import { eq } from "drizzle-orm";
+
+// NextAuth's session cookie names (insecure for HTTP, __Secure- prefix on HTTPS).
+const SESSION_COOKIE_NAMES = [
+  "__Secure-authjs.session-token",
+  "authjs.session-token",
+  "__Secure-next-auth.session-token",
+  "next-auth.session-token",
+];
+
+function readSessionToken(request: NextRequest): string | null {
+  for (const name of SESSION_COOKIE_NAMES) {
+    const v = request.cookies.get(name)?.value;
+    if (v) return v;
+  }
+  return null;
+}
+
+async function markSessionMfaVerified(request: NextRequest): Promise<void> {
+  const token = readSessionToken(request);
+  if (!token) return;
+  await db
+    .update(sessions)
+    .set({ mfaVerifiedAt: new Date() })
+    .where(eq(sessions.sessionToken, token));
+}
 
 async function _POST(request: NextRequest) {
   const guard = await requireUser();
@@ -53,6 +81,7 @@ async function _POST(request: NextRequest) {
     }
 
     await resetAttempts(rateLimitKey);
+    await markSessionMfaVerified(request);
     await audit({
       userId: session.user.id,
       action: "auth.mfa_verified",
@@ -79,6 +108,7 @@ async function _POST(request: NextRequest) {
   }
 
   await resetAttempts(rateLimitKey);
+  await markSessionMfaVerified(request);
   await audit({
     userId: session.user.id,
     action: "auth.mfa_verified",
