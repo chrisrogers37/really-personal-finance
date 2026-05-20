@@ -1,10 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ShieldCheck } from "lucide-react";
 
 export default function MfaChallengePage() {
+  return (
+    <Suspense fallback={null}>
+      <MfaChallengeForm />
+    </Suspense>
+  );
+}
+
+function MfaChallengeForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [code, setCode] = useState("");
