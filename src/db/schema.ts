@@ -39,6 +39,9 @@ export const auditActionEnum = pgEnum("audit_action", [
   "admin.role_change",
   "admin.user_deprovisioned",
   "admin.access_review",
+  "profile.email_change_requested",
+  "profile.email_change_completed",
+  "profile.email_change_cancelled",
 ]);
 
 // ─── Users (SCD2) ────────────────────────────────────────────────────────────
@@ -191,6 +194,27 @@ export const telegramConfigs = pgTable(
   },
   (table) => [
     index("idx_telegram_configs_user_id").on(table.userId),
+  ]
+);
+
+// ─── Email Change Tokens ─────────────────────────────────────────────────────
+export const emailChangeTokens = pgTable(
+  "email_change_tokens",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id").notNull(),
+    newEmail: text("new_email").notNull(),
+    token: text("token").notNull().unique(),
+    revokeToken: text("revoke_token").notNull().unique(),
+    expires: timestamp("expires", { mode: "date" }).notNull(),
+    usedAt: timestamp("used_at", { mode: "date" }),
+    cancelledAt: timestamp("cancelled_at", { mode: "date" }),
+    createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("idx_email_change_tokens_token").on(table.token),
+    index("idx_email_change_tokens_revoke_token").on(table.revokeToken),
+    index("idx_email_change_tokens_user_id").on(table.userId),
   ]
 );
 

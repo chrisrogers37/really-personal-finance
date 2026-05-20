@@ -31,24 +31,32 @@ export async function updateUserProfile(
 
   // Wrap close + insert in a transaction for atomicity.
   // If either operation fails, both are rolled back.
+  // If the email is changing without an explicit emailVerified, reset to null.
+  // Defense-in-depth: prevents any future caller from silently swapping email
+  // while keeping the prior verification timestamp. The verified email-change
+  // flow passes `emailVerified: new Date()` explicitly after token confirmation.
+  const emailIsChanging =
+    updates.email !== undefined && updates.email !== current.email;
+  const resolvedEmailVerified =
+    updates.emailVerified !== undefined
+      ? updates.emailVerified
+      : emailIsChanging
+        ? null
+        : current.emailVerified;
+
   const [newVersion] = await db.transaction(async (tx) => {
-    // Close current row
     await tx
       .update(users)
       .set({ validTo: now, isCurrent: false })
       .where(eq(users.id, current.id));
 
-    // Insert new version
     return tx
       .insert(users)
       .values({
         userId: current.userId,
         email: updates.email ?? current.email,
         name: updates.name ?? current.name,
-        emailVerified:
-          updates.emailVerified !== undefined
-            ? updates.emailVerified
-            : current.emailVerified,
+        emailVerified: resolvedEmailVerified,
         validFrom: now,
         isCurrent: true,
       })
