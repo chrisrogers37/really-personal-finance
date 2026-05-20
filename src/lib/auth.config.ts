@@ -200,6 +200,7 @@ export const authConfig: NextAuthConfig = {
           email: user.email,
           name: user.name,
           emailVerified: user.emailVerified,
+          mfaVerifiedAt: session.mfaVerifiedAt,
         },
       };
     },
@@ -274,6 +275,9 @@ export const authConfig: NextAuthConfig = {
         (session.user as unknown as Record<string, unknown>).role = currentUser.role;
         (session.user as unknown as Record<string, unknown>).mfaEnabled = currentUser.mfaEnabled;
       }
+
+      (session.user as unknown as Record<string, unknown>).mfaVerifiedAt =
+        (user as { mfaVerifiedAt?: Date | null }).mfaVerifiedAt ?? null;
 
       return session;
     },
