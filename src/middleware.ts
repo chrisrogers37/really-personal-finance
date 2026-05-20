@@ -9,6 +9,7 @@ const { auth } = NextAuth(authConfig);
 export default auth((req) => {
   const isLoggedIn = !!req.auth;
   const isAuthPage = req.nextUrl.pathname.startsWith("/auth");
+  const isMfaPage = req.nextUrl.pathname.startsWith("/auth/mfa");
   const isDashboardPage = req.nextUrl.pathname.startsWith("/dashboard");
   const isProfilePage = req.nextUrl.pathname.startsWith("/profile");
   const isAdminRoute = req.nextUrl.pathname.startsWith("/api/admin");
@@ -20,8 +21,9 @@ export default auth((req) => {
     return NextResponse.next();
   }
 
-  // Redirect logged-in users away from auth pages to dashboard
-  if (isAuthPage && isLoggedIn) {
+  // Redirect logged-in users away from auth pages to dashboard.
+  // Exception: /auth/mfa is the MFA challenge page — keep it reachable.
+  if (isAuthPage && isLoggedIn && !isMfaPage) {
     return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
   }
 
@@ -31,6 +33,22 @@ export default auth((req) => {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     return NextResponse.redirect(new URL("/auth/signin", req.nextUrl));
+  }
+
+  // MFA enforcement: logged in with MFA enabled but session not yet verified.
+  if (isLoggedIn) {
+    const user = req.auth?.user as
+      | { mfaEnabled?: boolean; mfaVerifiedAt?: Date | string | null }
+      | undefined;
+    const mfaRequired = !!user?.mfaEnabled && !user?.mfaVerifiedAt;
+    if (mfaRequired && !isMfaPage) {
+      if (isAdminRoute) {
+        return NextResponse.json({ error: "MFA required" }, { status: 401 });
+      }
+      if (isDashboardPage || isProfilePage) {
+        return NextResponse.redirect(new URL("/auth/mfa", req.nextUrl));
+      }
+    }
   }
 
   return NextResponse.next();
