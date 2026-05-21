@@ -25,7 +25,10 @@ export type AuditAction =
   | "telegram.link_failed"
   | "admin.role_change"
   | "admin.user_deprovisioned"
-  | "admin.access_review";
+  | "admin.access_review"
+  | "profile.email_change_requested"
+  | "profile.email_change_completed"
+  | "profile.email_change_cancelled";
 
 interface AuditEntry {
   userId?: string | null;
