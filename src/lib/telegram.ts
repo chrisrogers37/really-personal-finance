@@ -25,8 +25,8 @@ export async function sendTelegramMessage(
   });
 
   if (!response.ok) {
-    const error = await response.text();
-    console.error("Telegram send failed:", error);
+    // Log status only — the response body can echo message/chat content (PII).
+    console.error(`Telegram send failed: HTTP ${response.status}`);
     return false;
   }
   return true;

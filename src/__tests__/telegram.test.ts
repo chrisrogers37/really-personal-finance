@@ -56,6 +56,7 @@ describe("sendTelegramMessage", () => {
       "fetch",
       vi.fn().mockResolvedValue({
         ok: false,
+        status: 400,
         text: () => Promise.resolve("Bad Request"),
       })
     );

@@ -162,8 +162,13 @@ export async function syncPlaidTransactions(
         .set({ cursor })
         .where(inArray(accounts.id, itemAccountIds));
     } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      console.error(`Sync failed for item ${itemId}:`, message);
+      const isError = err instanceof Error;
+      const message = isError ? err.message : String(err);
+      // Log the error class only — Plaid messages can carry PII; the full
+      // message stays in the structured result returned to the cron caller.
+      console.error(
+        `Sync failed for item ${itemId} (${isError ? err.name : "unknown error"})`,
+      );
       errors.push({ itemId, error: message });
     }
   }
