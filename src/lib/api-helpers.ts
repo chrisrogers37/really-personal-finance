@@ -1,7 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 import type { Session } from "next-auth";
 import { auth } from "./auth";
 import { getUserRole, hasMinRole, type UserRole } from "./rbac";
+import { timingSafeCompare } from "./validation";
 
 export type AuthGuard = { userId: string; session: Session };
 export type RoleGuard = AuthGuard & { role: UserRole };
@@ -28,6 +29,19 @@ export async function requireRole(
 
 export async function requireAdmin(): Promise<RoleGuard | NextResponse> {
   return requireRole("admin");
+}
+
+/**
+ * Verify a cron route's Bearer secret in constant time. Returns a 401
+ * NextResponse to return on failure, or null when the request is authorized.
+ */
+export function requireCronAuth(request: NextRequest): NextResponse | null {
+  const authHeader = request.headers.get("authorization");
+  const expected = `Bearer ${process.env.CRON_SECRET}`;
+  if (!authHeader || !timingSafeCompare(authHeader, expected)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  return null;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
