@@ -115,6 +115,7 @@ Detailed documentation for maintainers and contributors is in the [`docs/`](docs
 | [Component Reference](docs/COMPONENTS.md) | Every React component and page with props, behavior, state management, and TypeScript interfaces |
 | [Security Documentation](docs/SECURITY.md) | Authentication, encryption, route protection, webhook security, input validation, and a security checklist for new features |
 | [Telegram Bot Guide](docs/TELEGRAM.md) | Bot setup, webhook configuration, all commands, automated alerts, anomaly detection, and how to extend the bot |
+| [System Review & Tech-Debt Triage](docs/SYSTEM_REVIEW.md) | Full-system review: prioritized bugs, security, architecture, quality-gate, and enhancement findings, cross-referenced to open issues |
 
 ## License
 
