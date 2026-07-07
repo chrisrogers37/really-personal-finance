@@ -14,6 +14,10 @@ To avoid duplication, this tracker separates:
 - **Part 2 — Already-tracked findings** confirmed still-present, cross-referenced to their
   open issue numbers so the whole backlog can be viewed in one place.
 
+> **Status (2026-07-07):** the Part 1 findings have been filed as GitHub issues —
+> **#135** (P0, individual), **#136** (P1, individual), **#137** (P2 cluster), and
+> **#138** (P3 cluster). See [`01_ISSUES_FILED.md`](01_ISSUES_FILED.md) for the finding→issue map.
+
 ## Health snapshot
 
 | Signal | Result | Notes |
