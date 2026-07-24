@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { formatCurrency, formatDate, cn } from "@/lib/utils";
+import { formatCurrency, formatDate, cn, sanitizeCallbackUrl } from "@/lib/utils";
 
 describe("formatCurrency", () => {
   it("formats positive amounts", () => {
@@ -53,5 +53,28 @@ describe("cn", () => {
   it("handles falsy values", () => {
     const result = cn("base", false, null, undefined, "extra");
     expect(result).toBe("base extra");
+  });
+});
+
+describe("sanitizeCallbackUrl (#131)", () => {
+  it("allows a same-origin absolute path", () => {
+    expect(sanitizeCallbackUrl("/dashboard/settings")).toBe("/dashboard/settings");
+  });
+
+  it("rejects protocol-relative //host", () => {
+    expect(sanitizeCallbackUrl("//evil.com")).toBe("/dashboard");
+  });
+
+  it("rejects an absolute URL", () => {
+    expect(sanitizeCallbackUrl("https://evil.com")).toBe("/dashboard");
+  });
+
+  it("rejects backslash tricks", () => {
+    expect(sanitizeCallbackUrl("/\\evil.com")).toBe("/dashboard");
+  });
+
+  it("falls back on null/empty", () => {
+    expect(sanitizeCallbackUrl(null)).toBe("/dashboard");
+    expect(sanitizeCallbackUrl("")).toBe("/dashboard");
   });
 });
