@@ -61,7 +61,8 @@ describe("updateUserProfile — carries forward versioned columns (#135)", () =>
 
   it("does not carry the old primary key into the new row", async () => {
     await updateUserProfile("user-1", { name: "New Name" });
-    const arg = txInsertValues.mock.calls[0][0] as Record<string, unknown>;
-    expect(arg.id).toBeUndefined();
+    expect(txInsertValues).toHaveBeenCalledWith(
+      expect.not.objectContaining({ id: expect.anything() }),
+    );
   });
 });
