@@ -17,6 +17,13 @@ export function hasMinRole(userRole: UserRole, requiredRole: UserRole): boolean 
   return ROLE_HIERARCHY[userRole] >= ROLE_HIERARCHY[requiredRole];
 }
 
+/** True when `callerRole` is strictly higher than `targetRole`. Used to gate
+ * role changes: a caller may only modify a target they strictly out-rank, so
+ * peers (admin↔admin, owner↔owner) and superiors are protected. */
+export function outRanks(callerRole: UserRole, targetRole: UserRole): boolean {
+  return ROLE_HIERARCHY[callerRole] > ROLE_HIERARCHY[targetRole];
+}
+
 export async function getUserRole(userId: string): Promise<UserRole> {
   const [user] = await db
     .select({ role: users.role })
