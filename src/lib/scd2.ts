@@ -50,10 +50,15 @@ export async function updateUserProfile(
       .set({ validTo: now, isCurrent: false })
       .where(eq(users.id, current.id));
 
+    // Carry forward every versioned column (role, mfaEnabled, and any future
+    // user columns). Drop lifecycle columns so the new row gets fresh values;
+    // override only the fields this update changes.
+    const { id: _id, createdAt: _createdAt, validFrom: _vf, validTo: _vt, isCurrent: _ic, ...carry } = current;
+
     return tx
       .insert(users)
       .values({
-        userId: current.userId,
+        ...carry,
         email: updates.email ?? current.email,
         name: updates.name ?? current.name,
         emailVerified: resolvedEmailVerified,
