@@ -6,7 +6,6 @@ import {
   VALID_ROLES,
   getUserRole,
   outRanks,
-  type UserRole,
 } from "@/lib/rbac";
 import { audit } from "@/lib/audit";
 import { db } from "@/db";
@@ -90,12 +89,12 @@ async function _PATCH(request: NextRequest) {
   // Strict out-ranking also protects the last owner implicitly: no one out-ranks
   // an owner, so owners are never demotable through this endpoint.
   const targetCurrentRole = await getUserRole(targetUserId);
-  if (!outRanks(callerRole as UserRole, targetCurrentRole)) {
+  if (!outRanks(callerRole, targetCurrentRole)) {
     return NextResponse.json({ error: "Insufficient rank for this target" }, { status: 403 });
   }
 
   // Only owners can promote to owner/admin.
-  if ((role === "owner" || role === "admin") && !hasMinRole(callerRole as UserRole, "owner")) {
+  if ((role === "owner" || role === "admin") && !hasMinRole(callerRole, "owner")) {
     return NextResponse.json({ error: "Only owners can assign admin/owner roles" }, { status: 403 });
   }
 
