@@ -663,3 +663,27 @@ git commit -m "fix(security): require step-up auth to re-enroll MFA over verifie
 **Type consistency:** `sanitizeCallbackUrl(raw, fallback="/dashboard")` used consistently (Tasks 4). `countCurrentOwners(): Promise<number>` defined in rbac (Task 3 Step 1) and consumed in the route (Step 4). `hasMinRole(caller, target)` matches the existing rbac signature. `verifyMfaCode(userId, code): Promise<boolean>` reused as the step-up check in Task 5 — matches `src/lib/mfa.ts`. ✅
 
 **Scope:** One cluster, one PR, split into ship-ready Part A and migration-bearing Part B — right-sized. ✅
+
+---
+
+## Execution Log — Part A (COMPLETE)
+
+Executed via `/claudna:implement-plan` on branch `implement/auth-authz-cluster1`. Baseline 176 tests → **196 tests passing**, typecheck clean on the changed surface.
+
+| Task | Issue | Commit | Tests |
+|---|---|---|---|
+| CI safety net (test-only) | #136 (partial) | `f27436e` | — |
+| SCD2 carry-forward | #135 | `48518dc` | +3 |
+| Strict rank guard | #127 | `6a60a6c` | +5 |
+| callbackUrl sanitizer | #131 | `24b4162` | +5 |
+| MFA re-enroll step-up | #125 | `44a60c3` | +4 |
+| Simplify pass (drop redundant casts) | — | `e1ade04` | — |
+| Rate-limit the step-up (finding A) | hardens #125 | `2afb9cf` | +3 |
+
+**Decisions made during execution:**
+- **#127 rank rule → strict out-ranking** (not the issue's literal `≥`). The issue's title/impact name peer admins as victims, which `≥` wouldn't protect; strict out-ranking blocks admin→admin and owner→owner demotions and protects the last owner implicitly. (User-ratified.)
+- **Simplify pass:** dropped redundant `as UserRole` casts; skipped the MFA enroll double-read (cold path; fix would change shared `verifyMfaCode` semantics) and the `sanitizeCallbackUrl` `typeof` guard (kept as defensive).
+- **Altitude finding A (step-up brute-forceable):** fixed in-PR — rate-limited via the shared `mfa:${userId}` bucket.
+- **Altitude finding B (deprovision self-target / last-owner):** pre-existing and outside #127's role-PATCH scope → filed as follow-up **#139**.
+
+**Deferred:** Part B (#78 bcrypt recovery codes, #130 TOTP single-use) — needs the `mfa_credentials` schema change + backfill.
