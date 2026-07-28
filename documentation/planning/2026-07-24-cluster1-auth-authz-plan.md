@@ -668,7 +668,7 @@ git commit -m "fix(security): require step-up auth to re-enroll MFA over verifie
 
 ## Execution Log — Part A (COMPLETE)
 
-Executed via `/claudna:implement-plan` on branch `implement/auth-authz-cluster1`. Baseline 176 tests → **196 tests passing**, typecheck clean on the changed surface.
+Executed via `/claudna:implement-plan` on branch `implement/auth-authz-cluster1` → **PR #140**. Baseline 176 tests → **196 tests passing**, typecheck clean on the changed surface.
 
 | Task | Issue | Commit | Tests |
 |---|---|---|---|
