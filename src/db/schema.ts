@@ -8,6 +8,7 @@ import {
   decimal,
   date,
   integer,
+  bigint,
   jsonb,
   index,
 } from "drizzle-orm/pg-core";
@@ -263,7 +264,17 @@ export const mfaCredentials = pgTable(
     id: uuid("id").defaultRandom().primaryKey(),
     userId: uuid("user_id").notNull().unique(),
     totpSecret: text("totp_secret").notNull(), // encrypted with AES-256-GCM
-    recoveryCodes: text("recovery_codes").notNull(), // encrypted JSON array
+    // Legacy: AES-256-GCM-encrypted JSON array of plaintext recovery codes.
+    // Nullable during the migration to bcrypt hashes; new enrollments leave it
+    // null. Dropped once every row is backfilled — see the Part B migration
+    // runbook + the column-drop follow-up issue.
+    recoveryCodes: text("recovery_codes"),
+    // bcrypt hashes of the recovery codes, one entry per code. Replaces the
+    // reversible recoveryCodes blob (#78). Null on rows not yet backfilled.
+    recoveryCodeHashes: text("recovery_code_hashes").array(),
+    // Highest TOTP timestep already consumed, to reject replay within the
+    // validation window (RFC 6238, #130). Null until the first successful TOTP.
+    lastTotpStep: bigint("last_totp_step", { mode: "number" }),
     verified: boolean("verified").notNull().default(false),
     createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
   },

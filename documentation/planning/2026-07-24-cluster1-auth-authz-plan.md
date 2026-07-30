@@ -687,3 +687,23 @@ Executed via `/claudna:implement-plan` on branch `implement/auth-authz-cluster1`
 - **Altitude finding B (deprovision self-target / last-owner):** pre-existing and outside #127's role-PATCH scope → filed as follow-up **#139**.
 
 **Deferred:** Part B (#78 bcrypt recovery codes, #130 TOTP single-use) — needs the `mfa_credentials` schema change + backfill.
+
+---
+
+## Execution Log — Part B (COMPLETE — code; live migration pending owner)
+
+Executed via `/claudna:implement-plan` on branch `implement/mfa-credential-hardening`. Baseline 196 tests → **208 passing**, typecheck clean on the changed surface. Code + tests + backfill script + migration runbook ship in the PR; the live `db:push` + backfill are the owner's to run per the runbook (chosen model: **"code + runbook, you run the DB"**).
+
+| Task | Issue | Commit | Notes |
+|---|---|---|---|
+| bcrypt recovery codes + single-use TOTP | #78, #130 | `985aa97` | schema (`recovery_code_hashes`, `last_totp_step`, `recovery_codes` nullable) + `mfa.ts` + 11 tests |
+| Backfill script + migration runbook | #78 | `54dbae6` | `scripts/backfill-recovery-hashes.ts`, `db:backfill:recovery`, runbook, `.env.branch` gitignore |
+| Simplify pass (dedup replay guard + recovery-fallback fix) | hardens #78 | `b019f26` | +2 tests |
+
+**Decisions / deviations from the Part B outline:**
+- **Expand/contract, not in-place replace.** Task 6's outline said to *drop* the old `recoveryCodes` column here. Instead this PR keeps it (made nullable) plus a legacy read fallback, so the migration is rollback-safe; the column drop + fallback removal are deferred to follow-up **#142** (run after prod backfill is verified).
+- **`recoveryCodeHashes IS NOT NULL` is the scheme signal** (not array length). The altitude review caught that a length-based branch would let a backfilled user who spent *all* hashed codes fall back to the still-present legacy blob and reuse them; branching on non-null closes that. (Fixed in `b019f26`.)
+- **bcryptjs 3.x self-types** → dropped the redundant `@types/bcryptjs`; added `tsx` to run the backfill under the `@/`-alias-free path.
+- **Migration is owner-run.** No code path executes `db:push`/backfill and the session has no verified-safe DB — see `2026-07-30-cluster1-partB-mfa-migration-runbook.md`.
+
+**Closes:** #78, #130. **Follow-up filed:** #142 (drop legacy column + fallback post-backfill).
