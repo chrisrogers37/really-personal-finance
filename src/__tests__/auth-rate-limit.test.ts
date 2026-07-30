@@ -11,6 +11,7 @@ import {
   isRateLimitedAuthPath,
   clientIpFromHeaders,
   emailRateLimitKey,
+  ipRateLimitKey,
   enforceAuthRateLimit,
   tooManyRequestsResponse,
 } from "@/lib/auth-rate-limit";
@@ -55,6 +56,12 @@ describe("clientIpFromHeaders", () => {
 describe("emailRateLimitKey", () => {
   it("lowercases and trims so keys are case/space-insensitive", () => {
     expect(emailRateLimitKey("  Foo@Bar.COM ")).toBe("auth:email:foo@bar.com");
+  });
+});
+
+describe("ipRateLimitKey", () => {
+  it("namespaces the IP under auth:ip:", () => {
+    expect(ipRateLimitKey("203.0.113.7")).toBe("auth:ip:203.0.113.7");
   });
 });
 

@@ -35,6 +35,11 @@ export function emailRateLimitKey(email: string): string {
   return `auth:email:${email.trim().toLowerCase()}`;
 }
 
+/** Rate-limit key for a client IP. Keeps the `auth:*` namespace in one place. */
+export function ipRateLimitKey(ip: string): string {
+  return `auth:ip:${ip}`;
+}
+
 /**
  * Count one attempt against `key`. Returns `retryAfterMs` (>= 0) when the key is
  * already over the limit and the caller should reject with 429, or `null` when

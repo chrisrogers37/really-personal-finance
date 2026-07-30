@@ -49,9 +49,9 @@ export function evaluateGate({
   const isDashboardPage = pathname.startsWith("/dashboard");
   const isProfilePage = pathname.startsWith("/profile");
 
-  // Any non-allowlisted API route is protected; API failures return JSON (not a
-  // redirect) so fetch callers get a real 401. App pages redirect to sign-in/MFA.
-  const isProtectedApi = isApiRoute; // public ones already returned above
+  // Any non-allowlisted API route is protected (public ones already returned
+  // above); API failures return JSON (not a redirect) so fetch callers get a
+  // real 401. App pages redirect to sign-in/MFA.
   const isProtectedPage = isDashboardPage || isProfilePage;
 
   if (isAuthPage && isLoggedIn && !isMfaPage) {
@@ -59,7 +59,7 @@ export function evaluateGate({
   }
 
   if (!isLoggedIn) {
-    if (isProtectedApi) {
+    if (isApiRoute) {
       return { type: "json", status: 401, body: { error: "Unauthorized" } };
     }
     if (isProtectedPage) {
@@ -68,7 +68,7 @@ export function evaluateGate({
   }
 
   if (isLoggedIn && mfaEnabled && !mfaVerifiedAt && !isMfaPage) {
-    if (isProtectedApi) {
+    if (isApiRoute) {
       return { type: "json", status: 401, body: { error: "MFA required" } };
     }
     if (isProtectedPage) {

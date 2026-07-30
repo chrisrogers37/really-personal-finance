@@ -53,16 +53,17 @@ async function _PATCH(request: NextRequest) {
     return NextResponse.json({ error: "targetUserId required" }, { status: 400 });
   }
 
+  // Handler-wide self-target guard: no admin action may target the caller's own
+  // account — self-deprovision is a lockout and self role-change is a self-demotion.
+  // One gate above the branch split so every destructive action inherits it (#139).
+  if (targetUserId === session.user.id) {
+    return NextResponse.json({ error: "Cannot target your own account" }, { status: 403 });
+  }
+
   // De-provisioning: deactivate user
   if (action === "deprovision") {
     if (!hasMinRole(callerRole, "owner")) {
       return NextResponse.json({ error: "Only owners can deprovision" }, { status: 403 });
-    }
-
-    // Self-target guard: an owner deprovisioning themselves is a self-lockout,
-    // even when other owners exist. Mirrors the role-change self guard below (#139).
-    if (targetUserId === session.user.id) {
-      return NextResponse.json({ error: "Cannot deprovision yourself" }, { status: 403 });
     }
 
     // Last-owner guard: never leave the org ownerless — that bricks every
@@ -93,10 +94,7 @@ async function _PATCH(request: NextRequest) {
     return NextResponse.json({ error: "Invalid role" }, { status: 400 });
   }
 
-  // No self role changes (prevents self-demotion and self-lockout).
-  if (targetUserId === session.user.id) {
-    return NextResponse.json({ error: "Cannot change your own role" }, { status: 403 });
-  }
+  // (Self role-change is already rejected by the handler-wide self-target guard above.)
 
   // Caller must STRICTLY out-rank the target's CURRENT role before any change.
   // Without this, an admin could demote an owner — or a peer admin — simply by

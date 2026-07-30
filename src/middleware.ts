@@ -5,6 +5,7 @@ import { evaluateGate } from "@/lib/middleware-gate";
 import {
   isRateLimitedAuthPath,
   clientIpFromHeaders,
+  ipRateLimitKey,
   enforceAuthRateLimit,
   tooManyRequestsResponse,
 } from "@/lib/auth-rate-limit";
@@ -18,7 +19,7 @@ export default auth(async (req) => {
   // backstop to the email-keyed limit at the route — before any auth gating.
   if (isRateLimitedAuthPath(req.nextUrl.pathname)) {
     const retryAfterMs = await enforceAuthRateLimit(
-      `auth:ip:${clientIpFromHeaders(req.headers)}`,
+      ipRateLimitKey(clientIpFromHeaders(req.headers)),
     );
     if (retryAfterMs !== null) return tooManyRequestsResponse(retryAfterMs);
   }
