@@ -29,3 +29,20 @@ export function formatDate(date: string | Date): string {
     year: "numeric",
   });
 }
+
+/**
+ * Return a safe, same-origin relative redirect path. Accepts only values that
+ * begin with a single "/" (no "//" protocol-relative, no "/\" backslash trick,
+ * no absolute URLs). Falls back to `fallback` otherwise. Guards against open
+ * redirects after trusted flows such as MFA.
+ */
+export function sanitizeCallbackUrl(
+  raw: string | null | undefined,
+  fallback = "/dashboard",
+): string {
+  if (!raw || typeof raw !== "string") return fallback;
+  if (!raw.startsWith("/")) return fallback;
+  if (raw.startsWith("//")) return fallback;
+  if (raw.includes("\\")) return fallback;
+  return raw;
+}

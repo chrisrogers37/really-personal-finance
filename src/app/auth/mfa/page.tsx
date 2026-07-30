@@ -3,6 +3,7 @@
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ShieldCheck } from "lucide-react";
+import { sanitizeCallbackUrl } from "@/lib/utils";
 
 export default function MfaChallengePage() {
   return (
@@ -37,7 +38,7 @@ function MfaChallengeForm() {
         setError("Invalid code. Try again.");
         return;
       }
-      const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+      const callbackUrl = sanitizeCallbackUrl(searchParams.get("callbackUrl"));
       router.replace(callbackUrl);
       router.refresh();
     } finally {

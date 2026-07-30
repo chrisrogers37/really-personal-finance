@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin, withErrorHandling } from "@/lib/api-helpers";
-import { setUserRole, hasMinRole, VALID_ROLES } from "@/lib/rbac";
+import {
+  setUserRole,
+  hasMinRole,
+  VALID_ROLES,
+  getUserRole,
+  outRanks,
+} from "@/lib/rbac";
 import { audit } from "@/lib/audit";
 import { db } from "@/db";
 import { users } from "@/db/schema";
@@ -72,7 +78,22 @@ async function _PATCH(request: NextRequest) {
     return NextResponse.json({ error: "Invalid role" }, { status: 400 });
   }
 
-  // Only owners can promote to owner/admin
+  // No self role changes (prevents self-demotion and self-lockout).
+  if (targetUserId === session.user.id) {
+    return NextResponse.json({ error: "Cannot change your own role" }, { status: 403 });
+  }
+
+  // Caller must STRICTLY out-rank the target's CURRENT role before any change.
+  // Without this, an admin could demote an owner — or a peer admin — simply by
+  // assigning "member", which skips the owner/admin-assignment gate below.
+  // Strict out-ranking also protects the last owner implicitly: no one out-ranks
+  // an owner, so owners are never demotable through this endpoint.
+  const targetCurrentRole = await getUserRole(targetUserId);
+  if (!outRanks(callerRole, targetCurrentRole)) {
+    return NextResponse.json({ error: "Insufficient rank for this target" }, { status: 403 });
+  }
+
+  // Only owners can promote to owner/admin.
   if ((role === "owner" || role === "admin") && !hasMinRole(callerRole, "owner")) {
     return NextResponse.json({ error: "Only owners can assign admin/owner roles" }, { status: 403 });
   }
