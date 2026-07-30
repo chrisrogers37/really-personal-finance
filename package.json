@@ -12,7 +12,8 @@
     "test:coverage": "vitest run --coverage",
     "db:push": "drizzle-kit push",
     "db:generate": "drizzle-kit generate",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "db:backfill:recovery": "tsx --env-file=.env scripts/backfill-recovery-hashes.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",
