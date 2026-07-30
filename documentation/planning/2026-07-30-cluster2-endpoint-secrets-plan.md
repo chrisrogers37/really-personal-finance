@@ -111,11 +111,37 @@ extend `middleware-gate` / a middleware IP test
 
 ## Verification checklist
 
-- [ ] `npm test` — full suite green (baseline 208 → +new).
-- [ ] `npx tsc --noEmit` — clean on the changed surface.
-- [ ] `/simplify` pass (diff will exceed the >50 line / >2 file threshold).
-- [ ] Manual reasoning: allowlist covers every currently-public `/api/*` route (checked
+- [x] `npm test` — full suite green (**248 passing**, +40 from baseline 208).
+- [x] `npx tsc --noEmit` — clean on the changed surface (only pre-existing
+      `profile-email-change.test.ts` mock-type errors remain, tracked by #137).
+- [x] `/simplify` pass — 4 angles; applied 3 findings (see log), skipped the rest.
+- [x] Manual reasoning: allowlist covers every currently-public `/api/*` route (checked
       against the route tree); no NextAuth internal route (`session`/`csrf`) rate-limited.
+
+## Execution log
+
+Status: **COMPLETE** — branch `implement/cluster2-endpoint-hardening`, one commit per task.
+
+- **#128** — fail-closed `if (!CRON_SECRET) return 500` before compare; +5 tests.
+- **#139** — `countCurrentOwners()` + last-owner guard; +5 tests.
+- **#111** — `/api/:path*` matcher + allowlist gate; telegram exemption tightened to
+  `/api/telegram/webhook` only; +8 gate tests.
+- **#109** — parameterized `maxAttempts` (default 5, auth 10); new `src/lib/auth-rate-limit.ts`
+  (shared enforce/keys/response); email-keyed at the route, IP-keyed in middleware; +20 tests.
+
+**Simplify pass — applied:** (1) hoisted the self-target guard to one handler-wide gate above
+the deprovision/role branch split (a future admin action inherits it); (2) dropped a redundant
+`isProtectedApi` alias in `evaluateGate`; (3) added `ipRateLimitKey()` so the `auth:*` key
+namespace lives in one place. **Skipped (noted):**
+- Extracting a shared 429/`Retry-After` helper and a shared client-IP helper and migrating the
+  existing inline copies (mfa/profile/consent/audit routes) — out of this PR's scope; **tech-debt
+  follow-up**.
+- Unifying the cron/telegram secret-verification into one `requireSecretHeader` helper — touches
+  the un-edited telegram route; **tech-debt follow-up**.
+- Narrowing the middleware matcher with a negative-lookahead to skip session-decode on the
+  high-frequency `/api/auth/{session,csrf,providers}` polling routes — a real perf win, but it
+  complicates the security chokepoint and the regex can't be unit-tested here; **perf follow-up**.
+- `countCurrentOwners` SQL `count(*)` vs `.length` — negligible (owners are few).
 
 ## Deferred — Part B (separate PR)
 
