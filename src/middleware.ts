@@ -30,5 +30,7 @@ export default auth((req) => {
 });
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/profile/:path*", "/auth/:path*", "/api/admin/:path*"],
+  // #111: cover all of /api/* (not just /api/admin) so the default-deny gate in
+  // evaluateGate applies to every API route; public routes are allowlisted there.
+  matcher: ["/dashboard/:path*", "/profile/:path*", "/auth/:path*", "/api/:path*"],
 };
