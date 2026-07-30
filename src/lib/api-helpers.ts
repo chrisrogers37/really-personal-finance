@@ -36,8 +36,19 @@ export async function requireAdmin(): Promise<RoleGuard | NextResponse> {
  * NextResponse to return on failure, or null when the request is authorized.
  */
 export function requireCronAuth(request: NextRequest): NextResponse | null {
+  const secret = process.env.CRON_SECRET;
+  // Fail CLOSED on a missing secret: without this guard `expected` becomes the
+  // literal "Bearer undefined", which an unauthenticated caller can send to pass
+  // the timing-safe compare (#128). Mirrors telegram/webhook's 500 on unset secret.
+  if (!secret) {
+    console.error("CRON_SECRET is not configured");
+    return NextResponse.json(
+      { error: "Server misconfiguration" },
+      { status: 500 },
+    );
+  }
   const authHeader = request.headers.get("authorization");
-  const expected = `Bearer ${process.env.CRON_SECRET}`;
+  const expected = `Bearer ${secret}`;
   if (!authHeader || !timingSafeCompare(authHeader, expected)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
