@@ -145,7 +145,7 @@ locked out during the transition. New enrollments write hashes only.
 ## Step 3 — Contract (follow-up, not now)
 
 Once prod backfill is verified and the deploy is stable, the **column-drop
-follow-up issue** covers:
+follow-up (#142)** covers:
 
 - remove the legacy fallback branch in `verifyRecoveryCode` (`src/lib/mfa.ts`),
 - drop `recovery_codes` from the schema, `npm run db:push`.
