@@ -31,6 +31,7 @@ import {
   recordFailure,
   resetAttempts,
   MAX_ATTEMPTS,
+  AUTH_MAX_ATTEMPTS,
   LOCKOUT_MS,
 } from "@/lib/rate-limit";
 
@@ -119,5 +120,45 @@ describe("resetAttempts", () => {
     await resetAttempts("k");
 
     expect(deleteResult).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("configurable maxAttempts (#109 auth threshold)", () => {
+  it("checkRateLimit uses the passed maxAttempts for remaining", async () => {
+    selectResult.mockResolvedValueOnce([
+      { key: "k", count: 3, lockedUntil: null, lastAttempt: new Date() },
+    ]);
+
+    const result = await checkRateLimit("k", AUTH_MAX_ATTEMPTS);
+
+    expect(AUTH_MAX_ATTEMPTS).toBe(10);
+    expect(result).toEqual({ allowed: true, remaining: AUTH_MAX_ATTEMPTS - 3 });
+  });
+
+  it("checkRateLimit reports full auth quota when no row exists", async () => {
+    selectResult.mockResolvedValueOnce([]);
+
+    const result = await checkRateLimit("k", AUTH_MAX_ATTEMPTS);
+
+    expect(result).toEqual({ allowed: true, remaining: AUTH_MAX_ATTEMPTS });
+  });
+
+  it("recordFailure clamps remaining against the passed maxAttempts", async () => {
+    insertResult.mockResolvedValueOnce([{ count: 4 }]);
+
+    const result = await recordFailure("k", AUTH_MAX_ATTEMPTS);
+
+    expect(result).toEqual({ remaining: AUTH_MAX_ATTEMPTS - 4 });
+  });
+
+  it("existing callers keep the default MAX_ATTEMPTS of 5", async () => {
+    expect(MAX_ATTEMPTS).toBe(5);
+    selectResult.mockResolvedValueOnce([
+      { key: "k", count: 1, lockedUntil: null, lastAttempt: new Date() },
+    ]);
+
+    const result = await checkRateLimit("k");
+
+    expect(result).toEqual({ allowed: true, remaining: MAX_ATTEMPTS - 1 });
   });
 });

@@ -2,12 +2,27 @@ import NextAuth from "next-auth";
 import { authConfig } from "@/lib/auth.config";
 import { NextResponse } from "next/server";
 import { evaluateGate } from "@/lib/middleware-gate";
+import {
+  isRateLimitedAuthPath,
+  clientIpFromHeaders,
+  enforceAuthRateLimit,
+  tooManyRequestsResponse,
+} from "@/lib/auth-rate-limit";
 
 // Use the lightweight auth config (no Email provider / nodemailer)
 // so middleware can run in the Edge Runtime.
 const { auth } = NextAuth(authConfig);
 
-export default auth((req) => {
+export default auth(async (req) => {
+  // #109: IP-keyed rate limit on the sign-in / callback entrypoints — a coarse
+  // backstop to the email-keyed limit at the route — before any auth gating.
+  if (isRateLimitedAuthPath(req.nextUrl.pathname)) {
+    const retryAfterMs = await enforceAuthRateLimit(
+      `auth:ip:${clientIpFromHeaders(req.headers)}`,
+    );
+    if (retryAfterMs !== null) return tooManyRequestsResponse(retryAfterMs);
+  }
+
   const user = req.auth?.user as
     | { mfaEnabled?: boolean; mfaVerifiedAt?: Date | string | null }
     | undefined;
