@@ -98,10 +98,11 @@ locked out during the transition. New enrollments write hashes only.
 6. **Verify on the branch** (psql / Neon SQL editor):
 
    ```sql
-   -- Must return 0: no verified row left with a legacy blob but no hashes.
+   -- Must return 0: every row with a legacy blob now also has hashes.
+   -- (recovery_code_hashes IS NULL is the authoritative "not yet backfilled"
+   -- signal; an empty array means migrated-and-exhausted, not un-migrated.)
    SELECT count(*) FROM mfa_credentials
-   WHERE (recovery_code_hashes IS NULL OR cardinality(recovery_code_hashes) = 0)
-     AND recovery_codes IS NOT NULL;
+   WHERE recovery_code_hashes IS NULL AND recovery_codes IS NOT NULL;
 
    -- Spot-check: hashes look like bcrypt ($2b$10$…), one entry per code.
    SELECT user_id, cardinality(recovery_code_hashes) AS n, left(recovery_code_hashes[1], 7) AS sample

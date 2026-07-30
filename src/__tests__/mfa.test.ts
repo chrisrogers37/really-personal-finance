@@ -159,7 +159,10 @@ describe("verifyMfaCode — recovery codes via bcrypt (#78)", () => {
     });
   });
 
-  it("treats an empty hash array as un-backfilled and falls back to legacy", async () => {
+  it("does not fall back to the legacy blob once on the hash scheme (exhausted codes)", async () => {
+    // A non-null but empty hash array means the row is migrated and every code
+    // has been consumed. The stale legacy blob (kept for rollback) must NOT be
+    // consulted, or a spent code would authenticate again.
     const legacyBlob = `enc(${JSON.stringify(["only"])})`;
     selectLimit.mockResolvedValue([
       credRow({ recoveryCodeHashes: [], recoveryCodes: legacyBlob }),
@@ -167,8 +170,20 @@ describe("verifyMfaCode — recovery codes via bcrypt (#78)", () => {
 
     const ok = await verifyMfaCode("u1", "only");
 
-    expect(ok).toBe(true);
-    expect(bcrypt.compare).not.toHaveBeenCalled();
+    expect(ok).toBe(false);
+  });
+
+  it("ignores the legacy blob while the hash scheme is active (both columns set)", async () => {
+    // A backfilled row keeps recovery_codes for rollback, but a code that exists
+    // only in the legacy blob must be rejected — the hashes are the source of truth.
+    const legacyBlob = `enc(${JSON.stringify(["legacy-only"])})`;
+    selectLimit.mockResolvedValue([
+      credRow({ recoveryCodeHashes: ["hash:aaa"], recoveryCodes: legacyBlob }),
+    ]);
+
+    const ok = await verifyMfaCode("u1", "legacy-only");
+
+    expect(ok).toBe(false);
   });
 });
 

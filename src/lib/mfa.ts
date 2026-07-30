@@ -20,6 +20,17 @@ function currentTotpStep(): number {
   return Math.floor(Date.now() / 1000 / TOTP_CONFIG.period);
 }
 
+/**
+ * The timestep a just-validated TOTP (offset `delta` from now) consumes, or null
+ * if it replays an already-consumed step. Single-sources the #130 replay rule
+ * shared by confirmMfaEnrollment and verifyMfaCode so the two can't drift.
+ */
+function nextTotpStep(delta: number, lastStep: number | null): number | null {
+  const step = currentTotpStep() + delta;
+  if (lastStep != null && step <= lastStep) return null;
+  return step;
+}
+
 export async function enrollMfa(userId: string, userEmail: string) {
   const totp = new OTPAuth.TOTP({
     ...TOTP_CONFIG,
@@ -78,8 +89,8 @@ export async function confirmMfaEnrollment(userId: string, code: string): Promis
 
   // #130: record the consumed timestep so this same code can't be replayed at
   // login immediately after enrollment.
-  const step = currentTotpStep() + delta;
-  if (cred.lastTotpStep != null && step <= cred.lastTotpStep) return false;
+  const step = nextTotpStep(delta, cred.lastTotpStep);
+  if (step === null) return false;
 
   await Promise.all([
     db.update(mfaCredentials).set({ verified: true, lastTotpStep: step }).where(eq(mfaCredentials.userId, userId)),
@@ -103,8 +114,8 @@ export async function verifyMfaCode(userId: string, code: string): Promise<boole
   if (delta !== null) {
     // #130: a TOTP is single-use. Reject any step at or below the last one we
     // consumed — covers replay of the same code and any older in-window code.
-    const step = currentTotpStep() + delta;
-    if (cred.lastTotpStep != null && step <= cred.lastTotpStep) return false;
+    const step = nextTotpStep(delta, cred.lastTotpStep);
+    if (step === null) return false;
     await db
       .update(mfaCredentials)
       .set({ lastTotpStep: step })
@@ -116,15 +127,21 @@ export async function verifyMfaCode(userId: string, code: string): Promise<boole
 }
 
 /**
- * Verify and consume a single-use recovery code. Prefers bcrypt hashes (#78);
- * falls back to the legacy encrypted-JSON blob for rows not yet backfilled.
+ * Verify and consume a single-use recovery code. A non-null recoveryCodeHashes
+ * array is the authoritative signal that the row is on the bcrypt scheme (#78) —
+ * set once at enrollment or backfill; null only on rows that predate the
+ * backfill, which still read the legacy encrypted-JSON blob.
  */
 async function verifyRecoveryCode(
   userId: string,
   code: string,
   cred: { recoveryCodeHashes: string[] | null; recoveryCodes: string | null },
 ): Promise<boolean> {
-  if (cred.recoveryCodeHashes && cred.recoveryCodeHashes.length > 0) {
+  // Use the hash scheme whenever it's present — even when the array is empty
+  // (all codes consumed), which yields no match. We must NOT fall back to the
+  // legacy blob here: the backfill leaves recovery_codes populated for rollback
+  // safety, so falling back would resurrect codes already spent via the hashes.
+  if (cred.recoveryCodeHashes !== null) {
     const hashes = cred.recoveryCodeHashes;
     // Compare against EVERY stored hash with no early break, so response timing
     // doesn't leak which code matched (or how far down the list it was).
