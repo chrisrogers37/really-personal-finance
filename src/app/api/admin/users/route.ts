@@ -6,6 +6,7 @@ import {
   VALID_ROLES,
   getUserRole,
   outRanks,
+  countCurrentOwners,
 } from "@/lib/rbac";
 import { audit } from "@/lib/audit";
 import { db } from "@/db";
@@ -56,6 +57,20 @@ async function _PATCH(request: NextRequest) {
   if (action === "deprovision") {
     if (!hasMinRole(callerRole, "owner")) {
       return NextResponse.json({ error: "Only owners can deprovision" }, { status: 403 });
+    }
+
+    // Self-target guard: an owner deprovisioning themselves is a self-lockout,
+    // even when other owners exist. Mirrors the role-change self guard below (#139).
+    if (targetUserId === session.user.id) {
+      return NextResponse.json({ error: "Cannot deprovision yourself" }, { status: 403 });
+    }
+
+    // Last-owner guard: never leave the org ownerless — that bricks every
+    // owner-only action (deprovision, admin/owner assignment). Owner→owner is
+    // allowed only while another owner remains (#139).
+    const targetRole = await getUserRole(targetUserId);
+    if (targetRole === "owner" && (await countCurrentOwners()) <= 1) {
+      return NextResponse.json({ error: "Cannot deprovision the last owner" }, { status: 403 });
     }
 
     await db
