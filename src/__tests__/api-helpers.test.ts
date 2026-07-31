@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { NextResponse } from "next/server";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { NextResponse, NextRequest } from "next/server";
 
 vi.mock("@/lib/auth", () => ({
   auth: vi.fn(),
@@ -24,6 +24,7 @@ import {
   requireUser,
   requireAdmin,
   requireRole,
+  requireCronAuth,
   withErrorHandling,
 } from "@/lib/api-helpers";
 
@@ -160,5 +161,59 @@ describe("withErrorHandling", () => {
     const res = await wrapped(req);
     expect(res.status).toBe(500);
     consoleSpy.mockRestore();
+  });
+});
+
+describe("requireCronAuth (#128 — fail closed on unset secret)", () => {
+  const realSecret = process.env.CRON_SECRET;
+
+  function cronRequest(authHeader?: string): NextRequest {
+    const headers = new Headers();
+    if (authHeader !== undefined) headers.set("authorization", authHeader);
+    return new NextRequest("https://example.com/api/cron/sync-transactions", {
+      headers,
+    });
+  }
+
+  afterEach(() => {
+    if (realSecret === undefined) delete process.env.CRON_SECRET;
+    else process.env.CRON_SECRET = realSecret;
+  });
+
+  it("fails CLOSED with 500 when CRON_SECRET is unset — even for 'Bearer undefined'", async () => {
+    delete process.env.CRON_SECRET;
+    // Pre-fix, `expected` becomes the literal "Bearer undefined" and this header
+    // passes the timing-safe compare. The guard must reject it before comparing.
+    const res = requireCronAuth(cronRequest("Bearer undefined"));
+    expect(res).toBeInstanceOf(NextResponse);
+    expect(res?.status).toBe(500);
+    expect(await res?.json()).toEqual({ error: "Server misconfiguration" });
+  });
+
+  it("fails CLOSED with 500 when CRON_SECRET is unset and no header is sent", async () => {
+    delete process.env.CRON_SECRET;
+    const res = requireCronAuth(cronRequest());
+    expect(res).toBeInstanceOf(NextResponse);
+    expect(res?.status).toBe(500);
+  });
+
+  it("authorizes (null) when the secret is set and the Bearer token matches", () => {
+    process.env.CRON_SECRET = "s3cr3t-value";
+    const res = requireCronAuth(cronRequest("Bearer s3cr3t-value"));
+    expect(res).toBeNull();
+  });
+
+  it("returns 401 when the secret is set but the token is wrong", () => {
+    process.env.CRON_SECRET = "s3cr3t-value";
+    const res = requireCronAuth(cronRequest("Bearer wrong"));
+    expect(res).toBeInstanceOf(NextResponse);
+    expect(res?.status).toBe(401);
+  });
+
+  it("returns 401 when the secret is set but no header is sent", () => {
+    process.env.CRON_SECRET = "s3cr3t-value";
+    const res = requireCronAuth(cronRequest());
+    expect(res).toBeInstanceOf(NextResponse);
+    expect(res?.status).toBe(401);
   });
 });

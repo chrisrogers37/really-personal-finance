@@ -104,3 +104,77 @@ describe("evaluateGate — MFA enforcement", () => {
     ).toEqual({ type: "next" });
   });
 });
+
+describe("evaluateGate — /api/* default-deny (#111)", () => {
+  it("returns 401 for an unauthenticated non-allowlisted API route", () => {
+    expect(gate({ pathname: "/api/transactions", isLoggedIn: false })).toEqual({
+      type: "json",
+      status: 401,
+      body: { error: "Unauthorized" },
+    });
+  });
+
+  it("returns MFA-required 401 for a non-allowlisted API route when unverified", () => {
+    expect(
+      gate({
+        pathname: "/api/transactions",
+        mfaEnabled: true,
+        mfaVerifiedAt: null,
+      }),
+    ).toEqual({ type: "json", status: 401, body: { error: "MFA required" } });
+  });
+
+  it("passes an authenticated, MFA-verified API request", () => {
+    expect(
+      gate({
+        pathname: "/api/transactions",
+        mfaEnabled: true,
+        mfaVerifiedAt: new Date(),
+      }),
+    ).toEqual({ type: "next" });
+  });
+
+  it("now gates /api/telegram/config (only /webhook is public)", () => {
+    expect(
+      gate({ pathname: "/api/telegram/config", isLoggedIn: false }),
+    ).toEqual({ type: "json", status: 401, body: { error: "Unauthorized" } });
+  });
+
+  it("keeps /api/telegram/webhook public (secret-authed)", () => {
+    expect(
+      gate({ pathname: "/api/telegram/webhook", isLoggedIn: false }),
+    ).toEqual({ type: "next" });
+  });
+
+  it("keeps NextAuth routes public so session polling never 401s", () => {
+    expect(gate({ pathname: "/api/auth/session", isLoggedIn: false })).toEqual({
+      type: "next",
+    });
+    expect(
+      gate({ pathname: "/api/auth/callback/google", isLoggedIn: false }),
+    ).toEqual({ type: "next" });
+  });
+
+  it("keeps token-based email confirm/revoke routes public", () => {
+    expect(
+      gate({ pathname: "/api/profile/confirm-email", isLoggedIn: false }),
+    ).toEqual({ type: "next" });
+    expect(
+      gate({ pathname: "/api/profile/revoke-email-change", isLoggedIn: false }),
+    ).toEqual({ type: "next" });
+  });
+
+  it("gates the authenticated /api/profile route", () => {
+    expect(gate({ pathname: "/api/profile", isLoggedIn: false })).toEqual({
+      type: "json",
+      status: 401,
+      body: { error: "Unauthorized" },
+    });
+  });
+
+  it("keeps cron routes public (secret-authed)", () => {
+    expect(
+      gate({ pathname: "/api/cron/send-alerts", isLoggedIn: false }),
+    ).toEqual({ type: "next" });
+  });
+});

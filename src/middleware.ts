@@ -2,12 +2,28 @@ import NextAuth from "next-auth";
 import { authConfig } from "@/lib/auth.config";
 import { NextResponse } from "next/server";
 import { evaluateGate } from "@/lib/middleware-gate";
+import {
+  isRateLimitedAuthPath,
+  clientIpFromHeaders,
+  ipRateLimitKey,
+  enforceAuthRateLimit,
+  tooManyRequestsResponse,
+} from "@/lib/auth-rate-limit";
 
 // Use the lightweight auth config (no Email provider / nodemailer)
 // so middleware can run in the Edge Runtime.
 const { auth } = NextAuth(authConfig);
 
-export default auth((req) => {
+export default auth(async (req) => {
+  // #109: IP-keyed rate limit on the sign-in / callback entrypoints — a coarse
+  // backstop to the email-keyed limit at the route — before any auth gating.
+  if (isRateLimitedAuthPath(req.nextUrl.pathname)) {
+    const retryAfterMs = await enforceAuthRateLimit(
+      ipRateLimitKey(clientIpFromHeaders(req.headers)),
+    );
+    if (retryAfterMs !== null) return tooManyRequestsResponse(retryAfterMs);
+  }
+
   const user = req.auth?.user as
     | { mfaEnabled?: boolean; mfaVerifiedAt?: Date | string | null }
     | undefined;
@@ -30,5 +46,7 @@ export default auth((req) => {
 });
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/profile/:path*", "/auth/:path*", "/api/admin/:path*"],
+  // #111: cover all of /api/* (not just /api/admin) so the default-deny gate in
+  // evaluateGate applies to every API route; public routes are allowlisted there.
+  matcher: ["/dashboard/:path*", "/profile/:path*", "/auth/:path*", "/api/:path*"],
 };

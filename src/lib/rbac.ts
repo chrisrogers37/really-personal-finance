@@ -43,3 +43,13 @@ export async function setUserRole(
     .set({ role: newRole })
     .where(and(eq(users.userId, targetUserId), eq(users.isCurrent, true)));
 }
+
+/** Number of distinct current owners. Used to protect the last owner from
+ * destructive mutations (deprovision) that would leave the org ownerless (#139). */
+export async function countCurrentOwners(): Promise<number> {
+  const owners = await db
+    .select({ userId: users.userId })
+    .from(users)
+    .where(and(eq(users.role, "owner"), eq(users.isCurrent, true)));
+  return owners.length;
+}
