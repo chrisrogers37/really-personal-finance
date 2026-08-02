@@ -66,6 +66,16 @@ the captured email:
    The URL is quoted-printable encoded — decode `=3D` → `=` (e.g. with `python3 -c "import quopri;..."`).
 3. Open the decoded `/api/auth/callback/email?...` URL to complete sign-in.
 
+Caveat (pre-existing app behavior, NOT an env issue): only **new-user** sign-in works. A
+**returning** user's magic-link callback redirects to `/auth/error?error=Configuration`
+because NextAuth's `updateUser` calls `updateUserProfile` (`src/lib/scd2.ts`) which uses
+`db.transaction()`, and the `neon-http` driver in drizzle-orm 0.45.2 throws
+"No transactions support in neon-http driver". The same limitation affects profile edits
+(`PUT /api/profile`) and account/data deletion. For end-to-end testing of the core flow, sign
+in with a fresh email (new user), then use CSV import / manual transactions, which do not use
+transactions. Note: `transactions.importId` is globally unique, so re-importing the same file
+(even under a different user) inserts nothing; `TRUNCATE transactions;` for a clean re-import.
+
 ### Lint / test / build
 
 - `npm test` — Vitest, 248 tests, no services needed (this is what CI runs).
