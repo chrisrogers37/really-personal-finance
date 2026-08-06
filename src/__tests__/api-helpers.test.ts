@@ -70,6 +70,27 @@ describe("requireUser", () => {
     if (!(result instanceof NextResponse)) return;
     expect(result.status).toBe(401);
   });
+
+  // GHSA-8fpg-xm3f-6cx3: under a configuration error the auth library could
+  // hand back an object populated with an error instead of null, and an
+  // "existence check" written as `if (!session)` would read that truthy object
+  // as authenticated and fail OPEN. requireUser tests the nested
+  // `session.user.id` rather than the object's presence, so it denies these.
+  // Pinned so a future simplification to `if (!session)` fails here instead of
+  // in production.
+  it.each([
+    ["null", null],
+    ["an empty object", {}],
+    ["an error-populated object", { error: "Configuration" }],
+    ["a session with a user but no id", { user: {} }],
+  ])("returns 401 when auth() resolves to %s", async (_label, resolved) => {
+    mockedAuth.mockResolvedValueOnce(resolved as never);
+
+    const result = await requireUser();
+    expect(result).toBeInstanceOf(NextResponse);
+    if (!(result instanceof NextResponse)) return;
+    expect(result.status).toBe(401);
+  });
 });
 
 describe("requireRole / requireAdmin", () => {
