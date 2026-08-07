@@ -14,3 +14,28 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
+
+  # Blocks a production-reachable CRITICAL advisory from entering the tree.
+  #
+  # Scope is deliberately narrow, and the narrowness is the point: this is the
+  # widest audit gate that passes on a clean tree today, so it blocks only on a
+  # genuine regression rather than on the existing backlog. Widening it is
+  # blocked on the dependency work in #137 -- `--audit-level=high` is currently
+  # red with 5 production advisories, so gating there would fail every PR
+  # regardless of what the PR changed, and a gate that always fails is a gate
+  # everyone learns to ignore.
+  #
+  # `--omit=dev` because a dev-only advisory does not ship: it cannot be reached
+  # by the deployed app, and blocking releases on the test runner's dependency
+  # tree trains people to bypass the gate.
+  #
+  # `--package-lock-only` because the lockfile is what `npm ci` installs, so
+  # auditing it audits exactly what ships -- without paying for an install.
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm audit --package-lock-only --omit=dev --audit-level=critical
