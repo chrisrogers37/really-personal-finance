@@ -186,6 +186,52 @@ describe("PUT /api/profile — email change request flow", () => {
     const res = await PUT(putReq({ email: "not-an-email" }));
     expect(res.status).toBe(400);
   });
+
+  it("does not log recipient addresses when the send fails (#133)", async () => {
+    loggedIn("old@example.com");
+
+    // Shape of a real nodemailer recipient-rejection error, captured from
+    // nodemailer 7.0.13 against an SMTP server returning 550 on RCPT TO.
+    // Note `envelope` is absent — the addresses live in `rejected` and
+    // `rejectedErrors[].recipient`.
+    const rejection = Object.assign(
+      new Error("Can't send mail - all recipients were rejected: 550 5.1.1 No such user here"),
+      {
+        code: "EENVELOPE",
+        response: "550 5.1.1 No such user here",
+        responseCode: 550,
+        command: "RCPT TO",
+        rejected: ["new@example.com"],
+        rejectedErrors: [
+          Object.assign(new Error("Recipient command failed: 550"), {
+            code: "EENVELOPE",
+            recipient: "new@example.com",
+          }),
+        ],
+      },
+    );
+    mockedSendConfirm.mockRejectedValueOnce(rejection);
+
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      const res = await PUT(putReq({ email: "new@example.com" }));
+      expect(res.status).toBe(500);
+
+      // Serialize EVERY argument of EVERY call — the defect was passing the raw
+      // error as a second argument, where console renders it in full.
+      const logged = errSpy.mock.calls
+        .map((args) => args.map((a) => (a instanceof Error ? [a.message, JSON.stringify(a, Object.getOwnPropertyNames(a))].join(" ") : typeof a === "string" ? a : JSON.stringify(a))).join(" "))
+        .join("\n");
+
+      expect(logged).not.toContain("new@example.com");
+      expect(logged).not.toContain("old@example.com");
+      expect(logged).not.toContain("@example.com");
+      // still diagnosable: the failure class survives redaction
+      expect(logged).toContain("EENVELOPE");
+    } finally {
+      errSpy.mockRestore();
+    }
+  });
 });
 
 describe("GET /api/profile/confirm-email", () => {
