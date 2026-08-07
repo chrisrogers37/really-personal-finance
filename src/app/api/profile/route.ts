@@ -95,7 +95,15 @@ async function _PUT(request: NextRequest) {
         );
       }
     } catch (err) {
-      console.error("[profile] Email send failed:", err);
+      // Log the transport error code only. A recipient-rejection error carries
+      // addresses in `rejected` and `rejectedErrors[].recipient` (PII), and this
+      // block covers both the old and the new address. `code` is the field that
+      // distinguishes the failure (ESOCKET vs EENVELOPE vs EAUTH) and carries none.
+      const code =
+        err instanceof Error && "code" in err
+          ? String((err as Error & { code?: unknown }).code)
+          : "unknown";
+      console.error(`[profile] Email send failed: ${code}`);
       return NextResponse.json(
         { error: "Failed to send verification email" },
         { status: 500 }
