@@ -50,10 +50,14 @@ async function _POST(request: NextRequest) {
   // Deliberately fails closed on a missing `type`: an update we cannot classify
   // is not treated as private.
   if (update.message.chat.type !== "private") {
+    // The one message allowed to reach a non-private chat: it carries no user
+    // data and has to be readable in the group to be of any use.
     await sendTelegramMessage(
       chatId,
       "For your security this bot only works in a direct message. " +
-        "Open a private chat with me and send /start YOUR_CODE there."
+        "Open a private chat with me and send /start YOUR_CODE there.",
+      "HTML",
+      { allowNonPrivateChat: true }
     );
     return NextResponse.json({ ok: true });
   }
