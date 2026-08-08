@@ -30,31 +30,23 @@ async function _PUT(request: NextRequest) {
   const body = await request.json();
   const { chatId, enabled } = body as Record<string, unknown>;
 
-  if (chatId !== undefined && (typeof chatId !== "string" || !chatId.trim())) {
-    return NextResponse.json({ error: "Valid chat ID is required" }, { status: 400 });
+  // Chat binding belongs exclusively to the `/start <code>` webhook flow, where
+  // the chat id arrives in Telegram's own update payload rather than from the
+  // caller. A chat id sent here is an unproven claim, and the binding it creates
+  // routes financial-summary PII — so it is refused outright rather than
+  // validated, because no check available here could make it trustworthy.
+  if (chatId !== undefined) {
+    return NextResponse.json(
+      { error: "chatId cannot be set here — link Telegram with a one-time code" },
+      { status: 400 },
+    );
   }
 
   if (enabled !== undefined && typeof enabled !== "boolean") {
     return NextResponse.json({ error: "enabled must be a boolean" }, { status: 400 });
   }
 
-  // Upsert
-  if (chatId) {
-    await db
-      .insert(telegramConfigs)
-      .values({
-        userId: session.user.id,
-        chatId: chatId.trim(),
-        enabled: enabled !== false,
-      })
-      .onConflictDoUpdate({
-        target: telegramConfigs.userId,
-        set: {
-          chatId: chatId.trim(),
-          enabled: enabled !== false,
-        },
-      });
-  } else if (enabled !== undefined) {
+  if (enabled !== undefined) {
     await db
       .update(telegramConfigs)
       .set({ enabled })
