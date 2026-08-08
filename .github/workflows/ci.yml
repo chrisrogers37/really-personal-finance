@@ -39,3 +39,26 @@ jobs:
         with:
           node-version: 20
       - run: npm audit --package-lock-only --omit=dev --audit-level=critical
+
+  # Blocks a type error from entering the tree. `tsc --noEmit` is green on main,
+  # so this fails only on a regression rather than on an existing backlog.
+  #
+  # Separate job rather than a step in `test` so a type error stays attributable
+  # and does not mask the suite result -- the two answer different questions and
+  # a reviewer should be able to see both at once.
+  #
+  # Lint is deliberately NOT gated here. It is red with 9 errors, 8 of them
+  # react-hooks/set-state-in-effect across 8 UI files. Clearing those means
+  # extracting a shared data-fetching hook -- a runtime refactor in a repo with
+  # no UI tests -- so gating it today would fail every PR regardless of what the
+  # PR changed. A gate that always fails is one people learn to bypass.
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
