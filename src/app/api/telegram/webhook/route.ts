@@ -10,7 +10,7 @@ import { withErrorHandling } from "@/lib/api-helpers";
 
 interface TelegramUpdate {
   message?: {
-    chat: { id: number };
+    chat: { id: number; type?: string };
     text?: string;
     from?: { id: number; first_name: string };
   };
@@ -39,6 +39,24 @@ async function _POST(request: NextRequest) {
 
   const chatId = update.message.chat.id.toString();
   const text = update.message.text.trim();
+
+  // Private chats only, and this is a delivery property rather than an
+  // authorization one. Every reply below is sent to the chat that asked, so in a
+  // group each member sees a summary regardless of who typed the command.
+  // Identifying the sender would not fix that -- the delivery is the leak, and
+  // there is no way to address a reply to one member of a group. The bot
+  // therefore has no safe behaviour in a group, so it declines to act in one.
+  //
+  // Deliberately fails closed on a missing `type`: an update we cannot classify
+  // is not treated as private.
+  if (update.message.chat.type !== "private") {
+    await sendTelegramMessage(
+      chatId,
+      "For your security this bot only works in a direct message. " +
+        "Open a private chat with me and send /start YOUR_CODE there."
+    );
+    return NextResponse.json({ ok: true });
+  }
 
   if (text.startsWith("/start")) {
     // /start <link_code> — link Telegram via one-time code from the web app
