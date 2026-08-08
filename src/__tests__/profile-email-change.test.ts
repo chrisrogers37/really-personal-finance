@@ -3,8 +3,15 @@ import { NextRequest } from "next/server";
 
 // ─── Mocks ───────────────────────────────────────────────────────────────────
 const insertValues = vi.fn();
-const updateWhere = vi.fn();
-const updateSet = vi.fn(() => ({ where: updateWhere, returning: vi.fn() }));
+// The update builder mirrors the chains the code under test actually uses:
+//   .set().where().returning()  — confirm-email and revoke-email-change
+//   .set().where()              — the SCD2 close in updateUserProfile
+// so `returning` hangs off what `where` returns, not off `set`. Declaring it as
+// a sibling of `where` modelled a `.set().returning()` chain that exists nowhere
+// in this codebase, and left every per-test override fighting the inferred type.
+const updateReturning = vi.fn();
+const updateWhere = vi.fn(() => ({ returning: updateReturning }));
+const updateSet = vi.fn(() => ({ where: updateWhere }));
 const deleteWhere = vi.fn();
 const selectLimit = vi.fn();
 const selectWhere = vi.fn(() => ({ limit: selectLimit }));
@@ -74,8 +81,9 @@ function loggedIn(email = "old@example.com") {
 beforeEach(() => {
   vi.clearAllMocks();
   insertValues.mockResolvedValue(undefined);
-  updateWhere.mockResolvedValue(undefined);
-  updateSet.mockReturnValue({ where: updateWhere, returning: vi.fn().mockResolvedValue([{ id: "ec-1" }]) });
+  updateReturning.mockResolvedValue([{ id: "ec-1" }]);
+  updateWhere.mockReturnValue({ returning: updateReturning });
+  updateSet.mockReturnValue({ where: updateWhere });
   deleteWhere.mockResolvedValue(undefined);
   selectLimit.mockResolvedValue([]);
   selectFrom.mockReturnValue({ where: selectWhere });
