@@ -189,7 +189,12 @@ export const telegramConfigs = pgTable(
   {
     id: uuid("id").defaultRandom().primaryKey(),
     userId: uuid("user_id").notNull().unique(),
-    chatId: text("chat_id").notNull(),
+    // One chat binds to at most one account. Without this, two accounts can bind
+    // the same chat and the chat-keyed lookups below become ambiguous: /summary
+    // does `limit(1)` with no ORDER BY and would serve an arbitrary account's
+    // data, while /pause and /resume write to every matching row and would let
+    // one account silence another's alerts.
+    chatId: text("chat_id").notNull().unique(),
     enabled: boolean("enabled").notNull().default(true),
     createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
   },
