@@ -1,0 +1,42 @@
+# Dependabot version updates.
+#
+# Version updates are configured by this file. Dependabot ALERTS and SECURITY
+# updates are separate repository settings and are not controlled here — this
+# file does not enable them, and their state should be read from the Security
+# tab rather than inferred from the presence of this config.
+#
+# Grouped by ecosystem so a week's currency drift arrives as one reviewable PR
+# rather than one PR per package. Security fixes are not grouped: those come
+# from Dependabot security updates, which open individually and should stay
+# individually reviewable.
+
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '09:00'
+    open-pull-requests-limit: 5
+    groups:
+      # Patch and minor drift carries the lowest review cost and the highest
+      # volume, so it is collapsed into one PR. A major sits outside the group
+      # and arrives on its own, because a major is a decision rather than a
+      # bump.
+      minor-and-patch:
+        patterns:
+          - '*'
+        update-types:
+          - minor
+          - patch
+
+  # The workflow files pin third-party actions, which is a supply-chain surface
+  # with no representation in package-lock.json. Nothing else tracks it.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '09:00'
+    open-pull-requests-limit: 5
