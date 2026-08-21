@@ -1,0 +1,67 @@
+name: Security Scan
+
+# Scheduled vulnerability detection, deliberately separate from the `audit` job
+# in ci.yml. The two answer different questions and are tuned differently on
+# purpose:
+#
+#   ci.yml `audit`   — a GATE. Runs per PR at --audit-level=critical, which is
+#                      the widest level that is green on a clean tree, so it
+#                      blocks a regression without blocking unrelated work.
+#   this workflow    — a DETECTOR. Runs on a schedule at --audit-level=high and
+#                      reports whatever is actually there.
+#
+# A gate must be survivable on every PR or people route around it. A detector
+# has no such constraint: nothing is blocked by it, so it can be set where the
+# service level actually sits. Collapsing the two forces one of them to be
+# wrong, which is how a High advisory reaches production while CI is green.
+#
+# This is the notification path. `npm audit` in a PR gate only reports on the
+# tree as it changes, so an advisory disclosed against an unchanged dependency
+# is invisible to it indefinitely. A schedule re-asks the question against the
+# published advisory database on a fixed cadence, which is the only way a new
+# disclosure against untouched code reaches anyone.
+#
+# A failing scheduled run notifies the workflow's last editor via GitHub's
+# standard scheduled-workflow failure notification. That is the alerting
+# mechanism; it is not a substitute for Dependabot alerts, which cover the same
+# ground continuously and are enabled in repository settings rather than here.
+#
+# Expect this to be RED on its first run, and read that correctly: it is
+# reporting real open High advisories in production dependencies, not
+# misfiring. It goes green when they are remediated. The always-red concern
+# that keeps ci.yml's gate at critical does not transfer here, because this
+# workflow blocks nothing.
+
+on:
+  schedule:
+    # Mondays, 09:00 UTC. Weekly rather than monthly because the patching
+    # service level for a High advisory is 7 days: a cadence longer than the
+    # window cannot detect a breach inside it.
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+
+jobs:
+  audit:
+    name: Production dependency audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Full inventory, every severity and both trees, recorded before the
+      # gating step so the run log carries the whole picture even when the
+      # step below exits non-zero and stops the job.
+      - name: Report all advisories (informational)
+        run: npm audit --package-lock-only || true
+
+      # The failing condition. Scoped to production dependencies for the same
+      # reason ci.yml is: a dev-only advisory is not reachable by the deployed
+      # application, and paging on one trains the reader to ignore the signal.
+      #
+      # --package-lock-only audits the lockfile, which is what `npm ci`
+      # installs, so it measures exactly what ships without paying for an
+      # install.
+      - name: Fail on High or Critical in production dependencies
+        run: npm audit --package-lock-only --omit=dev --audit-level=high
