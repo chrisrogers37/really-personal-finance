@@ -48,7 +48,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       # Full inventory, every severity and both trees, recorded before the
       # gating step so the run log carries the whole picture even when the
