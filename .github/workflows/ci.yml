@@ -1,3 +1,12 @@
+# The Node major below is pinned to a version inside its vendor support window.
+# Support dates come from `nodejs/Release` `schedule.json`, the vendor's own
+# published schedule, rather than a secondary source. Node 22 leaves support on
+# 2027-04-30.
+#
+# This pin governs CI only. The deployed runtime is set by the Vercel project
+# and is not declared in this repository, so the two can differ; the mechanism
+# for declaring it once is an open decision in
+# `policies/eol-software-policy.md` Section 8.2.
 name: CI
 on:
   pull_request:
@@ -10,7 +19,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
       - run: npm ci
       - run: npm test
@@ -37,7 +46,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
       - run: npm audit --package-lock-only --omit=dev --audit-level=critical
 
   # Blocks a type error from entering the tree. `tsc --noEmit` is green on main,
@@ -58,7 +67,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
       - run: npm ci
       - run: npm run typecheck
