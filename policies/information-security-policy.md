@@ -87,7 +87,7 @@ Audit logs include: user ID, action, resource, IP address, user agent, and times
 
 ### 7.3 Vulnerability Scanning
 - `npm audit` runs as a CI gate on every pull request and push to `main` (fails the build on Critical advisories; `.github/workflows/ci.yml`, job `audit`).
-- A scheduled scan runs weekly at High severity (`.github/workflows/security-scan.yml`, Mondays 09:00 UTC). Its first run (2026-08-21) correctly failed at the production-dependency gate, and the advisory set it reported includes the open High tracked as EX-001 in `policies/vulnerability-patching-policy.md`.
+- A scheduled scan runs weekly at High severity (`.github/workflows/security-scan.yml`, Mondays 09:00 UTC). Its first run (2026-08-21) correctly failed at the production-dependency gate on the open High advisory tracked as EX-001 in `policies/vulnerability-patching-policy.md` — the sole advisory in that step's report, affecting three packages in the `nodemailer` → `@auth/core` → `next-auth` chain.
 - Dependabot **version updates** run weekly (`.github/dependabot.yml`; first grouped update merged as #165).
 - Dependabot **security alerts and security updates are currently disabled** (measured 2026-08-21). Enabling them is tracked in `policies/vulnerability-scanning-policy.md` §8.1.
 - Manual security audits were conducted in July and August 2026; findings are tracked as repository issues.

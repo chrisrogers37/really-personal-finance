@@ -35,7 +35,7 @@ Support dates are taken from the vendor's published schedule, not from a seconda
 | `drizzle-orm` | ^0.45.2 | `package.json` | _not verified — see §8.5_ | Currency not assessed |
 | `plaid` | ^41.1.0 | `package.json` | _not verified — see §8.5_ | Currency not assessed |
 | `@neondatabase/serverless` | ^1.1.0 | `package.json` | _not verified — see §8.5_ | Currency not assessed |
-| `nodemailer` | 8.0.11 (transitive) | Pinned by `next-auth` | _not verified — see §8.5_ | **Open advisory — see patching policy EX-001** |
+| `nodemailer` | ^8.0.11 (direct — also reached transitively via `next-auth`) | `package.json`; transitive copy ranged by `@auth/core` | _not verified — see §8.5_ | **Open advisory — see patching policy EX-001** |
 
 Only the Node.js row has been checked against a vendor-published schedule. The remaining rows record the version in the tree — which is verified — and leave the lifecycle cell explicitly unverified rather than asserting a support status this draft did not confirm. §8.5 closes that gap.
 
