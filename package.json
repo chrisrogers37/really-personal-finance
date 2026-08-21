@@ -31,7 +31,7 @@
     "plaid": "^41.1.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
-    "react-plaid-link": "^4.1.1",
+    "react-plaid-link": "^5.0.0",
     "recharts": "^3.10.1",
     "tailwind-merge": "^3.6.0"
   },
