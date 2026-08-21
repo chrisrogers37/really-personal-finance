@@ -1,8 +1,8 @@
 # Access Control Policy
 
-**Version:** 1.0
+**Version:** 1.1
 **Effective Date:** 2026-04-14
-**Last Reviewed:** 2026-04-14
+**Last Reviewed:** 2026-08-21
 **Owner:** Chris Rogers
 
 ## 1. Purpose
@@ -92,9 +92,9 @@ All identity and access is managed through NextAuth v5:
 - Financial data purged; audit trail preserved
 
 ### 7.3 Automated De-provisioning
-- Sessions automatically expire based on configured TTL
-- Inactive accounts flagged after 24 months
-- Deprovisioned accounts cannot authenticate
+- Sessions automatically expire based on configured TTL.
+- Inactive-account flagging (24-month threshold, see `data-deletion-retention-policy.md` §6) is **policy-defined but not yet implemented as automation** (verified 2026-08-21: no scheduled job or code path performs it). No account has yet reached the threshold — the service launched in 2026 — and the automation is to be in place before the first account becomes eligible.
+- Deprovisioned accounts cannot authenticate.
 
 ## 8. Periodic Access Reviews
 
@@ -136,3 +136,10 @@ Logs retained for 7 years per retention policy.
 ## 11. Policy Review
 
 This policy is reviewed annually or upon changes to access control mechanisms.
+
+## Revision History
+
+| Version | Date | Change |
+|---|---|---|
+| 1.1 | 2026-08-21 | §7.3 corrected (issue #160): inactive-account flagging restated as policy-defined but not yet automated — the prior wording described it as an existing control. |
+| 1.0 | 2026-04-14 | Original accepted version. |
