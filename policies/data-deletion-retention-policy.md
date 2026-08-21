@@ -1,8 +1,8 @@
 # Data Deletion and Retention Policy
 
-**Version:** 1.0
+**Version:** 1.1
 **Effective Date:** 2026-04-14
-**Last Reviewed:** 2026-04-14
+**Last Reviewed:** 2026-08-21
 **Owner:** Chris Rogers
 
 ## 1. Purpose
@@ -83,6 +83,8 @@ These retained records enable incident investigation and compliance auditing.
 
 ## 6. Inactive Account Policy
 
+This section defines intended handling of dormant accounts. **The automation it describes is not yet implemented** (verified 2026-08-21: no scheduled job performs the flagging or notice), and no account has yet reached the 24-month threshold — the service launched in 2026. The automation is to be in place before the first account becomes eligible; until then this section is a commitment, not a description of a running control.
+
 - Accounts with no login activity for 24 months are flagged as inactive
 - A 30-day notice is sent before deletion
 - If no response, the account is deprovisioned following the standard deletion process
@@ -105,3 +107,10 @@ Deletion is implemented at the application layer:
 ## 9. Policy Review
 
 This policy is reviewed annually or when changes are made to data storage, retention requirements, or regulatory obligations.
+
+## Revision History
+
+| Version | Date | Change |
+|---|---|---|
+| 1.1 | 2026-08-21 | §6 corrected (issue #160): the inactive-account process restated as a commitment whose automation is not yet implemented — the prior wording read as a running control. |
+| 1.0 | 2026-04-14 | Original accepted version. |

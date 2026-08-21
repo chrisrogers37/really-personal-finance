@@ -1,9 +1,9 @@
 # End-of-Life Software Monitoring and Update Policy
 
 **Status:** DRAFT — not submittable. See §8 Open Decisions.
-**Version:** 0.1
+**Version:** 0.2
 **Effective Date:** _pending — see §8_
-**Last Reviewed:** 2026-08-20
+**Last Reviewed:** 2026-08-21
 **Owner:** Chris Rogers
 
 ## 1. Purpose
@@ -23,27 +23,27 @@ Transitive dependencies are governed by `policies/vulnerability-patching-policy.
 
 ## 3. Tracked Component Inventory
 
-Support dates are taken from the vendor's published schedule, not from a secondary source. For Node.js this is `nodejs/Release` `schedule.json`.
+Support dates are taken from the vendor's published schedule, not from a secondary source. Version cells re-measured against the tree 2026-08-21 (three rows moved with the first grouped dependency update, #165). For Node.js this is `nodejs/Release` `schedule.json`.
 
 | Component | Version in this repository | Where pinned | Vendor EOL | Status (2026-08-20) |
 |---|---|---|---|---|
-| Node.js (CI) | **20** | `.github/workflows/ci.yml` — all three jobs | **2026-04-30** | **PAST EOL — 112 days** |
+| Node.js (CI) | **22** | `.github/workflows/ci.yml` (all three jobs) and `.github/workflows/security-scan.yml` | 2027-04-30 | **Current** — remediated 2026-08-21 (PRs #162, #170) from Node 20, which had been past its 2026-04-30 EOL for 113 days |
 | Node.js (production) | _unknown_ | Not pinned in-repo; Vercel project setting | — | **Unverified — see §8.1** |
-| Next.js | ^16.2.12 | `package.json` | _not verified — see §8.6_ | Currency not assessed |
-| React | 19.2.3 | `package.json` | _not verified — see §8.6_ | Currency not assessed |
+| Next.js | ^16.3.1 | `package.json` | _not verified — see §8.5_ | Currency not assessed |
+| React | 19.2.8 | `package.json` | _not verified — see §8.5_ | Currency not assessed |
 | `next-auth` | ^5.0.0-beta.32 | `package.json` | Pre-release (`-beta.32`) | **Beta in production — see §8.3** |
-| `drizzle-orm` | ^0.45.2 | `package.json` | _not verified — see §8.6_ | Currency not assessed |
-| `plaid` | ^41.1.0 | `package.json` | _not verified — see §8.6_ | Currency not assessed |
-| `@neondatabase/serverless` | ^1.0.2 | `package.json` | _not verified — see §8.6_ | Currency not assessed |
-| `nodemailer` | 8.0.11 (transitive) | Pinned by `next-auth` | _not verified — see §8.6_ | **Open advisory — see patching policy EX-001** |
+| `drizzle-orm` | ^0.45.2 | `package.json` | _not verified — see §8.5_ | Currency not assessed |
+| `plaid` | ^41.1.0 | `package.json` | _not verified — see §8.5_ | Currency not assessed |
+| `@neondatabase/serverless` | ^1.1.0 | `package.json` | _not verified — see §8.5_ | Currency not assessed |
+| `nodemailer` | ^8.0.11 (direct — also reached transitively via `next-auth`) | `package.json`; transitive copy ranged by `@auth/core` | _not verified — see §8.5_ | **Open advisory — see patching policy EX-001** |
 
-Only the Node.js row has been checked against a vendor-published schedule. The remaining rows record the version in the tree — which is verified — and leave the lifecycle cell explicitly unverified rather than asserting a support status this draft did not confirm. §8.6 closes that gap.
+Only the Node.js row has been checked against a vendor-published schedule. The remaining rows record the version in the tree — which is verified — and leave the lifecycle cell explicitly unverified rather than asserting a support status this draft did not confirm. §8.5 closes that gap.
 
 **Three findings are recorded above rather than resolved, because resolving them is a decision, not an edit:**
 
-1. **CI has been building and testing on an end-of-life Node.js major since 2026-04-30.** Node 20 reached end of life on that date. This is the condition this attestation exists to prevent, and it went undetected for 112 days because no monitoring existed to detect it.
+1. **CI built and tested on an end-of-life Node.js major from 2026-04-30 to 2026-08-21.** Node 20 reached end of life on the first date; CI moved to Node 22 on the second (PRs #162, #170). The 113-day exposure went undetected because no monitoring existed to detect it — the remediation closes the instance, and §4's quarterly review is what closes the class.
 2. **The production runtime is not pinned in the repository.** `vercel.json` sets no runtime and `package.json` has no `engines` field, so the deployed Node version is whatever the Vercel project is configured to use. It may or may not match CI.
-3. **The current tracking issue records a version that is not in use.** GitHub issue #31 states "Node.js 22 LTS — supported until 2027-04". No Node 22 pin exists anywhere in the repository. The claim is not supported by the tree.
+3. **The tracking issue and the tree agreed only after remediation.** GitHub issue #31 states "Node.js 22 LTS — supported until 2027-04". When this draft was written no Node 22 pin existed anywhere in the repository; as of 2026-08-21 CI is pinned to 22 (PRs #162, #170), so #31 now matches CI — but production remains unpinned (§8.2), so the issue still overstates what is verified.
 
 ## 4. Monitoring
 
@@ -95,7 +95,7 @@ Status values below: **Implemented** — verified present. **Partial** — prese
 
 ## 8. Open Decisions Required Before Submission
 
-**8.1 — Set the Node.js upgrade target and date.** CI is 112 days past EOL. Which major (22 or 24), and by when? This is the finding a reviewer is most likely to test, and the attestation should not be submitted while it is open.
+**8.1 — RESOLVED for CI 2026-08-21: Node 22.** CI and the scheduled security scan are pinned to 22 (PRs #162, #170), ending the 113-day past-EOL exposure. What remains of this decision is the production half, which is §8.2.
 
 **8.2 — Decide how the runtime is pinned.** Options: `engines` in `package.json`, `.nvmrc`, the Vercel project setting, or a combination. Whichever is chosen, CI and production must read the same value. Confirm the current Vercel project Node setting — it is not visible from the repository.
 
@@ -103,9 +103,9 @@ Status values below: **Implemented** — verified present. **Partial** — prese
 
 **8.4 — Assign the quarterly review.** §4 requires a named owner and a recurring date; neither exists today.
 
-**8.6 — Verify the lifecycle status of the unverified components in §3.** Next.js, React, `drizzle-orm`, `plaid`, `@neondatabase/serverless` and `nodemailer` each need one check against the vendor's own published support policy. They are marked unverified rather than assumed current, because an EOL policy that asserts an unchecked support status is the failure it exists to prevent.
+**8.5 — Verify the lifecycle status of the unverified components in §3.** Next.js, React, `drizzle-orm`, `plaid`, `@neondatabase/serverless` and `nodemailer` each need one check against the vendor's own published support policy. They are marked unverified rather than assumed current, because an EOL policy that asserts an unchecked support status is the failure it exists to prevent.
 
-**8.5 — Correct GitHub issue #31.** Its stated stack does not match the repository. Leaving it uncorrected means the tracking record and the tree disagree.
+**8.6 — Correct GitHub issue #31.** Its stated stack does not match the repository. Leaving it uncorrected means the tracking record and the tree disagree.
 
 ## 9. Policy Review
 

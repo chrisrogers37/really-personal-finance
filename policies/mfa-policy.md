@@ -1,9 +1,9 @@
 # Multi-Factor Authentication Policy
 
 **Status:** DRAFT — not submittable. See §9 Open Decisions.
-**Version:** 0.1
+**Version:** 0.2
 **Effective Date:** _pending — see §9_
-**Last Reviewed:** 2026-08-20
+**Last Reviewed:** 2026-08-21
 **Owner:** Chris Rogers
 
 ## 1. Purpose
@@ -53,9 +53,11 @@ The table below records enforcement state. It is deliberately split into what is
 
 ## 5. Account Lifecycle
 
-- MFA is enrolled at account creation, before the account is granted access to any system in §2.
-- Recovery codes issued by a provider are stored in the owner's password manager, not in the repository, a shared document, or a ticket.
-- When an account is removed from a system, its removal is recorded in the access review record described in `policies/access-control-policy.md` §8.
+This section states requirements this policy establishes — not observed practice. None of the three can be verified from the repository; as-practiced verification is the §7 review, whose first pass is pending (§9.1).
+
+- MFA **must** be enrolled at account creation, before the account is granted access to any system in §2.
+- Recovery codes issued by a provider **must** be stored in the owner's password manager — never in the repository, a shared document, or a ticket.
+- When an account is removed from a system, its removal **must** be recorded in the access review record described in `policies/access-control-policy.md` §8.
 
 ## 6. Consumer MFA (In-Product, Distinct from §2)
 
@@ -93,7 +95,7 @@ Status values below: **Implemented** — verified present. **Partial** — prese
 
 ## 9. Open Decisions Required Before Submission
 
-**9.1 — Confirm and evidence MFA on each of the four systems in §2.** Only the account owner can read these settings. For each: is MFA on, is it enforced at org/team level, and what evidence will be retained? This cannot be answered from the repository and is the single blocker on this attestation.
+**9.1 — Confirm and evidence MFA on each of the four systems in §2.** Only the account owner can read these settings. For each: is MFA on, is it enforced at org/team level, and what evidence will be retained? This cannot be answered from the repository and is the single blocker on this attestation. (Measured 2026-08-21: the GitHub setting is not even readable with the repository credential this audit uses — `GET /user` returns `two_factor_authentication: null` without the `user` OAuth scope. Null means unreadable, not absent.)
 
 **9.2 — Confirm the account inventory is complete.** §2 lists four systems. If any other account can reach consumer data — a monitoring tool, a backup service, a personal script with a production connection string, a second GitHub account — it belongs in §2.
 
