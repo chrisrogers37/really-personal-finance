@@ -32,7 +32,19 @@ export function PlaidLinkButton({ onSuccess }: PlaidLinkButtonProps) {
   }
 
   const onPlaidSuccess = useCallback(
-    async (publicToken: string) => {
+    async (publicToken: string | null) => {
+      // react-plaid-link 5 types public_token as nullable: it is null for
+      // flows that do not create an Item, such as Identity Verification.
+      // This flow is Item-based, so a token is expected — but the guard keeps
+      // a null out of the exchange call, which under 4.x would have been
+      // POSTed and rejected. The surfaced error is the same one that path
+      // produced, so behaviour is unchanged; 5.0 only corrects the type
+      // definitions (see the library's MIGRATION.md).
+      if (!publicToken) {
+        setError("Failed to connect account");
+        setLinkToken(null);
+        return;
+      }
       try {
         const response = await fetch("/api/plaid/exchange-token", {
           method: "POST",
