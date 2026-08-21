@@ -27,7 +27,7 @@ Support dates are taken from the vendor's published schedule, not from a seconda
 
 | Component | Version in this repository | Where pinned | Vendor EOL | Status (2026-08-20) |
 |---|---|---|---|---|
-| Node.js (CI) | **22** | `.github/workflows/ci.yml` (all three jobs) and `.github/workflows/security-scan.yml` | 2027-04-30 | **Current** — remediated 2026-08-21 (PRs #167, #170) from Node 20, which had been past its 2026-04-30 EOL for 113 days |
+| Node.js (CI) | **22** | `.github/workflows/ci.yml` (all three jobs) and `.github/workflows/security-scan.yml` | 2027-04-30 | **Current** — remediated 2026-08-21 (PRs #162, #170) from Node 20, which had been past its 2026-04-30 EOL for 113 days |
 | Node.js (production) | _unknown_ | Not pinned in-repo; Vercel project setting | — | **Unverified — see §8.1** |
 | Next.js | ^16.3.1 | `package.json` | _not verified — see §8.5_ | Currency not assessed |
 | React | 19.2.8 | `package.json` | _not verified — see §8.5_ | Currency not assessed |
@@ -41,9 +41,9 @@ Only the Node.js row has been checked against a vendor-published schedule. The r
 
 **Three findings are recorded above rather than resolved, because resolving them is a decision, not an edit:**
 
-1. **CI built and tested on an end-of-life Node.js major from 2026-04-30 to 2026-08-21.** Node 20 reached end of life on the first date; CI moved to Node 22 on the second (PRs #167, #170). The 113-day exposure went undetected because no monitoring existed to detect it — the remediation closes the instance, and §4's quarterly review is what closes the class.
+1. **CI built and tested on an end-of-life Node.js major from 2026-04-30 to 2026-08-21.** Node 20 reached end of life on the first date; CI moved to Node 22 on the second (PRs #162, #170). The 113-day exposure went undetected because no monitoring existed to detect it — the remediation closes the instance, and §4's quarterly review is what closes the class.
 2. **The production runtime is not pinned in the repository.** `vercel.json` sets no runtime and `package.json` has no `engines` field, so the deployed Node version is whatever the Vercel project is configured to use. It may or may not match CI.
-3. **The tracking issue and the tree agreed only after remediation.** GitHub issue #31 states "Node.js 22 LTS — supported until 2027-04". When this draft was written no Node 22 pin existed anywhere in the repository; as of 2026-08-21 CI is pinned to 22 (PRs #167, #170), so #31 now matches CI — but production remains unpinned (§8.2), so the issue still overstates what is verified.
+3. **The tracking issue and the tree agreed only after remediation.** GitHub issue #31 states "Node.js 22 LTS — supported until 2027-04". When this draft was written no Node 22 pin existed anywhere in the repository; as of 2026-08-21 CI is pinned to 22 (PRs #162, #170), so #31 now matches CI — but production remains unpinned (§8.2), so the issue still overstates what is verified.
 
 ## 4. Monitoring
 
@@ -95,7 +95,7 @@ Status values below: **Implemented** — verified present. **Partial** — prese
 
 ## 8. Open Decisions Required Before Submission
 
-**8.1 — RESOLVED for CI 2026-08-21: Node 22.** CI and the scheduled security scan are pinned to 22 (PRs #167, #170), ending the 113-day past-EOL exposure. What remains of this decision is the production half, which is §8.2.
+**8.1 — RESOLVED for CI 2026-08-21: Node 22.** CI and the scheduled security scan are pinned to 22 (PRs #162, #170), ending the 113-day past-EOL exposure. What remains of this decision is the production half, which is §8.2.
 
 **8.2 — Decide how the runtime is pinned.** Options: `engines` in `package.json`, `.nvmrc`, the Vercel project setting, or a combination. Whichever is chosen, CI and production must read the same value. Confirm the current Vercel project Node setting — it is not visible from the repository.
 

@@ -82,7 +82,7 @@ Audit logs include: user ID, action, resource, IP address, user agent, and times
 
 ### 7.2 EOL Software Monitoring
 - EOL tracking and upgrade windows are defined in `policies/eol-software-policy.md`, which owns this control.
-- First lifecycle review executed 2026-08-20. It found CI running Node.js 20 past its 2026-04-30 end of life; remediated to Node 22 on 2026-08-21 (PRs #167, #170). The production runtime is not yet pinned in-repository (EOL policy §8.2).
+- First lifecycle review executed 2026-08-20. It found CI running Node.js 20 past its 2026-04-30 end of life; remediated to Node 22 on 2026-08-21 (PRs #162, #170). The production runtime is not yet pinned in-repository (EOL policy §8.2).
 - Automated EOL monitoring is not yet implemented; reviews are manual and quarterly per the EOL policy.
 
 ### 7.3 Vulnerability Scanning
