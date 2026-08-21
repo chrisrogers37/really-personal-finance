@@ -1,8 +1,8 @@
 # Information Security Policy
 
-**Version:** 1.0
+**Version:** 1.1
 **Effective Date:** 2026-04-14
-**Last Reviewed:** 2026-04-14
+**Last Reviewed:** 2026-08-21
 **Owner:** Chris Rogers
 
 ## 1. Purpose
@@ -81,18 +81,20 @@ Audit logs include: user ID, action, resource, IP address, user agent, and times
 - Medium/low vulnerabilities patched within 30 days
 
 ### 7.2 EOL Software Monitoring
-- Runtime versions (Node.js, Next.js) tracked against vendor EOL schedules
-- Framework and library versions reviewed quarterly
-- EOL components upgraded before support ends
+- EOL tracking and upgrade windows are defined in `policies/eol-software-policy.md`, which owns this control.
+- First lifecycle review executed 2026-08-20. It found CI running Node.js 20 past its 2026-04-30 end of life; remediated to Node 22 on 2026-08-21 (PRs #167, #170). The production runtime is not yet pinned in-repository (EOL policy §8.2).
+- Automated EOL monitoring is not yet implemented; reviews are manual and quarterly per the EOL policy.
 
 ### 7.3 Vulnerability Scanning
-- `npm audit` run as part of CI/CD pipeline
-- GitHub Dependabot enabled for automated security alerts
-- Manual security reviews before major releases
+- `npm audit` runs as a CI gate on every pull request and push to `main` (fails the build on Critical advisories; `.github/workflows/ci.yml`, job `audit`).
+- A scheduled scan runs weekly at High severity (`.github/workflows/security-scan.yml`, Mondays 09:00 UTC). Its first run (2026-08-21) correctly failed on the open High advisory tracked as EX-001 in `policies/vulnerability-patching-policy.md`.
+- Dependabot **version updates** run weekly (`.github/dependabot.yml`; first grouped update merged as #165).
+- Dependabot **security alerts and security updates are currently disabled** (measured 2026-08-21). Enabling them is tracked in `policies/vulnerability-scanning-policy.md` §8.1.
+- Manual security audits were conducted in July and August 2026; findings are tracked as repository issues.
 
 ## 8. Secure Development
 
-- Source code stored in private GitHub repository
+- Source code stored in a public GitHub repository (visibility re-confirmed 2026-08-21; whether it remains public is under owner review — `policies/vulnerability-scanning-policy.md` §8.4)
 - All changes go through pull request review
 - No secrets committed to source control
 - Environment variables used for all configuration
@@ -128,3 +130,10 @@ This policy supports compliance with:
 ## 12. Policy Review
 
 This policy is reviewed annually or upon significant changes to the application, infrastructure, or regulatory requirements.
+
+## Revision History
+
+| Version | Date | Change |
+|---|---|---|
+| 1.1 | 2026-08-21 | §7.2, §7.3 and §8 corrected to the measured state of the controls (issue #160): EOL monitoring re-homed to the dedicated policy with the Node 20 finding and its remediation recorded; scanning restated as what actually runs, with Dependabot alerts stated as disabled; repository visibility corrected from private to public. No control was changed by this revision — the document now describes what exists. |
+| 1.0 | 2026-04-14 | Original accepted version. |
